@@ -8,5 +8,5 @@ const router = express.Router(); // Corrected
 router.post('/login', loginValidation, login);
 router.post('/signUp', signupValidation, signup);
 router.post('/outpass', outpassValidation, submitOutpass);
-
+// hiii
 module.exports = router; 
