@@ -1,0 +1,25 @@
+.item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+}
+
+.card {
+    transition: opacity 0.3s ease-in-out;
+}
+
+.hidden {
+    opacity: 0;
+    pointer-events: none; /* Ensures hidden content does not interfere with user interaction */
+}
+
+.visible {
+    opacity: 1;
+}
+
+.main{
+    width: 70%;
+    /* overflow-y: scroll; */
+}
