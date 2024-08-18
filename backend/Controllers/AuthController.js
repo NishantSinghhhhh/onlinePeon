@@ -1,21 +1,19 @@
-const UserModel = require("../Models/User");
-const UserModel2 = require("../Models/Outpass")
+const { User } = require("../Models/User");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Outpass = require('../Models/Outpass'); // Import your Outpass model
 
-
 const submitOutpass = async (req, res) => {
     try {
-        const {
-            firstName,
-            lastName,
-            registrationNumber,
-            reason,
-            date,
-            startHour,
-            endHour,
-            contactNumber
+        const { 
+            firstName, 
+            lastName, 
+            registrationNumber, 
+            reason, 
+            date, 
+            startHour, 
+            endHour, 
+            contactNumber 
         } = req.body;
 
         // Validate required fields
@@ -26,8 +24,8 @@ const submitOutpass = async (req, res) => {
             });
         }
 
-        // Create a new Outpass document
-        const newOutpass = new Outpass({
+        // Create a new outpass instance
+        const outpass = new Outpass({
             firstName,
             lastName,
             registrationNumber,
@@ -38,11 +36,11 @@ const submitOutpass = async (req, res) => {
             contactNumber
         });
 
-        // Save the document to the database
-        await newOutpass.save();
+        // Save the new outpass to the database
+        await outpass.save();
 
         res.status(201).json({
-            message: 'Outpass data saved successfully',
+            message: 'Outpass submitted successfully',
             success: true
         });
     } catch (err) {
@@ -53,6 +51,7 @@ const submitOutpass = async (req, res) => {
         });
     }
 };
+
 
 const signup = async (req, res) => {
     try {
@@ -79,7 +78,7 @@ const signup = async (req, res) => {
         }
 
         // Check if the user already exists
-        const existingUser = await UserModel.findOne({ email });
+        const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(409).json({
                 message: 'User already exists',
@@ -88,7 +87,7 @@ const signup = async (req, res) => {
         }
 
         // Create a new user instance
-        const userModel = new UserModel({
+        const user = new User({
             name,
             email,
             password,
@@ -103,10 +102,10 @@ const signup = async (req, res) => {
         });
 
         // Hash the password
-        userModel.password = await bcrypt.hash(password, 10);
+        user.password = await bcrypt.hash(password, 10);
 
         // Save the new user to the database
-        await userModel.save();
+        await user.save();
 
         res.status(201).json({
             message: 'SignUp Successful',
@@ -121,8 +120,6 @@ const signup = async (req, res) => {
     }
 };
 
-// module.exports = signup;
-
 const login = async (req, res) => {
     try {
         const { name, email, password } = req.body;
@@ -135,7 +132,7 @@ const login = async (req, res) => {
         }
 
         // Find user by email
-        const user = await UserModel.findOne({ email });
+        const user = await User.findOne({ email });
         if (!user) {
             return res.status(403).json({
                 message: "Authentication failed, email or password is wrong",
@@ -181,4 +178,4 @@ module.exports = {
     signup,
     login,
     submitOutpass
-}
+};

@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const {db2 } = require('./db');
 
 const OutpassSchema = new Schema({
     firstName: {
@@ -39,4 +40,8 @@ const OutpassSchema = new Schema({
     // Additional fields if necessary
 });
 
-module.exports = mongoose.model('Outpass', OutpassSchema);
+
+const Outpass = db2.model('Outpass', OutpassSchema);
+
+module.exports = {Outpass};
+// module.exports = mongoose.model('Outpass', OutpassSchema);

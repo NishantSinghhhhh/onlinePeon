@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const { db1, db2 } = require('./db');
 
 const UserSchema = new Schema({
     name: {
@@ -56,4 +57,6 @@ const UserSchema = new Schema({
     }
 });
 
-module.exports = mongoose.model('User', UserSchema);
+// Create and export the User model
+const User = db1.model('User', UserSchema);
+module.exports = { User };
