@@ -48,32 +48,30 @@ const loginValidation = (req, res, next) => {
     next();
   };
   
-// module.exports = loginValidation;
 
-
-const outpassValidation = (req, res, next) => {
-    const schema = Joi.object({
-        firstName: Joi.string().min(2).max(50).required(),
-        lastName: Joi.string().min(2).max(50).required(),
-        regNumber: Joi.string().length(4).pattern(/^\d+$/).required(), // Exactly 4 digits
-        reason: Joi.string().min(10).required(), // Minimum 10 characters
-        date: Joi.date().required(), // Required and should be a valid date
-        startHour: Joi.string().pattern(/^([01]\d|2[0-3]):([0-5]\d)$/).required(), // Valid time format (HH:mm)
-        endHour: Joi.string().pattern(/^([01]\d|2[0-3]):([0-5]\d)$/).required(), // Valid time format (HH:mm)
-        contactNumber: Joi.string().length(10).pattern(/^\d+$/).required(), // Exactly 10 digits
-    });
-
-    const { error } = schema.validate(req.body);
-
-    if (error) {
-        return res.status(400).json({
-            message: "Bad Request",
-            error: error.details
-        });
-    }
-    next();
-};
-
+  const outpassValidation = (req, res, next) => {
+      const schema = Joi.object({
+          firstName: Joi.string().min(2).max(50).required(),
+          lastName: Joi.string().min(2).max(50).required(),
+          regNumber: Joi.string().length(4).pattern(/^\d{4}$/).required(), // Exactly 4 digits
+          reason: Joi.string().min(10).required(), // Minimum 10 characters
+          date: Joi.date().iso().required(), // Ensure date is in ISO format (e.g., 2024-08-18T00:00:00.000Z)
+          startHour: Joi.string().pattern(/^([01]\d|2[0-3]):([0-5]\d)$/).required(), // Valid time format (HH:mm)
+          endHour: Joi.string().pattern(/^([01]\d|2[0-3]):([0-5]\d)$/).required(), // Valid time format (HH:mm)
+          contactNumber: Joi.string().length(10).pattern(/^\d{10}$/).required(), // Exactly 10 digits
+      });
+  
+      const { error } = schema.validate(req.body, { abortEarly: false });
+  
+      if (error) {
+          return res.status(400).json({
+              message: "Bad Request",
+              error: error.details
+          });
+      }
+      next();
+  };
+  
 module.exports = {
     signupValidation,
     loginValidation,

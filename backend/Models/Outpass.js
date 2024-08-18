@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const {db2 } = require('./db');
+const { db2 } = require('./db');
 
 const OutpassSchema = new Schema({
     firstName: {
@@ -14,7 +14,7 @@ const OutpassSchema = new Schema({
     registrationNumber: {
         type: String,
         required: true,
-        match: /^\d{5,6}$/ // Ensure registration number is between 5 and 6 digits
+        match: /^\d{4}$/ // Exactly 4 digits
     },
     reason: {
         type: String,
@@ -27,21 +27,20 @@ const OutpassSchema = new Schema({
     startHour: {
         type: String,
         required: true,
+        match: /^([01]\d|2[0-3]):([0-5]\d)$/ // Valid time format (HH:mm)
     },
     endHour: {
         type: String,
         required: true,
+        match: /^([01]\d|2[0-3]):([0-5]\d)$/ // Valid time format (HH:mm)
     },
     contactNumber: {
         type: String,
         required: true,
-        match: /^\d{10}$/ // Ensure phone number is exactly 10 digits
+        match: /^\d{10}$/ 
     },
-    // Additional fields if necessary
 });
-
 
 const Outpass = db2.model('Outpass', OutpassSchema);
 
-module.exports = {Outpass};
-// module.exports = mongoose.model('Outpass', OutpassSchema);
+module.exports = { Outpass };
