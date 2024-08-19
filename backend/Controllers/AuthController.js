@@ -3,6 +3,70 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const {Outpass} = require('../Models/Outpass'); // Import your Outpass model
 const {Leave} = require('../Models/Leave'); // Import your Outpass model
+const {PL} = require('../Models/PL'); // Import your Outpass model
+
+const submitPL = async (req, res) => {
+    try {
+        console.log('Received request body:', JSON.stringify(req.body, null, 2));
+
+        const {
+            firstName,
+            lastName,
+            className,
+            rollNumber,
+            classesMissed,
+            reason,
+            startDate,
+            endDate,
+            documents // This might be a file or a URL, handle accordingly
+        } = req.body;
+
+        // Validate required fields
+        const missingFields = [];
+        if (!firstName) missingFields.push('firstName');
+        if (!lastName) missingFields.push('lastName');
+        if (!className) missingFields.push('className');
+        if (!rollNumber) missingFields.push('rollNumber');
+        if (!classesMissed) missingFields.push('classesMissed');
+        if (!reason) missingFields.push('reason');
+        if (!startDate) missingFields.push('startDate');
+        if (!endDate) missingFields.push('endDate');
+
+        if (missingFields.length > 0) {
+            return res.status(400).json({
+                message: `The following fields are required: ${missingFields.join(', ')}`,
+                success: false
+            });
+        }
+
+        // Create a new PL instance
+        const pl = new PL({
+            firstName,
+            lastName,
+            className,
+            rollNumber,
+            classesMissed,
+            reason,
+            startDate,
+            endDate,
+            documents // Handle this field appropriately, e.g., save the file or URL
+        });
+
+        // Save the new PL request to the database
+        await pl.save();
+
+        res.status(201).json({
+            message: 'Personal Leave request submitted successfully',
+            success: true
+        });
+    } catch (err) {
+        console.error('Error in submitPL:', err);
+        res.status(500).json({
+            message: 'Internal server error',
+            success: false
+        });
+    }
+};
 
 
 const submitLeave = async (req, res) => {
@@ -255,5 +319,6 @@ module.exports = {
     signup,
     login,
     submitOutpass,
-    submitLeave
+    submitLeave,
+    submitPL 
 };

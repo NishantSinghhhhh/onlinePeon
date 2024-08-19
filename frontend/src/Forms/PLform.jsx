@@ -1,22 +1,56 @@
 import React, { useState } from 'react';
-import { Card as ChakraCard, CardHeader, CardBody, CardFooter, Heading, FormControl, FormLabel, Input, Button, Stack, InputGroup, InputLeftAddon, Textarea, Box, Text } from '@chakra-ui/react';
+import {
+  Card as ChakraCard,
+  CardHeader,
+  CardBody,
+  CardFooter,
+  useToast,
+  Heading,
+  FormControl,
+  FormLabel,
+  Input,
+  Button,
+  Stack,
+  Textarea,
+  Box,
+  Text,
+  Select
+} from '@chakra-ui/react';
 import Navbar from '../components/navbar/navbar';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import styles from './Form.module.css';
 
+// Define classes
+const years = ['FE', 'SE', 'TE', 'BE'];
+const branches = ['Comp', 'IT', 'ENTC', 'Mech', "ARE"];
+const classesPerYear = ['A', 'B'];
+
+const generateClasses = () => {
+  const classOptions = [];
+  for (const year of years) {
+    for (const branch of branches) {
+      for (const cls of classesPerYear) {
+        classOptions.push(`${year}-${branch}-${cls}`);
+      }
+    }
+  }
+  return classOptions;
+};
+
 const PLForm = () => {
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
-  const [documents, setDocuments] = useState(null);
-  const [documentError, setDocumentError] = useState('');
-  
-  // State variables for the form fields
-  const [name, setName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [className, setClassName] = useState('');
   const [rollNumber, setRollNumber] = useState('');
   const [classesMissed, setClassesMissed] = useState('');
   const [reason, setReason] = useState('');
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
+  const [documents, setDocuments] = useState(null);
+  const [documentError, setDocumentError] = useState('');
+
+  const toast = useToast();
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -34,21 +68,102 @@ const PLForm = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Data extraction
-    const formData = {
-      name,
-      className,
-      rollNumber,
-      classesMissed,
-      reason,
-      startDate,
-      endDate,
-      documents
-    };
-    console.log('Form Data:', formData);
-    // You can now send this data to your API or handle it as needed
+
+    // Debugging
+    console.log('Form data:', { firstName, lastName, className, rollNumber, classesMissed, reason, startDate, endDate });
+
+    // Check if startDate and endDate are valid
+    let isoStartDate = '';
+    let isoEndDate = '';
+
+    if (startDate instanceof Date && !isNaN(startDate.getTime())) {
+      isoStartDate = startDate.toISOString();
+    } else {
+      return handleError('Invalid start date selected.');
+    }
+
+    if (endDate instanceof Date && !isNaN(endDate.getTime())) {
+      isoEndDate = endDate.toISOString();
+    } else {
+      return handleError('Invalid end date selected.');
+    }
+
+    // Check for empty fields
+    const emptyFields = [];
+    if (!firstName) emptyFields.push('First Name');
+    if (!lastName) emptyFields.push('Last Name');
+    if (!className) emptyFields.push('Class');
+    if (!rollNumber) emptyFields.push('Roll Number');
+    if (!classesMissed) emptyFields.push('Number of Classes Missed');
+    if (!reason) emptyFields.push('Reason for Absence');
+    if (!startDate) emptyFields.push('Start Date');
+    if (!endDate) emptyFields.push('End Date');
+
+    if (emptyFields.length > 0) {
+      return handleError(`The following fields are required: ${emptyFields.join(', ')}`);
+    }
+
+    // Validate roll number
+    if (!/^\d{4}$/.test(rollNumber)) {
+      return handleError('Roll Number must be exactly 4 digits.');
+    }
+
+    try {
+      const url = 'http://localhost:8000/auth/PL'; // Ensure this URL is correct
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firstName,
+          lastName,
+          className,
+          rollNumber,
+          classesMissed,
+          reason,
+          startDate: isoStartDate,
+          endDate: isoEndDate,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        return handleError(result.message || 'An error occurred while submitting the form.');
+      }
+
+      if (result.success) {
+        handleSuccess(result.message);
+        setTimeout(() => window.location.href = '/Home', 1000);
+      } else {
+        handleError(result.message || 'An unexpected error occurred.');
+      }
+    } catch (err) {
+      handleError('An unexpected error occurred.');
+    }
+  };
+
+  const handleError = (message) => {
+    toast({
+      title: 'Error',
+      description: message,
+      status: 'error',
+      duration: 5000,
+      isClosable: true
+    });
+  };
+
+  const handleSuccess = (message) => {
+    toast({
+      title: 'Success',
+      description: message,
+      status: 'success',
+      duration: 5000,
+      isClosable: true
+    });
   };
 
   return (
@@ -63,23 +178,39 @@ const PLForm = () => {
             <form onSubmit={handleSubmit}>
               <Stack spacing={4}>
                 <FormControl isRequired>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>First Name</FormLabel>
                   <Input
-                    placeholder='Your Name'
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    placeholder='First Name'
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    className={styles['chakra-input']}
+                  />
+                </FormControl>
+
+                <FormControl isRequired>
+                  <FormLabel>Last Name</FormLabel>
+                  <Input
+                    placeholder='Last Name'
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
                     className={styles['chakra-input']}
                   />
                 </FormControl>
 
                 <FormControl isRequired>
                   <FormLabel>Class</FormLabel>
-                  <Input
-                    placeholder='Class'
+                  <Select
+                    placeholder='Select Class'
                     value={className}
                     onChange={(e) => setClassName(e.target.value)}
                     className={styles['chakra-input']}
-                  />
+                  >
+                    {generateClasses().map((cls, index) => (
+                      <option key={index} value={cls}>
+                        {cls}
+                      </option>
+                    ))}
+                  </Select>
                 </FormControl>
 
                 <FormControl isRequired>
@@ -140,47 +271,45 @@ const PLForm = () => {
                       <Text color='red.500' mt={2}>{documentError}</Text>
                     )}
                     {documents && (
-                      <Box mt={2} border='1px solid #e2e8f0' p={2} borderRadius='md' bg='white'>
-                        <strong>Selected File:</strong> {documents.name}
-                        <br />
-                        <small>Size: {(documents.size / 1000000).toFixed(2)} MB</small>
+                      <Box mt={2} border='1px solid #e2e8f0' p={2} borderRadius='md' bg='gray.100'>
+                        <Text fontSize='sm'>{documents.name}</Text>
                       </Box>
                     )}
                   </Box>
                 </FormControl>
 
                 <FormControl isRequired>
-                  <FormLabel>Date Range</FormLabel>
-                  <Stack spacing={4}>
-                    <FormControl>
-                      <FormLabel>Start Date</FormLabel>
-                      <DatePicker
-                        selected={startDate}
-                        onChange={(date) => setStartDate(date)}
-                        dateFormat='MMMM d, yyyy'
-                        className={styles['chakra-input']}
-                      />
-                    </FormControl>
+                  <FormLabel>Start Date</FormLabel>
+                  <DatePicker
+                    selected={startDate}
+                    onChange={(date) => setStartDate(date)}
+                    dateFormat='yyyy-MM-dd'
+                    className={styles['chakra-input']}
+                  />
+                </FormControl>
 
-                    <FormControl>
-                      <FormLabel>End Date</FormLabel>
-                      <DatePicker
-                        selected={endDate}
-                        onChange={(date) => setEndDate(date)}
-                        dateFormat='MMMM d, yyyy'
-                        className={styles['chakra-input']}
-                      />
-                    </FormControl>
-                  </Stack>
+                <FormControl isRequired>
+                  <FormLabel>End Date</FormLabel>
+                  <DatePicker
+                    selected={endDate}
+                    onChange={(date) => setEndDate(date)}
+                    dateFormat='yyyy-MM-dd'
+                    className={styles['chakra-input']}
+                  />
                 </FormControl>
               </Stack>
+              <CardFooter>
+                <Button 
+                  type='submit' 
+                  colorScheme='teal' 
+                  mt={4} 
+                  size='lg'
+                >
+                  Submit
+                </Button>
+              </CardFooter>
             </form>
           </CardBody>
-          <CardFooter>
-            <Button colorScheme='teal' type='submit'>
-              Submit
-            </Button>
-          </CardFooter>
         </ChakraCard>
       </div>
     </>

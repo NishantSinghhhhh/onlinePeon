@@ -136,7 +136,7 @@ const LeaveForm = () => {
   
       if (result.success) {
         handleSuccess(result.message);
-        setTimeout(() => navigate('/'), 1000);
+        setTimeout(() => navigate('/Home'), 1000);
       } else if (result.error) {
         handleError(result.error.details?.[0]?.message || 'An error occurred');
       } else {

@@ -113,11 +113,50 @@ const leaveValidation = (req, res, next) => {
     console.log('Validation passed. Validated data:', JSON.stringify(value, null, 2));
     next();
 };
+const plValidation = (req, res, next) => {
+    console.log('Received request body:', JSON.stringify(req.body, null, 2));
 
+    // Define the Joi schema
+    const schema = Joi.object({
+        firstName: Joi.string().min(1).max(50).required(),
+        lastName: Joi.string().min(1).max(50).required(),
+        className: Joi.string().valid(
+            'FE-Comp-A', 'FE-Comp-B', 'FE-IT-A', 'FE-IT-B', 'FE-ENTC-A', 'FE-ENTC-B', 'FE-Mech-A', 'FE-Mech-B',
+            'SE-Comp-A', 'SE-Comp-B', 'SE-IT-A', 'SE-IT-B', 'SE-ENTC-A', 'SE-ENTC-B', 'SE-Mech-A', 'SE-Mech-B',
+            'TE-Comp-A', 'TE-Comp-B', 'TE-IT-A', 'TE-IT-B', 'TE-ENTC-A', 'TE-ENTC-B', 'TE-Mech-A', 'TE-Mech-B',
+            'BE-Comp-A', 'BE-Comp-B', 'BE-IT-A', 'BE-IT-B', 'BE-ENTC-A', 'BE-ENTC-B', 'BE-Mech-A', 'BE-Mech-B',
+            'ARE'
+        ).required(),
+        rollNumber: Joi.string().pattern(/^\d{4}$/).required(), // Ensuring roll number is exactly 4 digits
+        classesMissed: Joi.number().min(0).required(),
+        reason: Joi.string().min(10).required(),
+        startDate: Joi.date().iso().required(),
+        endDate: Joi.date().iso().required(),
+        documents: Joi.string().allow(null) // Allow null if no document is provided
+    });
+
+    // Validate the request body against the schema
+    const { error, value } = schema.validate(req.body, { abortEarly: false });
+
+    if (error) {
+        console.error('Validation error:', JSON.stringify(error.details, null, 2));
+        return res.status(400).json({
+            message: "Bad Request",
+            error: error.details.map(detail => ({
+                field: detail.path.join('.'),
+                message: detail.message
+            }))
+        });
+    }
+
+    console.log('Validation passed. Validated data:', JSON.stringify(value, null, 2));
+    next();
+};
 
 module.exports = {
     signupValidation,
     loginValidation,
     outpassValidation,
-    leaveValidation 
+    leaveValidation ,
+    plValidation
 }
