@@ -4,13 +4,13 @@ import Navbar from '../components/navbar/navbar';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useNavigate } from 'react-router-dom';
-import styles from './Form.module.css'; // Import the CSS module
+import styles from './Form.module.css';
 
 const OutpassForm = () => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
-    regNumber: '',
+    registrationNumber: '',
     reason: '',
     date: new Date(),
     startHour: '',
@@ -18,45 +18,79 @@ const OutpassForm = () => {
     contactNumber: '',
   });
   
-  const toast = useToast(); // Initialize useToast
-  const navigate = useNavigate(); // Initialize useNavigate
+  const toast = useToast();
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
+    setFormData(prevData => {
+      const newData = { ...prevData, [name]: value };
+      console.log(`Field '${name}' updated:`, newData[name]); // Debug log
+      return newData;
     });
   };
 
   const handleDateChange = (date) => {
-    setFormData({
-      ...formData,
-      date
+    setFormData(prevData => {
+      const newData = { ...prevData, date };
+      console.log('Date updated:', date); // Debug log
+      return newData;
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+  
+    console.log('Full formData state:', formData);
 
-    // Destructure formData
-    const { firstName, lastName, regNumber, reason, date, startHour, endHour, contactNumber } = formData;
+    const { firstName, lastName, registrationNumber, reason, date, startHour, endHour, contactNumber } = formData;
+    const isoDate = date.toISOString();
+  
+    console.log('Form data at submission:', {
+      firstName: `"${firstName}"`,
+      lastName: `"${lastName}"`,
+      registrationNumber: `"${registrationNumber}"`,
+      reason: `"${reason}"`,
+      date: `"${isoDate}"`,
+      startHour: `"${startHour}"`,
+      endHour: `"${endHour}"`,
+      contactNumber: `"${contactNumber}"`
+    });
 
-    // Check for empty fields
-    if (!firstName || !lastName || !regNumber || !reason || !date || !startHour || !endHour || !contactNumber) {
-      return handleError('All fields are required.');
+    console.log('Empty fields check:', {
+      firstName: !firstName,
+      lastName: !lastName,
+      registrationNumber: !registrationNumber,
+      reason: !reason,
+      date: !date,
+      startHour: !startHour,
+      endHour: !endHour,
+      contactNumber: !contactNumber
+    });
+
+    const emptyFields = [];
+    if (!firstName) emptyFields.push('firstName');
+    if (!lastName) emptyFields.push('lastName');
+    if (!registrationNumber) emptyFields.push('registrationNumber');
+    if (!reason) emptyFields.push('reason');
+    if (!date) emptyFields.push('date');
+    if (!startHour) emptyFields.push('startHour');
+    if (!endHour) emptyFields.push('endHour');
+    if (!contactNumber) emptyFields.push('contactNumber');
+
+    if (emptyFields.length > 0) {
+      console.log('Empty fields:', emptyFields);
+      return handleError(`The following fields are required: ${emptyFields.join(', ')}`);
     }
     
-     // Validate regNumber (exactly 4 digits)
-     if (!/^\d{4}$/.test(regNumber)) {
+    if (!/^\d{4}$/.test(registrationNumber)) {
       return handleError('Registration number must be exactly 4 digits.');
     }
-
-    // Validate contactNumber (exactly 10 digits)
+  
     if (!/^\d{10}$/.test(contactNumber)) {
       return handleError('Contact number must be exactly 10 digits.');
     }
-
+  
     try {
       const url = 'http://localhost:8000/auth/outpass';
       const response = await fetch(url, {
@@ -67,56 +101,40 @@ const OutpassForm = () => {
         body: JSON.stringify({
           firstName,
           lastName,
-          regNumber,
+          registrationNumber,
           reason,
-          date,
+          date: isoDate,
           startHour,
           endHour,
           contactNumber,
         }),
       });
-
-      // Check if response is OK (status code in the range 200-299)
+  
       if (!response.ok) {
         const errorData = await response.json();
-        const errorMessage = errorData.message || 'An error occurred';
-        return handleError(errorMessage);
+        console.error('Server response error:', errorData); // Debug log
+        return handleError(errorData.message || 'An error occurred');
       }
-
-      // Parse the JSON response
+  
       const result = await response.json();
-      const { success, message, error } = result;
+      console.log('Server response:', result); // Debug log
 
-      if (success) {
-        handleSuccess(message);
-        setTimeout(() => {
-          navigate('/'); // Navigate to the home page
-        }, 1000);
-      } else if (error) {
-        const details = error?.details[0]?.message || 'An error occurred';
-        handleError(details);
+      if (result.success) {
+        handleSuccess(result.message);
+        setTimeout(() => navigate('/'), 1000);
+      } else if (result.error) {
+        handleError(result.error.details?.[0]?.message || 'An error occurred');
       } else {
-        handleError(message || 'An unexpected error occurred.');
+        handleError(result.message || 'An unexpected error occurred.');
       }
     } catch (err) {
+      console.error('Fetch error:', err); // Debug log
       handleError('An unexpected error occurred.');
     }
-    
-    // Print all form data to the console
-    console.log('Form data being sent:');
-    console.log('First Name:', formData.firstName);
-    console.log('Last Name:', formData.lastName);
-    console.log('Registration Number:', formData.regNumber);
-    console.log('Reason:', formData.reason);
-    console.log('Date:', formData.date);
-    console.log('Start Hour:', formData.startHour);
-    console.log('End Hour:', formData.endHour);
-    console.log('Contact Number:', formData.contactNumber);
-
-    // Handle form submission here
   };
-
+  
   const handleError = (message) => {
+    console.error('Error:', message); // Debug log
     toast({
       title: 'Error',
       description: message,
@@ -127,6 +145,7 @@ const OutpassForm = () => {
   };
 
   const handleSuccess = (message) => {
+    console.log('Success:', message); // Debug log
     toast({
       title: 'Success',
       description: message,
@@ -173,8 +192,8 @@ const OutpassForm = () => {
                   <FormLabel>Registration Number</FormLabel>
                   <Input 
                     placeholder='Registration Number' 
-                    name='regNumber'
-                    value={formData.regNumber}
+                    name='registrationNumber'
+                    value={formData.registrationNumber}
                     onChange={handleChange}
                     className={styles['chakra-input']}
                   />

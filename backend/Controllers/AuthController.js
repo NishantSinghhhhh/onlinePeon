@@ -1,25 +1,103 @@
 const { User } = require("../Models/User");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const Outpass = require('../Models/Outpass'); // Import your Outpass model
+const {Outpass} = require('../Models/Outpass'); // Import your Outpass model
+const {Leave} = require('../Models/Leave'); // Import your Outpass model
 
-const submitOutpass = async (req, res) => {
+
+const submitLeave = async (req, res) => {
     try {
-        const { 
-            firstName, 
-            lastName, 
-            registrationNumber, 
-            reason, 
-            date, 
-            startHour, 
-            endHour, 
-            contactNumber 
+        console.log('Received request body:', JSON.stringify(req.body, null, 2));
+
+        const {
+            firstName,
+            lastName,
+            registrationNumber,
+            reasonForLeave,
+            startDate,
+            endDate,
+            placeOfResidence,
+            attendancePercentage,
+            contactNumber
         } = req.body;
 
         // Validate required fields
-        if (!firstName || !lastName || !registrationNumber || !reason || !date || !startHour || !endHour || !contactNumber) {
+        const missingFields = [];
+        if (!firstName) missingFields.push('firstName');
+        if (!lastName) missingFields.push('lastName');
+        if (!registrationNumber) missingFields.push('registrationNumber');
+        if (!reasonForLeave) missingFields.push('reasonForLeave');
+        if (!startDate) missingFields.push('startDate');
+        if (!endDate) missingFields.push('endDate');
+        if (!placeOfResidence) missingFields.push('placeOfResidence');
+        if (!attendancePercentage) missingFields.push('attendancePercentage');
+        if (!contactNumber) missingFields.push('contactNumber');
+
+        if (missingFields.length > 0) {
             return res.status(400).json({
-                message: 'All fields are required',
+                message: `The following fields are required: ${missingFields.join(', ')}`,
+                success: false
+            });
+        }
+
+        // Create a new leave instance
+        const leave = new Leave({
+            firstName,
+            lastName,
+            registrationNumber,
+            reasonForLeave,
+            startDate,
+            endDate,
+            placeOfResidence,
+            attendancePercentage,
+            contactNumber
+        });
+
+        // Save the new leave request to the database
+        await leave.save();
+
+        res.status(201).json({
+            message: 'Leave request submitted successfully',
+            success: true
+        });
+    } catch (err) {
+        console.error('Error in submitLeave:', err);
+        res.status(500).json({
+            message: 'Internal server error',
+            success: false
+        });
+    }
+};
+
+const submitOutpass = async (req, res) => {
+    try {
+        console.log('Received request body:', JSON.stringify(req.body, null, 2));
+
+        const {
+            firstName,
+            lastName,
+            registrationNumber,
+            reason,
+            date,
+            startHour,
+            endHour,
+            contactNumber
+        } = req.body;
+
+        // Validate required fields
+        const missingFields = [];
+        if (!firstName) missingFields.push('firstName');
+        if (!lastName) missingFields.push('lastName');
+        if (!registrationNumber) missingFields.push('registrationNumber');
+        if (!reason) missingFields.push('reason');
+        if (!date) missingFields.push('date');
+        if (!startHour) missingFields.push('startHour');
+        if (!endHour) missingFields.push('endHour');
+        if (!contactNumber) missingFields.push('contactNumber');
+
+        if (missingFields.length > 0) {
+            return res.status(400).json({
+                message: `The following fields are required: ${missingFields.join(', ')}`,
                 success: false
             });
         }
@@ -44,14 +122,13 @@ const submitOutpass = async (req, res) => {
             success: true
         });
     } catch (err) {
-        console.error(err); // Log the error to the server console for debugging
+        console.error('Error in submitOutpass:', err);
         res.status(500).json({
             message: 'Internal server error',
             success: false
         });
     }
 };
-
 
 const signup = async (req, res) => {
     try {
@@ -177,5 +254,6 @@ const login = async (req, res) => {
 module.exports = {
     signup,
     login,
-    submitOutpass
+    submitOutpass,
+    submitLeave
 };
