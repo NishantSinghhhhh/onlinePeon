@@ -5,7 +5,7 @@ const authRoutes = require('./Routes/AuthRouter');
 // const outpassRoutes = require('./Routes/OutpassRouter'); // Import outpass routes
 
 require('dotenv').config();
-// require('./Models/db');
+require('./Models/db');
 
 const PORT = process.env.PORT || 8080;
 
@@ -14,7 +14,7 @@ const app = express();
 // Middleware
 app.use(bodyParser.json());
 app.use(cors());
-
+// hii
 // Define routes
 app.get('/ping', (req, res) => {
     res.send("PONG");
