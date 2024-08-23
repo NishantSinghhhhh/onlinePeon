@@ -113,6 +113,7 @@ const leaveValidation = (req, res, next) => {
     console.log('Validation passed. Validated data:', JSON.stringify(value, null, 2));
     next();
 };
+
 const plValidation = (req, res, next) => {
     console.log('Received request body:', JSON.stringify(req.body, null, 2));
 
@@ -131,8 +132,7 @@ const plValidation = (req, res, next) => {
         classesMissed: Joi.number().min(0).required(),
         reason: Joi.string().min(10).required(),
         startDate: Joi.date().iso().required(),
-        endDate: Joi.date().iso().required(),
-        documents: Joi.string().allow(null) // Allow null if no document is provided
+        endDate: Joi.date().iso().required().greater(Joi.ref('startDate')), // Ensure endDate is after startDate
     });
 
     // Validate the request body against the schema

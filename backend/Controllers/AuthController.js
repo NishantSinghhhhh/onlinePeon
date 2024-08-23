@@ -18,7 +18,6 @@ const submitPL = async (req, res) => {
             reason,
             startDate,
             endDate,
-            documents // This might be a file or a URL, handle accordingly
         } = req.body;
 
         // Validate required fields
@@ -49,7 +48,6 @@ const submitPL = async (req, res) => {
             reason,
             startDate,
             endDate,
-            documents // Handle this field appropriately, e.g., save the file or URL
         });
 
         // Save the new PL request to the database

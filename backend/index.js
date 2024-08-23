@@ -1,40 +1,34 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const multer = require('multer');
 const authRoutes = require('./Routes/AuthRouter');
-// const outpassRoutes = require('./Routes/OutpassRouter'); // Import outpass routes
-const upload = require('./upload'); // Import multer setup
 
 require('dotenv').config();
 require('./Models/db');
 
 const PORT = process.env.PORT || 8080;
-
 const app = express();
+const upload = multer({dest:"uploads/"})
 
-// Middleware
 app.use(bodyParser.json());
 app.use(cors());
 
-// Define routes
 app.get('/ping', (req, res) => {
     res.send("PONG");
 });
 
-// Import and use your routes
 app.use('/auth', authRoutes);
-app.use('/outpass', authRoutes); // Use outpass routes
+app.use('/outpass', authRoutes); 
 app.use('/products', authRoutes);
 
-// Example route to handle file uploads using multer
-app.post('/upload', upload.single('file'), (req, res) => {
-    res.send({
-        message: 'File uploaded successfully!',
-        file: req.file
-    });
+app.post('/upload', upload.single('profileimage'), (req, res) => {
+    console.log(req.body);
+    console.log(req.file);
+
+    return res.redirect("/");
 });
 
-// Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });

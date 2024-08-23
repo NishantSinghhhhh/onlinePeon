@@ -12,8 +12,6 @@ import {
   Button,
   Stack,
   Textarea,
-  Box,
-  Text,
   Select
 } from '@chakra-ui/react';
 import Navbar from '../components/navbar/navbar';
@@ -21,9 +19,8 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import styles from './Form.module.css';
 
-// Define classes
 const years = ['FE', 'SE', 'TE', 'BE'];
-const branches = ['Comp', 'IT', 'ENTC', 'Mech', "ARE"];
+const branches = ['Comp', 'IT', 'ENTC', 'Mech', 'ARE'];
 const classesPerYear = ['A', 'B'];
 
 const generateClasses = () => {
@@ -47,68 +44,22 @@ const PLForm = () => {
   const [reason, setReason] = useState('');
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
-  const [documents, setDocuments] = useState(null);
-  const [documentError, setDocumentError] = useState('');
 
   const toast = useToast();
-
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      if (file.size > 5000000) { // 5MB size limit
-        setDocumentError('File size should be less than 5MB');
-        setDocuments(null);
-      } else if (!['application/pdf', 'image/jpeg', 'image/png'].includes(file.type)) {
-        setDocumentError('Only PDF, JPEG, and PNG files are allowed');
-        setDocuments(null);
-      } else {
-        setDocumentError('');
-        setDocuments(file);
-      }
-    }
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Debugging
-    console.log('Form data:', { firstName, lastName, className, rollNumber, classesMissed, reason, startDate, endDate });
-
-    // Check if startDate and endDate are valid
-    let isoStartDate = '';
-    let isoEndDate = '';
-
-    if (startDate instanceof Date && !isNaN(startDate.getTime())) {
-      isoStartDate = startDate.toISOString();
-    } else {
-      return handleError('Invalid start date selected.');
-    }
-
-    if (endDate instanceof Date && !isNaN(endDate.getTime())) {
-      isoEndDate = endDate.toISOString();
-    } else {
-      return handleError('Invalid end date selected.');
-    }
-
-    // Check for empty fields
-    const emptyFields = [];
-    if (!firstName) emptyFields.push('First Name');
-    if (!lastName) emptyFields.push('Last Name');
-    if (!className) emptyFields.push('Class');
-    if (!rollNumber) emptyFields.push('Roll Number');
-    if (!classesMissed) emptyFields.push('Number of Classes Missed');
-    if (!reason) emptyFields.push('Reason for Absence');
-    if (!startDate) emptyFields.push('Start Date');
-    if (!endDate) emptyFields.push('End Date');
-
-    if (emptyFields.length > 0) {
-      return handleError(`The following fields are required: ${emptyFields.join(', ')}`);
-    }
-
-    // Validate roll number
-    if (!/^\d{4}$/.test(rollNumber)) {
-      return handleError('Roll Number must be exactly 4 digits.');
-    }
+    const formData = {
+      firstName,
+      lastName,
+      className,
+      rollNumber,
+      classesMissed,
+      reason,
+      startDate,
+      endDate,
+    };
 
     try {
       const url = 'http://localhost:8000/auth/PL'; // Ensure this URL is correct
@@ -117,16 +68,7 @@ const PLForm = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          firstName,
-          lastName,
-          className,
-          rollNumber,
-          classesMissed,
-          reason,
-          startDate: isoStartDate,
-          endDate: isoEndDate,
-        }),
+        body: JSON.stringify(formData),
       });
 
       const result = await response.json();
@@ -137,7 +79,7 @@ const PLForm = () => {
 
       if (result.success) {
         handleSuccess(result.message);
-        setTimeout(() => window.location.href = '/Home', 1000);
+        setTimeout(() => window.location.href = '/uploaddoc', 1000);
       } else {
         handleError(result.message || 'An unexpected error occurred.');
       }
@@ -152,7 +94,7 @@ const PLForm = () => {
       description: message,
       status: 'error',
       duration: 5000,
-      isClosable: true
+      isClosable: true,
     });
   };
 
@@ -162,7 +104,7 @@ const PLForm = () => {
       description: message,
       status: 'success',
       duration: 5000,
-      isClosable: true
+      isClosable: true,
     });
   };
 
@@ -183,7 +125,6 @@ const PLForm = () => {
                     placeholder='First Name'
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
-                    className={styles['chakra-input']}
                   />
                 </FormControl>
 
@@ -193,7 +134,6 @@ const PLForm = () => {
                     placeholder='Last Name'
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
-                    className={styles['chakra-input']}
                   />
                 </FormControl>
 
@@ -203,7 +143,6 @@ const PLForm = () => {
                     placeholder='Select Class'
                     value={className}
                     onChange={(e) => setClassName(e.target.value)}
-                    className={styles['chakra-input']}
                   >
                     {generateClasses().map((cls, index) => (
                       <option key={index} value={cls}>
@@ -219,7 +158,6 @@ const PLForm = () => {
                     placeholder='Roll Number'
                     value={rollNumber}
                     onChange={(e) => setRollNumber(e.target.value)}
-                    className={styles['chakra-input']}
                   />
                 </FormControl>
 
@@ -230,7 +168,6 @@ const PLForm = () => {
                     placeholder='Number of Classes Missed'
                     value={classesMissed}
                     onChange={(e) => setClassesMissed(e.target.value)}
-                    className={styles['chakra-input']}
                   />
                 </FormControl>
 
@@ -240,42 +177,7 @@ const PLForm = () => {
                     placeholder='Reason for Absence'
                     value={reason}
                     onChange={(e) => setReason(e.target.value)}
-                    className={styles['chakra-input']}
                   />
-                </FormControl>
-
-                <FormControl>
-                  <FormLabel>Supporting Documents</FormLabel>
-                  <Box 
-                    border='1px solid #e2e8f0' 
-                    p={4} 
-                    borderRadius='md' 
-                    bg='gray.50' 
-                    _hover={{ borderColor: 'teal.500' }} 
-                    transition='border-color 0.2s'
-                    textAlign='center'
-                  >
-                    <Input 
-                      type='file' 
-                      accept='.pdf,.jpg,.jpeg,.png' 
-                      onChange={handleFileChange} 
-                      display='none' 
-                      id='file-upload' 
-                    />
-                    <label htmlFor='file-upload'>
-                      <Button colorScheme='teal' variant='outline' as='span'>
-                        Upload Document
-                      </Button>
-                    </label>
-                    {documentError && (
-                      <Text color='red.500' mt={2}>{documentError}</Text>
-                    )}
-                    {documents && (
-                      <Box mt={2} border='1px solid #e2e8f0' p={2} borderRadius='md' bg='gray.100'>
-                        <Text fontSize='sm'>{documents.name}</Text>
-                      </Box>
-                    )}
-                  </Box>
                 </FormControl>
 
                 <FormControl isRequired>
