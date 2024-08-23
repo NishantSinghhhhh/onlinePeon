@@ -54,3 +54,40 @@
   .upload-button {
     margin-top: 10px;
   }
+
+  .upload {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Make the container full height */
+    background-color: #f0f0f0; /* Optional: Add a background color */
+  }
+  
+  .box1{
+    height: 35vh;
+    width: 70vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .heading{
+    font-weight: 500;
+    font-size: 20px;
+  }
+
+  .box2{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    border: 1px solid black;
+    margin: 20px 0px;
+  }
+
+  .button1{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }

@@ -288,7 +288,10 @@ const LeaveForm = () => {
                 </FormControl>
               </Stack>
               <CardFooter>
-                <Button colorScheme='teal' type='submit'>
+                <Button 
+                // colorScheme='teal'
+                 type='submit'
+                 >
                   Submit
                 </Button>
               </CardFooter>

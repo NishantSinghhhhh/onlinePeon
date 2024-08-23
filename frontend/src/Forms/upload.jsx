@@ -5,8 +5,10 @@ import {
   FormLabel,
   Input,
   Box,
-  useToast
+  useToast,
+  HStack,
 } from '@chakra-ui/react';
+import styles from './Form.module.css';
 
 const Upload = () => {
   const [document, setDocument] = useState(null);
@@ -26,7 +28,14 @@ const Upload = () => {
         setDocumentError('');
         setDocument(file);
       }
+    } else {
+      setDocument(null); // Clear document if no file is selected
     }
+  };
+
+  const handleCancel = () => {
+    setDocument(null);
+    setDocumentError('');
   };
 
   const handleUpload = async (e) => {
@@ -44,7 +53,7 @@ const Upload = () => {
     }
 
     const formData = new FormData();
-    formData.append('document', document);
+    formData.append('profileimage', document);
 
     try {
       const response = await fetch('http://localhost:8000/upload', {
@@ -90,27 +99,40 @@ const Upload = () => {
   };
 
   return (
-    <Box p={5}>
-      <form action='/upload' method='POST' enctype="multipart/form-data" onSubmit={handleUpload}>
-        <FormControl isRequired>
-          <FormLabel>Upload Document</FormLabel>
-          <Input 
-            type="file" 
-            accept=".pdf,.jpg,.jpeg,.png" 
-            name="profileimage"
-            onChange={handleFileChange} 
-          />
-          {documentError && <Box color="red.500" mt={2}>{documentError}</Box>}
-        </FormControl>
-        <Button 
-          type="submit" 
-          colorScheme="teal" 
-          mt={4}
-        >
-          Upload
-        </Button>
-      </form>
-    </Box>
+    <div className={styles.upload}>
+      <Box className={styles.box1} p={5} bg="white" borderRadius="md" boxShadow="md">
+        <form onSubmit={handleUpload}>
+          <h1 className={styles.heading}>Submit Document Supporting your Permitted Leave (PL)</h1>
+          <FormControl isRequired>
+            <FormLabel className={styles.box2}>Select Document</FormLabel>
+            <Input 
+              type="file" 
+              accept=".pdf,.jpg,.jpeg,.png" 
+              onChange={handleFileChange} 
+            />
+            {documentError && <Box color="red.500" mt={2}>{documentError}</Box>}
+          </FormControl>
+          <HStack spacing={4} mt={4}>
+            <Button 
+              className={styles.button1}
+              type="submit" 
+              // colorScheme="teal"
+              disabled={!document} // Disable button if no file is selected
+            >
+              Upload
+            </Button>
+            <Button 
+              className={styles.button1}
+              // colorScheme="#EDF2F7"
+              onClick={handleCancel}
+              disabled={!document} // Disable cancel button if no file is selected
+            >
+              Cancel
+            </Button>
+          </HStack>
+        </form>
+      </Box>
+    </div>
   );
 };
 
