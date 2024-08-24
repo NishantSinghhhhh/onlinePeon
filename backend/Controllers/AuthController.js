@@ -5,6 +5,7 @@ const {Outpass} = require('../Models/Outpass'); // Import your Outpass model
 const {Leave} = require('../Models/Leave'); // Import your Outpass model
 const {PL} = require('../Models/PL'); // Import your Outpass model
 
+
 const submitPL = async (req, res) => {
     try {
         console.log('Received request body:', JSON.stringify(req.body, null, 2));
@@ -318,5 +319,5 @@ module.exports = {
     login,
     submitOutpass,
     submitLeave,
-    submitPL 
+    submitPL,
 };

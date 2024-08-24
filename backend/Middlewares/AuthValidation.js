@@ -152,11 +152,10 @@ const plValidation = (req, res, next) => {
     console.log('Validation passed. Validated data:', JSON.stringify(value, null, 2));
     next();
 };
-
 module.exports = {
     signupValidation,
     loginValidation,
     outpassValidation,
     leaveValidation ,
-    plValidation
+    plValidation,
 }

@@ -11,4 +11,5 @@ router.post('/outpass', outpassValidation, submitOutpass);
 router.post('/leave', leaveValidation, submitLeave);
 router.post('/PL', plValidation,submitPL );
 
+
 module.exports = router; 

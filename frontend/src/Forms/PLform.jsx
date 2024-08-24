@@ -14,10 +14,10 @@ import {
   Textarea,
   Select
 } from '@chakra-ui/react';
-import Navbar from '../components/navbar/navbar';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import styles from './Form.module.css';
+import { useRollNumber } from '../context/RollNumberContext';
 
 const years = ['FE', 'SE', 'TE', 'BE'];
 const branches = ['Comp', 'IT', 'ENTC', 'Mech', 'ARE'];
@@ -46,9 +46,14 @@ const PLForm = () => {
   const [endDate, setEndDate] = useState(new Date());
 
   const toast = useToast();
+  const { setRollNumber: setRollNumberContext } = useRollNumber();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!firstName || !lastName || !className || !rollNumber || !classesMissed || !reason || !startDate || !endDate) {
+      return handleError('Please fill in all required fields.');
+    }
 
     const formData = {
       firstName,
@@ -78,7 +83,9 @@ const PLForm = () => {
       }
 
       if (result.success) {
-        handleSuccess(result.message);
+        handleSuccess('PL request submitted successfully!');
+        console.log('Roll Number:', rollNumber); // Print the roll number to the console
+        setRollNumberContext(rollNumber); // Update the roll number in context
         setTimeout(() => window.location.href = '/uploaddoc', 1000);
       } else {
         handleError(result.message || 'An unexpected error occurred.');
@@ -110,7 +117,7 @@ const PLForm = () => {
 
   return (
     <>
-      <Navbar />
+      {/* <Navbar /> */}
       <div className={styles.main}>
         <ChakraCard borderWidth='1px' borderRadius='md' p={4} boxShadow='md' w='full'>
           <CardHeader>
@@ -157,7 +164,7 @@ const PLForm = () => {
                   <Input
                     placeholder='Roll Number'
                     value={rollNumber}
-                    onChange={(e) => setRollNumber(e.target.value)}
+                    onChange={(e) => setRollNumber(e.target.value.trim())} // Trim spaces
                   />
                 </FormControl>
 
@@ -200,13 +207,8 @@ const PLForm = () => {
                   />
                 </FormControl>
               </Stack>
-              <CardFooter>
-                <Button 
-                  type='submit' 
-                  // colorScheme='teal' 
-                  mt={4} 
-                  size='lg'
-                >
+              <CardFooter mt={4}>
+                <Button colorScheme='blue' type='submit'>
                   Submit
                 </Button>
               </CardFooter>

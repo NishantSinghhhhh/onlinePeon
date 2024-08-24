@@ -42,12 +42,23 @@ app.post('/upload', upload.single('profileimage'), (req, res) => {
             return res.status(400).json({ success: false, message: 'No file uploaded.' });
         }
 
-        console.log(req.body);
-        console.log(req.file);
+        // Log the full request body
+        console.log('Request Body:', JSON.stringify(req.body, null, 2));
+
+        // Log details of the uploaded file
+        console.log('Uploaded File Details:');
+        console.log(`Original Name: ${req.file.originalname}`);
+        console.log(`File Name: ${req.file.filename}`);
+        console.log(`File Path: ${req.file.path}`);
+        console.log(`File Size: ${req.file.size} bytes`);
+        console.log(`MIME Type: ${req.file.mimetype}`);
+
+        // Additional details
+        console.log('Destination Path:', req.file.destination);
 
         return res.json({ success: true, message: 'File uploaded successfully.' });
     } catch (err) {
-        console.error(err);
+        console.error('Error:', err);
         return res.status(500).json({ success: false, message: 'An unexpected error occurred.' });
     }
 });

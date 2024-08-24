@@ -35,4 +35,9 @@ const db4 = mongoose.createConnection(mongo_url2, {
     useUnifiedTopology: true,
   });
 
-module.exports = { db1, db2, db3, db4};
+const db5 = mongoose.createConnection(mongo_url2, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
+
+module.exports = { db1, db2, db3, db4, db5};
