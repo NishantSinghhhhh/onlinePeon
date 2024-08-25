@@ -288,7 +288,7 @@ const login = async (req, res) => {
                 success: false
             });
         }
-
+// hii
         // Generate JWT token
         const jwtToken = jwt.sign(
             { email: user.email, _id: user._id },
