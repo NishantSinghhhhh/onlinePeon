@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const {Outpass} = require('../Models/Outpass'); // Import your Outpass model
 const {Leave} = require('../Models/Leave'); // Import your Outpass model
 const {PL} = require('../Models/PL'); // Import your Outpass model
+const {Staff} = require('../Models/staff'); // Import your Outpass model
 
 const submitPL = async (req, res) => {
     try {
@@ -315,10 +316,66 @@ const login = async (req, res) => {
     }
 };
 
+const signupStaff = async (req, res) => {
+    try {
+        // No need to call staffSignupValidation here, it's used as middleware
+        const {
+            name,
+            email,
+            password,
+            department,
+            classTeacher,
+            counselor,
+            staffId,
+            contactNumber,
+        } = req.body;
+
+        // Check if the user already exists
+        const existingUser = await staff.findOne({ email });
+        if (existingUser) {
+            return res.status(409).json({
+                message: 'User already exists',
+                success: false
+            });
+        }
+
+        // Create a new user instance
+        const staff = new staff({
+            name,
+            email,
+            password,
+            department,
+            classTeacher,
+            counselor,
+            staffId,
+            contactNumber,
+            departmentHead
+        });
+
+        // Hash the password
+        staff.password = await bcrypt.hash(password, 10);
+
+        // Save the new user to the database
+        await staff.save();
+
+        res.status(201).json({
+            message: 'SignUp Successful',
+            success: true
+        });
+    } catch (err) {
+        console.error(err); // Log the error to the server console for debugging
+        res.status(500).json({
+            message: 'Internal server error',
+            success: false
+        });
+    }
+};
+
 module.exports = {
     signup,
     login,
     submitOutpass,
     submitLeave,
     submitPL,
+    signupStaff
 };

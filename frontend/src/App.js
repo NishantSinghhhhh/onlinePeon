@@ -12,6 +12,7 @@ import Declined from './components/Result/Declined';
 import Expired from './components/Result/Expired';
 import Pending from './components/Result/Pending';
 import Register from './components/signIn/Register'
+import StaffRegistration from './components/signIn/StaffRegistration'
 // import Upload from './Forms/upload';
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
         <Route path='/Expired' element={<Expired/>}/>
         <Route path='/Register' element={<Register/>}/>
         <Route path='/Pending' element={<Pending/>}/>
+        <Route path='/Register1' element={<StaffRegistration/>}/>
         {/* <Route path='/uploaddoc' element={<Upload/>}/> */}
       </Routes>
     </Router>

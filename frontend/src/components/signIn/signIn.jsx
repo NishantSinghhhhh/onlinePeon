@@ -97,7 +97,6 @@ const SignInCard = () => {
     }
   };
   
-
   const handleError = (message) => {
     console.error(message);
     toast({
@@ -218,10 +217,10 @@ const SignInCard = () => {
                 mt={4}
                 width='full'
               >
-                Submit
+                {isStudent ? 'Submit as Student' : 'Submit as Staff'}
               </Button>
             </form>
-            <Link to="/Register">
+            <Link to={isStudent ? "/Register" : "/Register1"}>
               <Button
                 colorScheme='gray'
                 variant='solid'
@@ -230,7 +229,7 @@ const SignInCard = () => {
                 mt={4}
                 width='full'
               >
-                Register Here
+                {isStudent ? 'Register Here' : 'Register as Staff'}
               </Button>
             </Link>
           </Stack>
