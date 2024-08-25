@@ -12,7 +12,9 @@ import {
   Button,
   Stack,
   Textarea,
-  Select
+  Select,
+  Box,
+  Text
 } from '@chakra-ui/react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -44,6 +46,7 @@ const PLForm = () => {
   const [reason, setReason] = useState('');
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
+  const [document, setDocument] = useState('');
 
   const toast = useToast();
   const { setRollNumber: setRollNumberContext } = useRollNumber();
@@ -51,7 +54,7 @@ const PLForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!firstName || !lastName || !className || !rollNumber || !classesMissed || !reason || !startDate || !endDate) {
+    if (!firstName || !lastName || !className || !rollNumber || !classesMissed || !reason || !startDate || !endDate || !document) {
       return handleError('Please fill in all required fields.');
     }
 
@@ -64,6 +67,7 @@ const PLForm = () => {
       reason,
       startDate,
       endDate,
+      document, // Base64-encoded document
     };
 
     try {
@@ -86,13 +90,22 @@ const PLForm = () => {
         handleSuccess('PL request submitted successfully!');
         console.log('Roll Number:', rollNumber); // Print the roll number to the console
         setRollNumberContext(rollNumber); // Update the roll number in context
-        setTimeout(() => window.location.href = '/uploaddoc', 1000);
+        setTimeout(() => window.location.href = '/Home', 1000);
       } else {
         handleError(result.message || 'An unexpected error occurred.');
       }
     } catch (err) {
       handleError('An unexpected error occurred.');
     }
+  };
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    const base64 = await convertToBase64(file);
+    
+    console.log("Base64 Encoded String: ", base64); // Print the base64 string to the console
+    
+    setDocument(base64); // Set base64-encoded document in state
   };
 
   const handleError = (message) => {
@@ -117,7 +130,6 @@ const PLForm = () => {
 
   return (
     <>
-      {/* <Navbar /> */}
       <div className={styles.main}>
         <ChakraCard borderWidth='1px' borderRadius='md' p={4} boxShadow='md' w='full'>
           <CardHeader>
@@ -197,6 +209,7 @@ const PLForm = () => {
                   />
                 </FormControl>
 
+
                 <FormControl isRequired>
                   <FormLabel>End Date</FormLabel>
                   <DatePicker
@@ -206,6 +219,25 @@ const PLForm = () => {
                     className={styles['chakra-input']}
                   />
                 </FormControl>
+
+                <FormControl isRequired>
+                  <FormLabel>Upload Document</FormLabel>
+                  <Input
+                    type="file"
+                    accept=".pdf,.doc,.docx"
+                    onChange={handleFileUpload}
+                  />
+                  <Text fontSize="sm" color="gray.500" mt={1}>
+                    Please upload a PDF or Word document (max 5MB)
+                  </Text>
+                </FormControl>
+
+                {document && (
+                  <Box mt={2}>
+                    <Text fontWeight="bold">Selected file:</Text>
+                    <Text>{document.name}</Text>
+                  </Box>
+                )}
               </Stack>
               <CardFooter mt={4}>
                 <Button colorScheme='blue' type='submit'>
@@ -221,3 +253,16 @@ const PLForm = () => {
 };
 
 export default PLForm;
+
+function convertToBase64(file){
+  return new Promise((resolve, reject) => {
+    const fileReader = new FileReader();
+    fileReader.readAsDataURL(file);
+    fileReader.onload = () => {
+      resolve(fileReader.result)
+    };
+    fileReader.onerror = (error) => {
+      reject(error)
+    }
+  })
+}

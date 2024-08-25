@@ -51,6 +51,10 @@ const PLSchema = new Schema({
         type: Date,
         required: true
     },
+    document: {
+        type: String,
+        required: true, // The document is required
+    }
 }, {
     timestamps: true 
 });

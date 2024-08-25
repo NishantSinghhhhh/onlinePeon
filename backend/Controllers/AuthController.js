@@ -5,7 +5,6 @@ const {Outpass} = require('../Models/Outpass'); // Import your Outpass model
 const {Leave} = require('../Models/Leave'); // Import your Outpass model
 const {PL} = require('../Models/PL'); // Import your Outpass model
 
-
 const submitPL = async (req, res) => {
     try {
         console.log('Received request body:', JSON.stringify(req.body, null, 2));
@@ -19,6 +18,7 @@ const submitPL = async (req, res) => {
             reason,
             startDate,
             endDate,
+            document, // Include document field
         } = req.body;
 
         // Validate required fields
@@ -31,6 +31,7 @@ const submitPL = async (req, res) => {
         if (!reason) missingFields.push('reason');
         if (!startDate) missingFields.push('startDate');
         if (!endDate) missingFields.push('endDate');
+        if (!document) missingFields.push('document'); // Validate document
 
         if (missingFields.length > 0) {
             return res.status(400).json({
@@ -49,6 +50,7 @@ const submitPL = async (req, res) => {
             reason,
             startDate,
             endDate,
+            document, // Include document field in the instance creation
         });
 
         // Save the new PL request to the database
@@ -66,7 +68,6 @@ const submitPL = async (req, res) => {
         });
     }
 };
-
 
 const submitLeave = async (req, res) => {
     try {

@@ -12,7 +12,7 @@ import Declined from './components/Result/Declined';
 import Expired from './components/Result/Expired';
 import Pending from './components/Result/Pending';
 import Register from './components/signIn/Register'
-import Upload from './Forms/upload';
+// import Upload from './Forms/upload';
 function App() {
   return (
     <div className="App">
@@ -28,7 +28,7 @@ function App() {
         <Route path='/Expired' element={<Expired/>}/>
         <Route path='/Register' element={<Register/>}/>
         <Route path='/Pending' element={<Pending/>}/>
-        <Route path='/uploaddoc' element={<Upload/>}/>
+        {/* <Route path='/uploaddoc' element={<Upload/>}/> */}
       </Routes>
     </Router>
     </div>

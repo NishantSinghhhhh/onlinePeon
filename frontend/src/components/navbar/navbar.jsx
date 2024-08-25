@@ -35,6 +35,28 @@ const Navbar = () => {
             <BreadcrumbItem>
               <BreadcrumbLink
                 as={Link}
+                to='/Home'
+                mr={10}
+                p={3}
+                borderRadius='md'
+                _hover={{
+                  textDecoration: 'none',
+                  bg: 'gray.700',
+                  color: 'white',
+                }}
+                bg={location.pathname === '/' ? 'gray.600' : 'transparent'}
+                color={location.pathname === '/' ? 'white' : 'gray.300'}
+                fontWeight={location.pathname === '/' ? 'bold' : 'normal'}
+                border='1px'
+                borderColor={location.pathname === '/' ? 'gray.700' : 'transparent'}
+              >
+                Home
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+
+            <BreadcrumbItem>
+              <BreadcrumbLink
+                as={Link}
                 to='/Approved'
                 mr={10}
                 p={3}
@@ -128,6 +150,6 @@ const Navbar = () => {
       </Flex>
     </Box>
   );
-}
+};
 
 export default Navbar;

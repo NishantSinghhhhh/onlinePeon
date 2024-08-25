@@ -114,6 +114,7 @@ const leaveValidation = (req, res, next) => {
     next();
 };
 
+
 const plValidation = (req, res, next) => {
     console.log('Received request body:', JSON.stringify(req.body, null, 2));
 
@@ -133,6 +134,11 @@ const plValidation = (req, res, next) => {
         reason: Joi.string().min(10).required(),
         startDate: Joi.date().iso().required(),
         endDate: Joi.date().iso().required().greater(Joi.ref('startDate')), // Ensure endDate is after startDate
+        document: Joi.string().pattern(/^data:(application\/pdf|application\/msword|application\/vnd.openxmlformats-officedocument.wordprocessingml.document);base64,([A-Za-z0-9+/=]+)$/)
+            .required()
+            .messages({
+                'string.pattern.base': 'Document must be a valid base64 string with a PDF or Word document MIME type.'
+            })
     });
 
     // Validate the request body against the schema
@@ -152,6 +158,7 @@ const plValidation = (req, res, next) => {
     console.log('Validation passed. Validated data:', JSON.stringify(value, null, 2));
     next();
 };
+
 module.exports = {
     signupValidation,
     loginValidation,
