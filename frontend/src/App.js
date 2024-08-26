@@ -13,6 +13,11 @@ import Expired from './components/Result/Expired';
 import Pending from './components/Result/Pending';
 import Register from './components/signIn/Register'
 import StaffRegistration from './components/signIn/StaffRegistration'
+import StaffHome from './pages/StaffHome/StaffHome'
+import StaffOutpass from './components/StaffOptions/StaffOutpass';
+import StaffDone from './components/StaffOptions/StaffDone'
+import StaffLeave from './components/StaffOptions/StaffLeave';
+import StaffPL from './components/StaffOptions/StaffPL';
 // import Upload from './Forms/upload';
 function App() {
   return (
@@ -30,6 +35,11 @@ function App() {
         <Route path='/Register' element={<Register/>}/>
         <Route path='/Pending' element={<Pending/>}/>
         <Route path='/Register1' element={<StaffRegistration/>}/>
+        <Route path='/StaffHome' element={<StaffHome/>}/>
+        <Route path='/StaffOutpass' element={<StaffOutpass/>}/>
+        <Route path='/StaffDone' element={<StaffDone/>}/>
+        <Route path='/StaffLeave' element={<StaffLeave/>}/>
+        <Route path='/StaffPL' element={<StaffPL/>}/>
         {/* <Route path='/uploaddoc' element={<Upload/>}/> */}
       </Routes>
     </Router>

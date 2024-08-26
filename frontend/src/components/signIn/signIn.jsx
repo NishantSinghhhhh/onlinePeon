@@ -141,7 +141,7 @@ const SignInCard = () => {
         localStorage.setItem('token', jwtToken);
         localStorage.setItem('loggedInUser', name);
         setTimeout(() => {
-          navigate('/home');
+          navigate('/StaffHome');
         }, 1000);
       } else if (error) {
         const details = error?.details && Array.isArray(error.details) ? error.details[0]?.message : error.message;
