@@ -59,7 +59,7 @@ const StaffSchema = new Schema({
   staffId: {
     type: String,
     required: true,
-    match: /^\d{4,6}$/ // Ensure staff ID is between 5 and 6 digits
+    match: /^\d{5,6}$/ // Ensure staff ID is between 5 and 6 digits
   },
   contactNumber: {
     type: String,

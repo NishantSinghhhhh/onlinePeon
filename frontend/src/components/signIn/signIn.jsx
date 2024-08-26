@@ -42,9 +42,9 @@ const SignInCard = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    const { email, password, registrationNumber, staffId } = loginInfo;
+    const { email, password, registrationNumber } = loginInfo;
   
-    if (!email || !password || (isStudent && !registrationNumber) || (!isStudent && !staffId)) {
+    if (!email || !password || !registrationNumber) {
       return handleError('All fields are required');
     }
   
@@ -53,8 +53,8 @@ const SignInCard = () => {
       console.log('Sending request with:', {
         email,
         password,
-        ...(isStudent ? { registrationNumber } : { staffId }),
-        isStudent
+        registrationNumber,
+        isStudent: true
       });
   
       const response = await fetch(url, {
@@ -65,8 +65,8 @@ const SignInCard = () => {
         body: JSON.stringify({
           email,
           password,
-          ...(isStudent ? { registrationNumber } : { staffId }),
-          isStudent // Include isStudent in the request payload
+          registrationNumber,
+          isStudent: true
         })
       });
   
@@ -96,7 +96,64 @@ const SignInCard = () => {
       handleError(err.message || 'An unexpected error occurred');
     }
   };
+
+  const staffLogin = async (e) => {
+    e.preventDefault();
+    const { email, password, staffId } = loginInfo;
   
+    if (!email || !password || !staffId) {
+      return handleError('All fields are required');
+    }
+  
+    try {
+      const url = `http://localhost:8000/auth/loginStaff`;
+      console.log('Sending request with:', {
+        email,
+        password,
+        staffId,
+        isStudent: false
+      });
+  
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          staffId,
+          isStudent: false
+        })
+      });
+  
+      const result = await response.json();
+      console.log('API response:', result);
+  
+      if (!response.ok) {
+        throw new Error(result.message || 'An unexpected error occurred');
+      }
+  
+      const { success, message, jwtToken, name, error } = result;
+  
+      if (success) {
+        handleSuccess(message);
+        localStorage.setItem('token', jwtToken);
+        localStorage.setItem('loggedInUser', name);
+        setTimeout(() => {
+          navigate('/home');
+        }, 1000);
+      } else if (error) {
+        const details = error?.details && Array.isArray(error.details) ? error.details[0]?.message : error.message;
+        handleError(details || message);
+      } else {
+        handleError(message);
+      }
+    } catch (err) {
+      handleError(err.message || 'An unexpected error occurred');
+    }
+  };
+
   const handleError = (message) => {
     console.error(message);
     toast({
@@ -156,7 +213,7 @@ const SignInCard = () => {
                 Sign In as Staff
               </Button>
             </Stack>
-            <form onSubmit={handleLogin}>
+            <form onSubmit={isStudent ? handleLogin : staffLogin}>
               <FormControl id='email'>
                 <FormLabel>Email</FormLabel>
                 <Input

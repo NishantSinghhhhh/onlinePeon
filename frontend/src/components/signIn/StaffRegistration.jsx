@@ -99,7 +99,7 @@ const StaffRegistration = () => {
     }
 
     // Validate staff ID and contact number
-    if (!/^\d{4,6}$/.test(staffId)) {
+    if (!/^\d{5,6}$/.test(staffId)) {
         return handleError('Staff ID must be a 5-6 digit number.');
     }
     if (!/^\d{10}$/.test(contactNumber)) {

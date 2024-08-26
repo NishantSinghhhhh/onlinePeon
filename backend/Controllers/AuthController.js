@@ -315,7 +315,6 @@ const login = async (req, res) => {
         });
     }
 };
-
 const signupStaff = async (req, res) => {
     try {
         // No need to call staffSignupValidation here, it's used as middleware
@@ -331,7 +330,7 @@ const signupStaff = async (req, res) => {
         } = req.body;
 
         // Check if the user already exists
-        const existingUser = await staff.findOne({ email });
+        const existingUser = await Staff.findOne({ email });
         if (existingUser) {
             return res.status(409).json({
                 message: 'User already exists',
@@ -340,7 +339,7 @@ const signupStaff = async (req, res) => {
         }
 
         // Create a new user instance
-        const staff = new staff({
+        const newStaff = new Staff({
             name,
             email,
             password,
@@ -349,14 +348,13 @@ const signupStaff = async (req, res) => {
             counselor,
             staffId,
             contactNumber,
-            departmentHead
         });
 
         // Hash the password
-        staff.password = await bcrypt.hash(password, 10);
+        newStaff.password = await bcrypt.hash(password, 10);
 
         // Save the new user to the database
-        await staff.save();
+        await newStaff.save();
 
         res.status(201).json({
             message: 'SignUp Successful',
@@ -371,11 +369,67 @@ const signupStaff = async (req, res) => {
     }
 };
 
+const staffLogin = async (req, res) => {
+    try {
+        const { staffId, email, password } = req.body;
+
+        if (!email || !password || !staffId) {
+            return res.status(400).json({
+                message: "Email, password, and staff ID are required",
+                success: false
+            });
+        }
+
+        // Find staff by email and staffId
+        const staff = await Staff.findOne({ email, staffId });
+        if (!staff) {
+            return res.status(403).json({
+                message: "Authentication failed, email, password, or staff ID is incorrect",
+                success: false
+            });
+        }
+
+        // Compare provided password with stored hashed password
+        const isPassEqual = await bcrypt.compare(password, staff.password);
+        if (!isPassEqual) {
+            return res.status(403).json({
+                message: "Authentication failed, email, password, or staff ID is incorrect",
+                success: false
+            });
+        }
+
+        // Generate JWT token
+        const jwtToken = jwt.sign(
+            { email: staff.email, _id: staff._id, staffId: staff.staffId },
+            process.env.JWT_SECRET,
+            { expiresIn: '24h' }
+        );
+
+        // Send success response
+        res.status(200).json({
+            message: "Login successful",
+            success: true,
+            jwtToken,
+            email,
+            name: staff.name
+        });
+
+    } catch (err) {
+        console.error('Staff login error:', err); // Log the error for debugging
+        res.status(500).json({
+            message: "Internal server error",
+            success: false
+        });
+    }
+};
+
+
 module.exports = {
     signup,
     login,
     submitOutpass,
     submitLeave,
     submitPL,
-    signupStaff
+    signupStaff,
+    staffLogin
 };

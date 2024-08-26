@@ -159,8 +159,6 @@ const plValidation = (req, res, next) => {
     next();
 };
 
-// const Joi = require('joi');
-
 const staffSignupValidation = (req, res, next) => {
     const schema = Joi.object({
         name: Joi.string().min(3).max(100).required(),
@@ -201,19 +199,16 @@ const staffSignupValidation = (req, res, next) => {
             'Y-1', 'Y-2', 'Y-3', 'Y-4', 'Y-5', 'Y-6',
             'Z-1', 'Z-2', 'Z-3', 'Z-4', 'Z-5', 'Z-6'
         ).required(),
-        staffId: Joi.string().length(5).max(6).pattern(/^\d+$/).required(),
+        staffId: Joi.string().min(5).max(6).pattern(/^\d+$/).required(),
         contactNumber: Joi.string().length(10).pattern(/^\d+$/).required(),
     });
 
-    // Log the request body for debugging
     console.log("Request Body:", req.body);
 
     const { error } = schema.validate(req.body);
 
     if (error) {
-        // Log the validation errors for debugging
         console.log("Validation Error Details:", error.details);
-
         return res.status(400).json({
             message: "Bad Request",
             error: error.details.map(err => ({
@@ -226,6 +221,25 @@ const staffSignupValidation = (req, res, next) => {
     next();
 };
 
+const loginStaffValidation = (req, res, next) => {
+    const schema = Joi.object({
+        email: Joi.string().email().required(),
+        password: Joi.string().min(4).max(100).required(),
+        staffId: Joi.string().required(), // Staff-specific ID validation
+        isStudent: Joi.boolean().valid(false).required() // Ensure isStudent is false for staff
+    });
+
+    const { error } = schema.validate(req.body);
+
+    if (error) {
+        return res.status(400).json({
+            message: "Bad Request",
+            error: error.details
+        });
+    }
+    next();
+};
+
 
 module.exports = {
     signupValidation,
@@ -233,5 +247,6 @@ module.exports = {
     outpassValidation,
     leaveValidation ,
     plValidation,
-    staffSignupValidation
+    staffSignupValidation,
+    loginStaffValidation
 }
