@@ -6,7 +6,8 @@ const StaffHome = () => {
     <div>
       <StaffNavbar/>
     </div>
-  )
-}
+  );
+};
+// this is to check
 
 export default StaffHome
