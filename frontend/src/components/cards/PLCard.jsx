@@ -1,7 +1,5 @@
 import React from 'react';
 import { Box, Flex, Text, Button, Card, CardBody, useDisclosure, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter } from '@chakra-ui/react';
-import { Document, Page } from 'react-pdf';
-import 'react-pdf/dist/esm/Page/AnnotationLayer.css'; // Import PDF viewer styles
 
 const PLCard = ({ data }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -60,14 +58,19 @@ const PLCard = ({ data }) => {
                 <Text>{new Date(data.endDate).toLocaleDateString()}</Text>
               </Flex>
               <Flex justify="space-between" mb={2}>
+                <Text fontWeight="semibold">Created At:</Text>
+                <Text>{new Date(data.createdAt).toLocaleString()}</Text>
+              </Flex>
+              <Flex justify="space-between" mb={2}>
+                <Text fontWeight="semibold">Updated At:</Text>
+                <Text>{new Date(data.updatedAt).toLocaleString()}</Text>
+              </Flex>
+              {/* You can remove or handle the Document part if not needed */}
+              <Flex justify="space-between" mb={2}>
                 <Text fontWeight="semibold">Document:</Text>
                 <Box border="1px solid gray" borderRadius="md" p={2} mt={2}>
-                  <Document
-                    file={data.document} // Directly use the document file URL if available
-                    options={{ workerSrc: `https://unpkg.com/pdfjs-dist/build/pdf.worker.min.js` }}
-                  >
-                    <Page pageNumber={1} />
-                  </Document>
+                  {/* Display a placeholder or handle the document */}
+                  <Text>No Document Available</Text>
                 </Box>
               </Flex>
             </Flex>
