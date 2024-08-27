@@ -47,6 +47,16 @@ const LeaveSchema = new Schema({
         type: String,
         required: true,
         match: /^\d{10}$/ // Exactly 10 digits
+    },
+    className: {
+        type: String,
+        required: true, // Adjust according to your needs
+        enum: [
+            'FE-COMP-A', 'FE-COMP-B', 'FE-ENTC-A', 'FE-ENTC-B', 'FE-IT-A', 'FE-IT-B', 'FE-MECH', 'FE-ARE',
+            'SE-COMP-A', 'SE-COMP-B', 'SE-ENTC-A', 'SE-ENTC-B', 'SE-IT-A', 'SE-IT-B', 'SE-MECH',
+            'TE-COMP-A', 'TE-COMP-B', 'TE-ENTC-A', 'TE-ENTC-B', 'TE-IT-A', 'TE-IT-B', 'TE-MECH',
+            'BE-COMP-A', 'BE-COMP-B', 'BE-ENTC-A', 'BE-ENTC-B', 'BE-IT-A', 'BE-IT-B', 'BE-MECH',
+        ] // Optional: Adjust according to your valid class names
     }
 }, {
     timestamps: true // Automatically adds createdAt and updatedAt fields

@@ -37,8 +37,18 @@ const OutpassSchema = new Schema({
     contactNumber: {
         type: String,
         required: true,
-        match: /^\d{10}$/ 
+        match: /^\d{10}$/ // Exactly 10 digits
     },
+    className: {
+        type: String,
+        required: true,
+        enum: [
+            'FE-COMP-A', 'FE-COMP-B', 'FE-ENTC-A', 'FE-ENTC-B', 'FE-IT-A', 'FE-IT-B', 'FE-MECH', 'FE-ARE',
+            'SE-COMP-A', 'SE-COMP-B', 'SE-ENTC-A', 'SE-ENTC-B', 'SE-IT-A', 'SE-IT-B', 'SE-MECH',
+            'TE-COMP-A', 'TE-COMP-B', 'TE-ENTC-A', 'TE-ENTC-B', 'TE-IT-A', 'TE-IT-B', 'TE-MECH',
+            'BE-COMP-A', 'BE-COMP-B', 'BE-ENTC-A', 'BE-ENTC-B', 'BE-IT-A', 'BE-IT-B', 'BE-MECH',
+        ] // Validate against predefined class names
+    }
 });
 
 const Outpass = db2.model('Outpass', OutpassSchema);
