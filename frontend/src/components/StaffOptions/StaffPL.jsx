@@ -1,9 +1,9 @@
-import React from 'react'
+// import React from 'react'
 
-const StaffPL = () => {
-  return (
-    <div>StaffPL</div>
-  )
-}
+// const StaffPL = () => {
+//   return (
+//     <div>StaffPL</div>
+//   )
+// }
 
-export default StaffPL
+// export default StaffPL

@@ -14,15 +14,13 @@ const app = express();
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 
-// const uploads = multer({storage});
-
 app.use(bodyParser.json());
 app.use(cors());
 
 app.get('/ping', (req, res) => {
     res.send("PONG");
 });
-
+// ../
 app.use('/auth', authRoutes);
 app.use('/outpass', authRoutes); 
 app.use('/products', authRoutes);
