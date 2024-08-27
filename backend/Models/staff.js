@@ -34,7 +34,7 @@ const StaffSchema = new Schema({
   },
   department: {
     type: String,
-    enum: ['COMP', 'ENTC', 'IT', 'Mech'], // Example departments
+    enum: ['COMP', 'ENTC', 'IT', 'Mech'],
     required: true
   },
   classTeacher: {

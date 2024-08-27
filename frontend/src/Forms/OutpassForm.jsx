@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card as ChakraCard, useToast, CardHeader, CardBody, CardFooter, Heading, FormControl, FormLabel, Input, Button, Stack, InputGroup, InputLeftAddon } from '@chakra-ui/react';
+import { Card as ChakraCard, useToast, CardHeader, CardBody, CardFooter, Heading, FormControl, FormLabel, Input, Button, Stack, InputGroup, InputLeftAddon, Select } from '@chakra-ui/react';
 import Navbar from '../components/navbar/navbar';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -16,6 +16,7 @@ const OutpassForm = () => {
     startHour: '',
     endHour: '',
     contactNumber: '',
+    className: '', // New field for class name
   });
   
   const toast = useToast();
@@ -43,7 +44,7 @@ const OutpassForm = () => {
   
     console.log('Full formData state:', formData);
 
-    const { firstName, lastName, registrationNumber, reason, date, startHour, endHour, contactNumber } = formData;
+    const { firstName, lastName, registrationNumber, reason, date, startHour, endHour, contactNumber, className } = formData;
     const isoDate = date.toISOString();
   
     console.log('Form data at submission:', {
@@ -54,7 +55,8 @@ const OutpassForm = () => {
       date: `"${isoDate}"`,
       startHour: `"${startHour}"`,
       endHour: `"${endHour}"`,
-      contactNumber: `"${contactNumber}"`
+      contactNumber: `"${contactNumber}"`,
+      className: `"${className}"`, // Added className to logs
     });
 
     console.log('Empty fields check:', {
@@ -65,7 +67,8 @@ const OutpassForm = () => {
       date: !date,
       startHour: !startHour,
       endHour: !endHour,
-      contactNumber: !contactNumber
+      contactNumber: !contactNumber,
+      className: !className // Added className to checks
     });
 
     const emptyFields = [];
@@ -77,6 +80,7 @@ const OutpassForm = () => {
     if (!startHour) emptyFields.push('startHour');
     if (!endHour) emptyFields.push('endHour');
     if (!contactNumber) emptyFields.push('contactNumber');
+    if (!className) emptyFields.push('className'); // Added className to checks
 
     if (emptyFields.length > 0) {
       console.log('Empty fields:', emptyFields);
@@ -107,6 +111,7 @@ const OutpassForm = () => {
           startHour,
           endHour,
           contactNumber,
+          className, // Added className to request body
         }),
       });
   
@@ -121,7 +126,7 @@ const OutpassForm = () => {
 
       if (result.success) {
         handleSuccess(result.message);
-        setTimeout(() => navigate('/'), 1000);
+        setTimeout(() => navigate('/Home'), 1000);
       } else if (result.error) {
         handleError(result.error.details?.[0]?.message || 'An error occurred');
       } else {
@@ -261,11 +266,52 @@ const OutpassForm = () => {
                     />
                   </InputGroup>
                 </FormControl>
+
+                <FormControl isRequired>
+                  <FormLabel>Class Name</FormLabel>
+                  <Select
+                    placeholder='Select Class'
+                    name='className'
+                    value={formData.className}
+                    onChange={handleChange}
+                    className={styles['chakra-input']}
+                  >
+                    <option value='FE-COMP-A'>FE-COMP-A</option>
+                    <option value='FE-COMP-B'>FE-COMP-B</option>
+                    <option value='FE-ENTC-A'>FE-ENTC-A</option>
+                    <option value='FE-ENTC-B'>FE-ENTC-B</option>
+                    <option value='FE-IT-A'>FE-IT-A</option>
+                    <option value='FE-IT-B'>FE-IT-B</option>
+                    <option value='FE-MECH'>FE-MECH</option>
+                    <option value='FE-ARE'>FE-ARE</option>
+                    <option value='SE-COMP-A'>SE-COMP-A</option>
+                    <option value='SE-COMP-B'>SE-COMP-B</option>
+                    <option value='SE-ENTC-A'>SE-ENTC-A</option>
+                    <option value='SE-ENTC-B'>SE-ENTC-B</option>
+                    <option value='SE-IT-A'>SE-IT-A</option>
+                    <option value='SE-IT-B'>SE-IT-B</option>
+                    <option value='SE-MECH'>SE-MECH</option>
+                    <option value='TE-COMP-A'>TE-COMP-A</option>
+                    <option value='TE-COMP-B'>TE-COMP-B</option>
+                    <option value='TE-ENTC-A'>TE-ENTC-A</option>
+                    <option value='TE-ENTC-B'>TE-ENTC-B</option>
+                    <option value='TE-IT-A'>TE-IT-A</option>
+                    <option value='TE-IT-B'>TE-IT-B</option>
+                    <option value='TE-MECH'>TE-MECH</option>
+                    <option value='BE-COMP-A'>BE-COMP-A</option>
+                    <option value='BE-COMP-B'>BE-COMP-B</option>
+                    <option value='BE-ENTC-A'>BE-ENTC-A</option>
+                    <option value='BE-ENTC-B'>BE-ENTC-B</option>
+                    <option value='BE-IT-A'>BE-IT-A</option>
+                    <option value='BE-IT-B'>BE-IT-B</option>
+                    <option value='BE-MECH'>BE-MECH</option>
+                  </Select>
+                </FormControl>
               </Stack>
               <CardFooter>
                 <Button 
-                // colorScheme='teal' 
-                type='submit'
+                  colorScheme='gray' 
+                  type='submit'
                 >
                   Submit
                 </Button>

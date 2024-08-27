@@ -21,21 +21,12 @@ import 'react-datepicker/dist/react-datepicker.css';
 import styles from './Form.module.css';
 import { useRollNumber } from '../context/RollNumberContext';
 
-const years = ['FE', 'SE', 'TE', 'BE'];
-const branches = ['Comp', 'IT', 'ENTC', 'Mech', 'ARE'];
-const classesPerYear = ['A', 'B'];
-
-const generateClasses = () => {
-  const classOptions = [];
-  for (const year of years) {
-    for (const branch of branches) {
-      for (const cls of classesPerYear) {
-        classOptions.push(`${year}-${branch}-${cls}`);
-      }
-    }
-  }
-  return classOptions;
-};
+const classOptions = [
+  'FE-Comp-A', 'FE-Comp-B', 'FE-IT-A', 'FE-IT-B', 'FE-ENTC-A', 'FE-ENTC-B', 'FE-Mech', 'FE-ARE',
+  'SE-Comp-A', 'SE-Comp-B', 'SE-IT-A', 'SE-IT-B', 'SE-ENTC-A', 'SE-ENTC-B', 'SE-Mech',
+  'TE-Comp-A', 'TE-Comp-B', 'TE-IT-A', 'TE-IT-B', 'TE-ENTC-A', 'TE-ENTC-B', 'TE-Mech', 
+  'BE-Comp-A', 'BE-Comp-B', 'BE-IT-A', 'BE-IT-B', 'BE-ENTC-A', 'BE-ENTC-B', 'BE-Mech',
+];
 
 const PLForm = () => {
   const [firstName, setFirstName] = useState('');
@@ -163,7 +154,7 @@ const PLForm = () => {
                     value={className}
                     onChange={(e) => setClassName(e.target.value)}
                   >
-                    {generateClasses().map((cls, index) => (
+                    {classOptions.map((cls, index) => (
                       <option key={index} value={cls}>
                         {cls}
                       </option>
@@ -209,7 +200,6 @@ const PLForm = () => {
                   />
                 </FormControl>
 
-
                 <FormControl isRequired>
                   <FormLabel>End Date</FormLabel>
                   <DatePicker
@@ -235,7 +225,7 @@ const PLForm = () => {
                 {document && (
                   <Box mt={2}>
                     <Text fontWeight="bold">Selected file:</Text>
-                    <Text>{document.name}</Text>
+                    <Text>{document.split(',')[1].slice(0, 50)}...</Text> {/* Display first 50 chars of base64 */}
                   </Box>
                 )}
               </Stack>

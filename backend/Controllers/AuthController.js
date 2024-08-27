@@ -5,11 +5,13 @@ const {Outpass} = require('../Models/Outpass'); // Import your Outpass model
 const {Leave} = require('../Models/Leave'); // Import your Outpass model
 const {PL} = require('../Models/PL'); // Import your Outpass model
 const {Staff} = require('../Models/staff'); // Import your Outpass model
+// const { PL } = require('./models/pl'); // Ensure the correct path to the PL model
 
 const submitPL = async (req, res) => {
     try {
         console.log('Received request body:', JSON.stringify(req.body, null, 2));
 
+        // Extract fields from the request body
         const {
             firstName,
             lastName,
@@ -19,29 +21,10 @@ const submitPL = async (req, res) => {
             reason,
             startDate,
             endDate,
-            document, // Include document field
+            document // Include document field
         } = req.body;
 
-        // Validate required fields
-        const missingFields = [];
-        if (!firstName) missingFields.push('firstName');
-        if (!lastName) missingFields.push('lastName');
-        if (!className) missingFields.push('className');
-        if (!rollNumber) missingFields.push('rollNumber');
-        if (!classesMissed) missingFields.push('classesMissed');
-        if (!reason) missingFields.push('reason');
-        if (!startDate) missingFields.push('startDate');
-        if (!endDate) missingFields.push('endDate');
-        if (!document) missingFields.push('document'); // Validate document
-
-        if (missingFields.length > 0) {
-            return res.status(400).json({
-                message: `The following fields are required: ${missingFields.join(', ')}`,
-                success: false
-            });
-        }
-
-        // Create a new PL instance
+        // Create a new PL instance with all required fields
         const pl = new PL({
             firstName,
             lastName,
@@ -51,7 +34,7 @@ const submitPL = async (req, res) => {
             reason,
             startDate,
             endDate,
-            document, // Include document field in the instance creation
+            document // Include document field in the instance creation
         });
 
         // Save the new PL request to the database
@@ -70,10 +53,12 @@ const submitPL = async (req, res) => {
     }
 };
 
+//  Ensure the correct path to the Leave model
 const submitLeave = async (req, res) => {
     try {
         console.log('Received request body:', JSON.stringify(req.body, null, 2));
 
+        // Extract fields from the request body
         const {
             firstName,
             lastName,
@@ -83,29 +68,11 @@ const submitLeave = async (req, res) => {
             endDate,
             placeOfResidence,
             attendancePercentage,
-            contactNumber
+            contactNumber,
+            className
         } = req.body;
 
-        // Validate required fields
-        const missingFields = [];
-        if (!firstName) missingFields.push('firstName');
-        if (!lastName) missingFields.push('lastName');
-        if (!registrationNumber) missingFields.push('registrationNumber');
-        if (!reasonForLeave) missingFields.push('reasonForLeave');
-        if (!startDate) missingFields.push('startDate');
-        if (!endDate) missingFields.push('endDate');
-        if (!placeOfResidence) missingFields.push('placeOfResidence');
-        if (!attendancePercentage) missingFields.push('attendancePercentage');
-        if (!contactNumber) missingFields.push('contactNumber');
-
-        if (missingFields.length > 0) {
-            return res.status(400).json({
-                message: `The following fields are required: ${missingFields.join(', ')}`,
-                success: false
-            });
-        }
-
-        // Create a new leave instance
+        // Create a new leave instance with all required fields
         const leave = new Leave({
             firstName,
             lastName,
@@ -115,7 +82,8 @@ const submitLeave = async (req, res) => {
             endDate,
             placeOfResidence,
             attendancePercentage,
-            contactNumber
+            contactNumber,
+            className
         });
 
         // Save the new leave request to the database
@@ -134,6 +102,7 @@ const submitLeave = async (req, res) => {
     }
 };
 
+
 const submitOutpass = async (req, res) => {
     try {
         console.log('Received request body:', JSON.stringify(req.body, null, 2));
@@ -146,7 +115,8 @@ const submitOutpass = async (req, res) => {
             date,
             startHour,
             endHour,
-            contactNumber
+            contactNumber,
+            className // Added className
         } = req.body;
 
         // Validate required fields
@@ -159,6 +129,7 @@ const submitOutpass = async (req, res) => {
         if (!startHour) missingFields.push('startHour');
         if (!endHour) missingFields.push('endHour');
         if (!contactNumber) missingFields.push('contactNumber');
+        if (!className) missingFields.push('className'); // Check for className
 
         if (missingFields.length > 0) {
             return res.status(400).json({
@@ -176,7 +147,8 @@ const submitOutpass = async (req, res) => {
             date,
             startHour,
             endHour,
-            contactNumber
+            contactNumber,
+            className // Added className
         });
 
         // Save the new outpass to the database
