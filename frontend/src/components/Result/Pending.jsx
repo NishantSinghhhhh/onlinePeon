@@ -255,3 +255,5 @@ const Pending = () => {
 };
 
 export default Pending;
+
+// find a good function for base64 and convert string into an image ort pdf
