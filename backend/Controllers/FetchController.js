@@ -1,45 +1,130 @@
 const { Outpass } = require('../Models/Outpass');
+const { PL } = require('../Models/PL');
+const { Leave } = require('../Models/Leave');
 
-const fetchOutpassesByRegNo = async (req, res) => {
+// Fetch pending requests by registration number
+const fetchPendingByRegNo = async (req, res) => {
     try {
         const { regNo } = req.params;
 
-        // Debugging: Log the incoming registration number
-        console.log('Received Registration Number:', regNo);
+        const [outpasses, pls, leaves] = await Promise.all([
+            Outpass.find({ registrationNumber: regNo, 'extraDataArray.0': 0 }).exec(),
+            PL.find({ registrationNumber: regNo, 'extraDataArray.0': 0 }).exec(),
+            Leave.find({ registrationNumber: regNo, 'extraDataArray.0': 0 }).exec()
+        ]);
 
-        // Debugging: Check if the Outpass model is properly loaded
-        if (!Outpass) {
-            console.error('Outpass model is not defined.');
-            return res.status(500).json({ message: 'Internal server error: Outpass model is not defined.' });
-        }
-
-        console.log('Outpass model:', Outpass);
-
-        // Debugging: Check if the find method exists on the model
-        if (typeof Outpass.find !== 'function') {
-            console.error('find method is not a function on the Outpass model.');
-            return res.status(500).json({ message: 'Internal server error: find method is not available on Outpass model.' });
-        }
-
-        // Perform the database query
-        const outpasses = await Outpass.find({ registrationNumber: regNo });
-
-        // Debugging: Log the results from the query
-        console.log('Outpasses fetched from the database:', outpasses);
-
-        // Check if any outpasses were found
-        if (outpasses.length === 0) {
-            console.log('No outpasses found for this registration number.');
-            return res.status(404).json({ message: 'No outpasses found for this registration number.' });
-        }
-
-        // Respond with the fetched outpasses
-        res.json(outpasses);
-    } catch (error) {
-        // Debugging: Log the error
-        console.error('Error fetching outpasses:', error);
-        res.status(500).json({ message: 'Internal server error' });
+        res.status(200).json({
+            outpasses,
+            pls,
+            leaves
+        });
+    } catch (err) {
+        res.status(500).json({
+            message: 'Internal server error',
+            success: false,
+            error: err.message
+        });
     }
 };
 
-module.exports = { fetchOutpassesByRegNo };
+// Fetch approved requests by registration number
+const fetchApprovedByRegNo = async (req, res) => {
+    try {
+        const { regNo } = req.params;
+
+        const [outpasses, pls, leaves] = await Promise.all([
+            Outpass.find({ registrationNumber: regNo, 'extraDataArray.0': 1 }).exec(),
+            PL.find({ registrationNumber: regNo, 'extraDataArray.0': 1 }).exec(),
+            Leave.find({ registrationNumber: regNo, 'extraDataArray.0': 1 }).exec()
+        ]);
+
+        res.status(200).json({
+            outpasses,
+            pls,
+            leaves
+        });
+    } catch (err) {
+        res.status(500).json({
+            message: 'Internal server error',
+            success: false,
+            error: err.message
+        });
+    }
+};
+
+const fetchDeclinedByRegNo = async (req, res) => {
+  try {
+      const { regNo } = req.params;
+
+      const [outpasses, pls, leaves] = await Promise.all([
+          Outpass.find({ registrationNumber: regNo, 'extraDataArray.0': 2 }).exec(),
+          PL.find({ registrationNumber: regNo, 'extraDataArray.0': 2 }).exec(),
+          Leave.find({ registrationNumber: regNo, 'extraDataArray.0': 2 }).exec()
+      ]);
+
+      res.status(200).json({
+          outpasses,
+          pls,
+          leaves
+      });
+  } catch (err) {
+      console.error('Error fetching declined requests:', err.message);
+      res.status(500).json({
+          message: 'Internal server error',
+          success: false,
+          error: err.message
+      });
+  }
+};
+const fetchExpiredByRegNo = async (req, res) => {
+  try {
+    const { regNo } = req.params;
+    
+    console.log('Fetching expired items for registration number:', regNo);
+
+    // Get the current date
+    const today = new Date();
+    console.log('Current date:', today);
+
+    // Fetch expired outpasses
+    const outpasses = await Outpass.find({
+      registrationNumber: regNo,
+      date: { $lt: today }
+    }).exec();
+    console.log('Fetched outpasses:', outpasses);
+
+    // Fetch expired PLs
+    const pls = await PL.find({
+      registrationNumber: regNo,
+      endDate: { $lt: today }
+    }).exec();
+    console.log('Fetched PLs:', pls);
+
+    // Fetch expired leaves
+    const leaves = await Leave.find({
+      registrationNumber: regNo,
+      endDate: { $lt: today }
+    }).exec();
+    console.log('Fetched leaves:', leaves);
+
+    res.status(200).json({
+      outpasses,
+      pls,
+      leaves
+    });
+  } catch (err) {
+    console.error('Error fetching expired requests:', err.message);
+    res.status(500).json({
+      message: 'Internal server error',
+      success: false,
+      error: err.message
+    });
+  }
+};
+
+module.exports = {
+  fetchPendingByRegNo,
+  fetchApprovedByRegNo,
+  fetchDeclinedByRegNo,
+  fetchExpiredByRegNo
+};

@@ -1,9 +1,13 @@
 const express = require('express');
-const { fetchOutpassesByRegNo } = require('../Controllers/FetchController'); // Import the controller function
+const { fetchPendingByRegNo, fetchApprovedByRegNo, fetchDeclinedByRegNo, fetchExpiredByRegNo } = require('../Controllers/FetchController');
 
 const router = express.Router();
 
-// Route to fetch outpasses by registration number
-router.get('/fetchoutpasses/:regNo', fetchOutpassesByRegNo);
+// Existing routes
+router.get('/fetchpending/:regNo', fetchPendingByRegNo);
+router.get('/fetchapproved/:regNo', fetchApprovedByRegNo);
+router.get('/fetchdeclined/:regNo', fetchDeclinedByRegNo);
+
+router.get('/fetchexpired/:regNo', fetchExpiredByRegNo);
 
 module.exports = router;

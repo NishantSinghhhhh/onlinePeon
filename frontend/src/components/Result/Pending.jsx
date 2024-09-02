@@ -1,7 +1,26 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Stack, Heading, Text, Flex, Badge } from '@chakra-ui/react';
+import {
+  Box,
+  Stack,
+  Heading,
+  Text,
+  Flex,
+  Badge,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  Button,
+  useDisclosure,
+} from '@chakra-ui/react';
 import Navbar from '../navbar/navbar';
 import { HashLoader } from 'react-spinners';
+import { format } from 'date-fns';
+import { Worker, Viewer } from '@react-pdf-viewer/core';
+import '@react-pdf-viewer/core/lib/styles/index.css';
 
 const Pending = () => {
   const [outpasses, setOutpasses] = useState([]);
@@ -10,6 +29,10 @@ const Pending = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showLoader, setShowLoader] = useState(true);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [selectedRequest, setSelectedRequest] = useState(null);
+  const [pdfUrl, setPdfUrl] = useState(null);
+  const [loadingDocument, setLoadingDocument] = useState(false);
 
   useEffect(() => {
     const fetchPendingData = async () => {
@@ -38,19 +61,41 @@ const Pending = () => {
         setError(err.message || 'An unexpected error occurred');
       } finally {
         setLoading(false);
+        setShowLoader(false);
       }
     };
 
     fetchPendingData();
-
-    // Ensure loader is shown for at least 2 seconds
-    const timer = setTimeout(() => {
-      setShowLoader(false);
-    }, 2000);
-
-    // Clear the timeout if the component unmounts before 2 seconds
-    return () => clearTimeout(timer);
   }, []);
+
+  const handleCardClick = (request) => {
+    setSelectedRequest(request);
+    setLoadingDocument(true);
+
+    if (request.document) {
+      try {
+        // Convert base64 string to a Blob
+        const byteCharacters = atob(request.document.split(',')[1]);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: 'application/pdf' });
+        
+        // Create a URL for the Blob
+        const url = URL.createObjectURL(blob);
+        setPdfUrl(url);
+      } catch (error) {
+        console.error('Error creating PDF Blob:', error);
+        setPdfUrl(null);
+      }
+    } else {
+      setPdfUrl(null);
+    }
+
+    onOpen();
+  };
 
   if (loading || showLoader) {
     return (
@@ -113,6 +158,7 @@ const Pending = () => {
                 borderWidth="1px"
                 borderRadius="md"
                 bg="white"
+                onClick={() => handleCardClick(card)}
               >
                 <Flex align="center" mb={2}>
                   <Heading fontSize="lg" mr={2}>
@@ -122,9 +168,9 @@ const Pending = () => {
                 </Flex>
                 <Text mb={2}>{card.reason || 'Details about the pending PL'}</Text>
                 <Text fontWeight="bold">
-                  From: {card.startHour || '00:00'} 
+                  From: {format(new Date(card.startDate), 'yyyy-MM-dd')} 
                   &nbsp; to &nbsp; 
-                  {card.endHour || '00:00'}
+                  {format(new Date(card.endDate), 'yyyy-MM-dd')}
                 </Text>
               </Box>
             ))}
@@ -145,6 +191,7 @@ const Pending = () => {
                 borderWidth="1px"
                 borderRadius="md"
                 bg="white"
+                onClick={() => handleCardClick(card)}
               >
                 <Flex align="center" mb={2}>
                   <Heading fontSize="lg" mr={2}>
@@ -154,9 +201,9 @@ const Pending = () => {
                 </Flex>
                 <Text mb={2}>{card.reason || 'Details about the pending leave'}</Text>
                 <Text fontWeight="bold">
-                  From: {card.startHour || '00:00'} 
+                  From: {format(new Date(card.startDate), 'yyyy-MM-dd')} 
                   &nbsp; to &nbsp; 
-                  {card.endHour || '00:00'}
+                  {format(new Date(card.endDate), 'yyyy-MM-dd')}
                 </Text>
               </Box>
             ))}
@@ -165,6 +212,44 @@ const Pending = () => {
           <Text>No pending leaves.</Text>
         )}
       </Flex>
+
+      {/* Modal */}
+      <Modal isOpen={isOpen} onClose={onClose} size="xl">
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Request Details</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            {selectedRequest && (
+              <Box>
+                <Text><strong>Name:</strong> {selectedRequest.firstName} {selectedRequest.lastName}</Text>
+                <Text><strong>Class:</strong> {selectedRequest.className}</Text>
+                <Text><strong>Roll Number:</strong> {selectedRequest.rollNumber}</Text>
+                <Text><strong>Registration Number:</strong> {selectedRequest.registrationNumber}</Text>
+                <Text><strong>Classes Missed:</strong> {selectedRequest.classesMissed}</Text>
+                <Text><strong>Reason:</strong> {selectedRequest.reason}</Text>
+                <Text><strong>From:</strong> {format(new Date(selectedRequest.startDate), 'yyyy-MM-dd')}</Text>
+                <Text><strong>To:</strong> {format(new Date(selectedRequest.endDate), 'yyyy-MM-dd')}</Text>
+                <Text><strong>Document:</strong></Text>
+                {loadingDocument ? (
+                  <Text>Loading document...</Text>
+                ) : (
+                  pdfUrl && (
+                    <Worker workerUrl="https://unpkg.com/pdfjs-dist@2.15.349/build/pdf.worker.min.js">
+                      <Viewer fileUrl={pdfUrl} />
+                    </Worker>
+                  )
+                )}
+              </Box>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={onClose}>
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </>
   );
 };
