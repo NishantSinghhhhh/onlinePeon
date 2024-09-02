@@ -1,14 +1,21 @@
 import React, { useState } from 'react';
 import {
   Card as ChakraCard, useToast, CardHeader, CardBody, CardFooter,
-  Heading, FormControl, FormLabel, Input, Button, Stack, InputGroup, InputLeftAddon,
-  Select
+  Heading, FormControl, FormLabel, Input, Button, Stack, Select
 } from '@chakra-ui/react';
 import Navbar from '../components/navbar/navbar';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useNavigate } from 'react-router-dom';
 import styles from './Form.module.css';
+
+const classOptions = [
+  'FE-COMP-A', 'FE-COMP-B', 'FE-ENTC-A', 'FE-ENTC-B', 'FE-IT-A', 'FE-IT-B',
+  'FE-MECH', 'FE-ARE', 'SE-COMP-A', 'SE-COMP-B', 'SE-ENTC-A', 'SE-ENTC-B',
+  'SE-IT-A', 'SE-IT-B', 'SE-MECH', 'TE-COMP-A', 'TE-COMP-B', 'TE-ENTC-A',
+  'TE-ENTC-B', 'TE-IT-A', 'TE-IT-B', 'TE-MECH', 'BE-COMP-A', 'BE-COMP-B',
+  'BE-ENTC-A', 'BE-ENTC-B', 'BE-IT-A', 'BE-IT-B', 'BE-MECH'
+];
 
 const LeaveForm = () => {
   const [formData, setFormData] = useState({
@@ -21,7 +28,8 @@ const LeaveForm = () => {
     placeOfResidence: '',
     attendancePercentage: '',
     contactNumber: '',
-    className: '' // Added className
+    className: '', // Added className
+    extraDataArray: [0, 0, 0, 0] // Hidden array with 4 numbers
   });
 
   const toast = useToast();
@@ -46,28 +54,28 @@ const LeaveForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     // Debug: Log the form data before submission
     console.log('Full formData state:', formData);
-
-    const { firstName, lastName, registrationNumber, reasonForLeave, startDate, endDate, placeOfResidence, attendancePercentage, contactNumber, className } = formData;
-
+  
+    const { firstName, lastName, registrationNumber, reasonForLeave, startDate, endDate, placeOfResidence, attendancePercentage, contactNumber, className, extraDataArray } = formData;
+  
     // Check if startDate and endDate are valid
     let isoStartDate = '';
     let isoEndDate = '';
-
+  
     if (startDate instanceof Date && !isNaN(startDate.getTime())) {
       isoStartDate = startDate.toISOString();
     } else {
       return handleError('Invalid start date selected.');
     }
-
+  
     if (endDate instanceof Date && !isNaN(endDate.getTime())) {
       isoEndDate = endDate.toISOString();
     } else {
       return handleError('Invalid end date selected.');
     }
-
+  
     // Debug: Log the form data to be sent to the server
     console.log('Form data at submission:', {
       firstName: `"${firstName}"`,
@@ -79,9 +87,10 @@ const LeaveForm = () => {
       placeOfResidence: `"${placeOfResidence}"`,
       attendancePercentage: `"${attendancePercentage}"`,
       contactNumber: `"${contactNumber}"`,
-      className: `"${className}"` // Added className
+      className: `"${className}"`, // Added className
+      extraDataArray // Include hidden array in request
     });
-
+  
     // Check for empty fields
     const emptyFields = [];
     if (!firstName) emptyFields.push('firstName');
@@ -94,21 +103,21 @@ const LeaveForm = () => {
     if (!attendancePercentage) emptyFields.push('attendancePercentage');
     if (!contactNumber) emptyFields.push('contactNumber');
     if (!className) emptyFields.push('className'); // Check for className
-
+  
     if (emptyFields.length > 0) {
       console.log('Empty fields:', emptyFields);
       return handleError(`The following fields are required: ${emptyFields.join(', ')}`);
     }
-
+  
     // Validate registration number and contact number
-    if (!/^\d{4}$/.test(registrationNumber)) {
-      return handleError('Registration number must be exactly 4 digits.');
+    if (!/^\d{5,6}$/.test(registrationNumber)) { // Updated regex
+      return handleError('Registration number must be exactly 5 or 6 digits.');
     }
-
+  
     if (!/^\d{10}$/.test(contactNumber)) {
       return handleError('Contact number must be exactly 10 digits.');
     }
-
+  
     try {
       const url = 'http://localhost:8000/auth/leave'; // Ensure this URL is correct
       const response = await fetch(url, {
@@ -126,19 +135,20 @@ const LeaveForm = () => {
           placeOfResidence,
           attendancePercentage,
           contactNumber,
-          className // Added className
+          className, // Added className
+          extraDataArray // Include hidden array in request
         }),
       });
-
+  
       if (!response.ok) {
         const errorData = await response.json();
         console.error('Server response error:', errorData); // Debug log
         return handleError(errorData.message || 'An error occurred');
       }
-
+  
       const result = await response.json();
       console.log('Server response:', result); // Debug log
-
+  
       if (result.success) {
         handleSuccess(result.message);
         setTimeout(() => navigate('/Home'), 1000);
@@ -152,6 +162,7 @@ const LeaveForm = () => {
       handleError('An unexpected error occurred.');
     }
   };
+  
 
   const handleError = (message) => {
     console.error('Error:', message); // Debug log
@@ -235,10 +246,7 @@ const LeaveForm = () => {
                   <DatePicker
                     selected={formData.startDate}
                     onChange={(date) => handleDateChange(date, 'startDate')}
-                    dateFormat='MMMM d, yyyy'
                     className={styles['chakra-input']}
-                    wrapperClassName={styles['chakra-datepicker']}
-                    popperClassName={styles['chakra-datepicker-popover']}
                   />
                 </FormControl>
 
@@ -247,17 +255,14 @@ const LeaveForm = () => {
                   <DatePicker
                     selected={formData.endDate}
                     onChange={(date) => handleDateChange(date, 'endDate')}
-                    dateFormat='MMMM d, yyyy'
                     className={styles['chakra-input']}
-                    wrapperClassName={styles['chakra-datepicker']}
-                    popperClassName={styles['chakra-datepicker-popover']}
                   />
                 </FormControl>
 
                 <FormControl isRequired>
                   <FormLabel>Place of Residence</FormLabel>
-                  <Input
-                    placeholder='Place of Residence'
+                  <Input 
+                    placeholder='Place of Residence' 
                     name='placeOfResidence'
                     value={formData.placeOfResidence}
                     onChange={handleChange}
@@ -267,10 +272,9 @@ const LeaveForm = () => {
 
                 <FormControl isRequired>
                   <FormLabel>Attendance Percentage</FormLabel>
-                  <Input
-                    placeholder='Attendance Percentage'
+                  <Input 
+                    placeholder='Attendance Percentage' 
                     name='attendancePercentage'
-                    type='number'
                     value={formData.attendancePercentage}
                     onChange={handleChange}
                     className={styles['chakra-input']}
@@ -279,10 +283,9 @@ const LeaveForm = () => {
 
                 <FormControl isRequired>
                   <FormLabel>Contact Number</FormLabel>
-                  <Input
-                    placeholder='Contact Number'
+                  <Input 
+                    placeholder='Contact Number' 
                     name='contactNumber'
-                    type='tel'
                     value={formData.contactNumber}
                     onChange={handleChange}
                     className={styles['chakra-input']}
@@ -292,52 +295,23 @@ const LeaveForm = () => {
                 <FormControl isRequired>
                   <FormLabel>Class</FormLabel>
                   <Select
-                    placeholder='Select class'
+                    placeholder='Select Class'
                     name='className'
                     value={formData.className}
                     onChange={handleChange}
                     className={styles['chakra-select']}
                   >
-                     <option value='FE-COMP-A'>FE-COMP-A</option>
-                    <option value='FE-COMP-B'>FE-COMP-B</option>
-                    <option value='FE-ENTC-A'>FE-ENTC-A</option>
-                    <option value='FE-ENTC-B'>FE-ENTC-B</option>
-                    <option value='FE-IT-A'>FE-IT-A</option>
-                    <option value='FE-IT-B'>FE-IT-B</option>
-                    <option value='FE-MECH'>FE-MECH</option>
-                    <option value='FE-ARE'>FE-ARE</option>
-                    <option value='SE-COMP-A'>SE-COMP-A</option>
-                    <option value='SE-COMP-B'>SE-COMP-B</option>
-                    <option value='SE-ENTC-A'>SE-ENTC-A</option>
-                    <option value='SE-ENTC-B'>SE-ENTC-B</option>
-                    <option value='SE-IT-A'>SE-IT-A</option>
-                    <option value='SE-IT-B'>SE-IT-B</option>
-                    <option value='SE-MECH'>SE-MECH</option>
-                    <option value='TE-COMP-A'>TE-COMP-A</option>
-                    <option value='TE-COMP-B'>TE-COMP-B</option>
-                    <option value='TE-ENTC-A'>TE-ENTC-A</option>
-                    <option value='TE-ENTC-B'>TE-ENTC-B</option>
-                    <option value='TE-IT-A'>TE-IT-A</option>
-                    <option value='TE-IT-B'>TE-IT-B</option>
-                    <option value='TE-MECH'>TE-MECH</option>
-                    <option value='BE-COMP-A'>BE-COMP-A</option>
-                    <option value='BE-COMP-B'>BE-COMP-B</option>
-                    <option value='BE-ENTC-A'>BE-ENTC-A</option>
-                    <option value='BE-ENTC-B'>BE-ENTC-B</option>
-                    <option value='BE-IT-A'>BE-IT-A</option>
-                    <option value='BE-IT-B'>BE-IT-B</option>
-                    <option value='BE-MECH'>BE-MECH</option>
-
+                    {classOptions.map(option => (
+                      <option key={option} value={option}>{option}</option>
+                    ))}
                   </Select>
                 </FormControl>
-
-                <Button colorScheme='gray' type='submit'>
-                  Submit
-                </Button>
               </Stack>
+              <CardFooter>
+                <Button type='submit' colorScheme='blue' mt={4}>Submit</Button>
+              </CardFooter>
             </form>
           </CardBody>
-
         </ChakraCard>
       </div>
     </>

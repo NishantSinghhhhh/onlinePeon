@@ -43,11 +43,16 @@ const SignInCard = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     const { email, password, registrationNumber } = loginInfo;
-  
+
+    // Validate registration number length
+    if (registrationNumber.length < 5 || registrationNumber.length > 6) {
+        return handleError('Registration number must be 5 or 6 characters long');
+    }
+
     if (!email || !password || !registrationNumber) {
       return handleError('All fields are required');
     }
-  
+
     try {
       const url = `http://localhost:8000/auth/login`;
       console.log('Sending request with:', {
@@ -56,7 +61,7 @@ const SignInCard = () => {
         registrationNumber,
         isStudent: true
       });
-  
+
       const response = await fetch(url, {
         method: "POST",
         headers: {
@@ -69,20 +74,22 @@ const SignInCard = () => {
           isStudent: true
         })
       });
-  
+
       const result = await response.json();
       console.log('API response:', result);
-  
+
       if (!response.ok) {
         throw new Error(result.message || 'An unexpected error occurred');
       }
-  
+
       const { success, message, jwtToken, name, error } = result;
-  
+
       if (success) {
         handleSuccess(message);
         localStorage.setItem('token', jwtToken);
         localStorage.setItem('loggedInUser', name);
+        // Store the login info in local storage
+        localStorage.setItem('loginInfo', JSON.stringify({ email, registrationNumber, isStudent: true }));
         setTimeout(() => {
           navigate('/home');
         }, 1000);
@@ -97,14 +104,15 @@ const SignInCard = () => {
     }
   };
 
+
   const staffLogin = async (e) => {
     e.preventDefault();
     const { email, password, staffId } = loginInfo;
-  
+
     if (!email || !password || !staffId) {
       return handleError('All fields are required');
     }
-  
+
     try {
       const url = `http://localhost:8000/auth/loginStaff`;
       console.log('Sending request with:', {
@@ -113,7 +121,7 @@ const SignInCard = () => {
         staffId,
         isStudent: false
       });
-  
+
       const response = await fetch(url, {
         method: "POST",
         headers: {
@@ -126,20 +134,22 @@ const SignInCard = () => {
           isStudent: false
         })
       });
-  
+
       const result = await response.json();
       console.log('API response:', result);
-  
+
       if (!response.ok) {
         throw new Error(result.message || 'An unexpected error occurred');
       }
-  
+
       const { success, message, jwtToken, name, error } = result;
-  
+
       if (success) {
         handleSuccess(message);
         localStorage.setItem('token', jwtToken);
         localStorage.setItem('loggedInUser', name);
+        // Store the login info in local storage
+        localStorage.setItem('loginInfo', JSON.stringify({ email, staffId, isStudent: false }));
         setTimeout(() => {
           navigate('/StaffHome');
         }, 1000);

@@ -17,11 +17,13 @@ const submitPL = async (req, res) => {
             lastName,
             className,
             rollNumber,
+            registrationNumber,
             classesMissed,
             reason,
             startDate,
             endDate,
-            document // Include document field
+            document,
+            extraDataArray // Extract extraDataArray from the request body
         } = req.body;
 
         // Create a new PL instance with all required fields
@@ -30,11 +32,13 @@ const submitPL = async (req, res) => {
             lastName,
             className,
             rollNumber,
+            registrationNumber, // Include registrationNumber in the instance creation
             classesMissed,
             reason,
             startDate,
             endDate,
-            document // Include document field in the instance creation
+            document,
+            extraDataArray // Include extraDataArray in the instance creation
         });
 
         // Save the new PL request to the database
@@ -53,7 +57,6 @@ const submitPL = async (req, res) => {
     }
 };
 
-//  Ensure the correct path to the Leave model
 const submitLeave = async (req, res) => {
     try {
         console.log('Received request body:', JSON.stringify(req.body, null, 2));
@@ -69,7 +72,8 @@ const submitLeave = async (req, res) => {
             placeOfResidence,
             attendancePercentage,
             contactNumber,
-            className
+            className,
+            extraDataArray // Include extraDataArray
         } = req.body;
 
         // Create a new leave instance with all required fields
@@ -83,7 +87,8 @@ const submitLeave = async (req, res) => {
             placeOfResidence,
             attendancePercentage,
             contactNumber,
-            className
+            className,
+            extraDataArray // Include extraDataArray
         });
 
         // Save the new leave request to the database
@@ -116,7 +121,8 @@ const submitOutpass = async (req, res) => {
             startHour,
             endHour,
             contactNumber,
-            className // Added className
+            className, // Added className
+            extraDataArray // Added extraDataArray
         } = req.body;
 
         // Validate required fields
@@ -130,6 +136,7 @@ const submitOutpass = async (req, res) => {
         if (!endHour) missingFields.push('endHour');
         if (!contactNumber) missingFields.push('contactNumber');
         if (!className) missingFields.push('className'); // Check for className
+        if (!extraDataArray) missingFields.push('extraDataArray'); // Check for extraDataArray
 
         if (missingFields.length > 0) {
             return res.status(400).json({
@@ -148,7 +155,8 @@ const submitOutpass = async (req, res) => {
             startHour,
             endHour,
             contactNumber,
-            className // Added className
+            className, // Added className
+            extraDataArray // Added extraDataArray
         });
 
         // Save the new outpass to the database

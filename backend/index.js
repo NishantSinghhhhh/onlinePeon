@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const multer = require('multer');
 const authRoutes = require('./Routes/AuthRouter');
+const fetchRoutes = require('./Routes/fetchRouter')
 const { func } = require('joi');
 
 require('dotenv').config();
@@ -20,9 +21,11 @@ app.use(cors());
 app.get('/ping', (req, res) => {
     res.send("PONG");
 });
+// app.get('/')
 // ../
 app.use('/auth', authRoutes);
 app.use('/outpass', authRoutes); 
+app.use('/fetch', fetchRoutes)
 app.use('/products', authRoutes);
 
 app.listen(PORT, () => {

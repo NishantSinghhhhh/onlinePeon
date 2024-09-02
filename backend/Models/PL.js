@@ -33,6 +33,12 @@ const PLSchema = new Schema({
         required: true,
         match: /^\d{4}$/ // Assuming roll number is exactly 4 digits
     },
+    registrationNumber: {
+        type: String,
+        required: true,
+        minlength: 5, // Minimum length of 5 characters
+        maxlength: 6 // Maximum length of 6 characters
+    },
     classesMissed: {
         type: Number,
         required: true,
@@ -53,7 +59,12 @@ const PLSchema = new Schema({
     },
     document: {
         type: String,
-        required: true, // The document is required
+        required: true // The document is required
+    },
+    extraDataArray: {
+        type: [Number],
+        required: true, // Ensure the array is provided
+        validate: [array => array.length === 4, 'ExtraDataArray must contain exactly 4 numbers'] // Validate array length
     }
 }, {
     timestamps: true 

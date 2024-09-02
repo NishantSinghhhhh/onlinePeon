@@ -1,5 +1,5 @@
 // pages/Approved.js
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Box, Stack, Heading, Text, Flex, Badge } from '@chakra-ui/react';
 import Navbar from '../navbar/navbar';
 
@@ -25,6 +25,17 @@ const Approved = () => {
       endDate: '2024-08-12'
     }
   ];
+
+  // Log the registration number from the sign-in information stored in localStorage
+  useEffect(() => {
+    const loginInfo = localStorage.getItem('loginInfo');
+    if (loginInfo) {
+      const { registrationNumber } = JSON.parse(loginInfo);
+      console.log('Registration Number:', registrationNumber);
+    } else {
+      console.log('No sign-in information found');
+    }
+  }, []);
 
   return (
     <>

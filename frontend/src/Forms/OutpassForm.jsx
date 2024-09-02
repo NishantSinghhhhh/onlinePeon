@@ -6,6 +6,14 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { useNavigate } from 'react-router-dom';
 import styles from './Form.module.css';
 
+const classOptions = [
+  'FE-COMP-A', 'FE-COMP-B', 'FE-ENTC-A', 'FE-ENTC-B', 'FE-IT-A', 'FE-IT-B', 
+  'FE-MECH', 'FE-ARE', 'SE-COMP-A', 'SE-COMP-B', 'SE-ENTC-A', 'SE-ENTC-B', 
+  'SE-IT-A', 'SE-IT-B', 'SE-MECH', 'TE-COMP-A', 'TE-COMP-B', 'TE-ENTC-A', 
+  'TE-ENTC-B', 'TE-IT-A', 'TE-IT-B', 'TE-MECH', 'BE-COMP', 'BE-ENTC', 
+  'BE-IT', 'BE-MECH'
+];
+
 const OutpassForm = () => {
   const [formData, setFormData] = useState({
     firstName: '',
@@ -16,9 +24,10 @@ const OutpassForm = () => {
     startHour: '',
     endHour: '',
     contactNumber: '',
-    className: '', // New field for class name
+    className: '',
+    extraDataArray: [0, 0, 0, 0], // Hidden array with 4 numbers
   });
-  
+
   const toast = useToast();
   const navigate = useNavigate();
 
@@ -26,7 +35,6 @@ const OutpassForm = () => {
     const { name, value } = e.target;
     setFormData(prevData => {
       const newData = { ...prevData, [name]: value };
-      console.log(`Field '${name}' updated:`, newData[name]); // Debug log
       return newData;
     });
   };
@@ -34,42 +42,15 @@ const OutpassForm = () => {
   const handleDateChange = (date) => {
     setFormData(prevData => {
       const newData = { ...prevData, date };
-      console.log('Date updated:', date); // Debug log
       return newData;
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    console.log('Full formData state:', formData);
 
-    const { firstName, lastName, registrationNumber, reason, date, startHour, endHour, contactNumber, className } = formData;
+    const { firstName, lastName, registrationNumber, reason, date, startHour, endHour, contactNumber, className, extraDataArray } = formData;
     const isoDate = date.toISOString();
-  
-    console.log('Form data at submission:', {
-      firstName: `"${firstName}"`,
-      lastName: `"${lastName}"`,
-      registrationNumber: `"${registrationNumber}"`,
-      reason: `"${reason}"`,
-      date: `"${isoDate}"`,
-      startHour: `"${startHour}"`,
-      endHour: `"${endHour}"`,
-      contactNumber: `"${contactNumber}"`,
-      className: `"${className}"`, // Added className to logs
-    });
-
-    console.log('Empty fields check:', {
-      firstName: !firstName,
-      lastName: !lastName,
-      registrationNumber: !registrationNumber,
-      reason: !reason,
-      date: !date,
-      startHour: !startHour,
-      endHour: !endHour,
-      contactNumber: !contactNumber,
-      className: !className // Added className to checks
-    });
 
     const emptyFields = [];
     if (!firstName) emptyFields.push('firstName');
@@ -80,21 +61,20 @@ const OutpassForm = () => {
     if (!startHour) emptyFields.push('startHour');
     if (!endHour) emptyFields.push('endHour');
     if (!contactNumber) emptyFields.push('contactNumber');
-    if (!className) emptyFields.push('className'); // Added className to checks
+    if (!className) emptyFields.push('className');
 
     if (emptyFields.length > 0) {
-      console.log('Empty fields:', emptyFields);
       return handleError(`The following fields are required: ${emptyFields.join(', ')}`);
     }
-    
-    if (!/^\d{4}$/.test(registrationNumber)) {
-      return handleError('Registration number must be exactly 4 digits.');
+
+    if (!/^\d{5,6}$/.test(registrationNumber)) {
+      return handleError('Registration number must be 5 or 6 digits long.');
     }
-  
+
     if (!/^\d{10}$/.test(contactNumber)) {
       return handleError('Contact number must be exactly 10 digits.');
     }
-  
+
     try {
       const url = 'http://localhost:8000/auth/outpass';
       const response = await fetch(url, {
@@ -111,35 +91,29 @@ const OutpassForm = () => {
           startHour,
           endHour,
           contactNumber,
-          className, // Added className to request body
+          className,
+          extraDataArray, // Hidden array included in request body
         }),
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json();
-        console.error('Server response error:', errorData); // Debug log
         return handleError(errorData.message || 'An error occurred');
       }
-  
-      const result = await response.json();
-      console.log('Server response:', result); // Debug log
 
+      const result = await response.json();
       if (result.success) {
         handleSuccess(result.message);
         setTimeout(() => navigate('/Home'), 1000);
-      } else if (result.error) {
-        handleError(result.error.details?.[0]?.message || 'An error occurred');
       } else {
         handleError(result.message || 'An unexpected error occurred.');
       }
     } catch (err) {
-      console.error('Fetch error:', err); // Debug log
       handleError('An unexpected error occurred.');
     }
   };
-  
+
   const handleError = (message) => {
-    console.error('Error:', message); // Debug log
     toast({
       title: 'Error',
       description: message,
@@ -150,7 +124,6 @@ const OutpassForm = () => {
   };
 
   const handleSuccess = (message) => {
-    console.log('Success:', message); // Debug log
     toast({
       title: 'Success',
       description: message,
@@ -276,48 +249,23 @@ const OutpassForm = () => {
                     onChange={handleChange}
                     className={styles['chakra-input']}
                   >
-                    <option value='FE-COMP-A'>FE-COMP-A</option>
-                    <option value='FE-COMP-B'>FE-COMP-B</option>
-                    <option value='FE-ENTC-A'>FE-ENTC-A</option>
-                    <option value='FE-ENTC-B'>FE-ENTC-B</option>
-                    <option value='FE-IT-A'>FE-IT-A</option>
-                    <option value='FE-IT-B'>FE-IT-B</option>
-                    <option value='FE-MECH'>FE-MECH</option>
-                    <option value='FE-ARE'>FE-ARE</option>
-                    <option value='SE-COMP-A'>SE-COMP-A</option>
-                    <option value='SE-COMP-B'>SE-COMP-B</option>
-                    <option value='SE-ENTC-A'>SE-ENTC-A</option>
-                    <option value='SE-ENTC-B'>SE-ENTC-B</option>
-                    <option value='SE-IT-A'>SE-IT-A</option>
-                    <option value='SE-IT-B'>SE-IT-B</option>
-                    <option value='SE-MECH'>SE-MECH</option>
-                    <option value='TE-COMP-A'>TE-COMP-A</option>
-                    <option value='TE-COMP-B'>TE-COMP-B</option>
-                    <option value='TE-ENTC-A'>TE-ENTC-A</option>
-                    <option value='TE-ENTC-B'>TE-ENTC-B</option>
-                    <option value='TE-IT-A'>TE-IT-A</option>
-                    <option value='TE-IT-B'>TE-IT-B</option>
-                    <option value='TE-MECH'>TE-MECH</option>
-                    <option value='BE-COMP-A'>BE-COMP-A</option>
-                    <option value='BE-COMP-B'>BE-COMP-B</option>
-                    <option value='BE-ENTC-A'>BE-ENTC-A</option>
-                    <option value='BE-ENTC-B'>BE-ENTC-B</option>
-                    <option value='BE-IT-A'>BE-IT-A</option>
-                    <option value='BE-IT-B'>BE-IT-B</option>
-                    <option value='BE-MECH'>BE-MECH</option>
+                    {classOptions.map((option, index) => (
+                      <option key={index} value={option}>
+                        {option}
+                      </option>
+                    ))}
                   </Select>
                 </FormControl>
-              </Stack>
-              <CardFooter>
-                <Button 
-                  colorScheme='gray' 
-                  type='submit'
-                >
+
+                <Button type='submit' colorScheme='blue' size='lg'>
                   Submit
                 </Button>
-              </CardFooter>
+              </Stack>
             </form>
           </CardBody>
+          <CardFooter>
+            <Button variant='ghost' onClick={() => navigate('/Home')}>Back to Home</Button>
+          </CardFooter>
         </ChakraCard>
       </div>
     </>

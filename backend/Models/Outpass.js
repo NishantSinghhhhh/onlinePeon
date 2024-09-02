@@ -14,7 +14,7 @@ const OutpassSchema = new Schema({
     registrationNumber: {
         type: String,
         required: true,
-        match: /^\d{4}$/ // Exactly 4 digits
+        match: /^\d{5,6}$/ // 5 or 6 digits
     },
     reason: {
         type: String,
@@ -48,6 +48,16 @@ const OutpassSchema = new Schema({
             'TE-COMP-A', 'TE-COMP-B', 'TE-ENTC-A', 'TE-ENTC-B', 'TE-IT-A', 'TE-IT-B', 'TE-MECH',
             'BE-COMP-A', 'BE-COMP-B', 'BE-ENTC-A', 'BE-ENTC-B', 'BE-IT-A', 'BE-IT-B', 'BE-MECH',
         ] // Validate against predefined class names
+    },
+    extraDataArray: {
+        type: [Number],
+        required: true,
+        validate: {
+            validator: function(array) {
+                return array.length === 4; // Ensure the array has exactly 4 elements
+            },
+            message: 'extraDataArray must contain exactly 4 numbers'
+        }
     }
 });
 

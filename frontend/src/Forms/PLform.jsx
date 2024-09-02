@@ -33,11 +33,13 @@ const PLForm = () => {
   const [lastName, setLastName] = useState('');
   const [className, setClassName] = useState('');
   const [rollNumber, setRollNumber] = useState('');
+  const [registrationNumber, setRegistrationNumber] = useState(''); // New state for registration number
   const [classesMissed, setClassesMissed] = useState('');
   const [reason, setReason] = useState('');
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [document, setDocument] = useState('');
+  const [extraDataArray] = useState([0, 0, 0, 0]); // Initialize extraDataArray
 
   const toast = useToast();
   const { setRollNumber: setRollNumberContext } = useRollNumber();
@@ -45,7 +47,7 @@ const PLForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!firstName || !lastName || !className || !rollNumber || !classesMissed || !reason || !startDate || !endDate || !document) {
+    if (!firstName || !lastName || !className || !rollNumber || !registrationNumber || !classesMissed || !reason || !startDate || !endDate || !document) {
       return handleError('Please fill in all required fields.');
     }
 
@@ -54,11 +56,13 @@ const PLForm = () => {
       lastName,
       className,
       rollNumber,
+      registrationNumber, // Add registration number here
       classesMissed,
       reason,
       startDate,
       endDate,
       document, // Base64-encoded document
+      extraDataArray, // Add extraDataArray here
     };
 
     try {
@@ -80,6 +84,7 @@ const PLForm = () => {
       if (result.success) {
         handleSuccess('PL request submitted successfully!');
         console.log('Roll Number:', rollNumber); // Print the roll number to the console
+        console.log('Registration Number:', registrationNumber); // Print the registration number to the console
         setRollNumberContext(rollNumber); // Update the roll number in context
         setTimeout(() => window.location.href = '/Home', 1000);
       } else {
@@ -172,6 +177,15 @@ const PLForm = () => {
                 </FormControl>
 
                 <FormControl isRequired>
+                  <FormLabel>Registration Number</FormLabel>
+                  <Input
+                    placeholder='Registration Number'
+                    value={registrationNumber}
+                    onChange={(e) => setRegistrationNumber(e.target.value.trim())} // Trim spaces
+                  />
+                </FormControl>
+
+                <FormControl isRequired>
                   <FormLabel>Number of Classes Missed</FormLabel>
                   <Input
                     type='number'
@@ -244,7 +258,7 @@ const PLForm = () => {
 
 export default PLForm;
 
-function convertToBase64(file){
+function convertToBase64(file) {
   return new Promise((resolve, reject) => {
     const fileReader = new FileReader();
     fileReader.readAsDataURL(file);
@@ -254,5 +268,5 @@ function convertToBase64(file){
     fileReader.onerror = (error) => {
       reject(error)
     }
-  })
+  });
 }
