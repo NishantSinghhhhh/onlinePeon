@@ -297,16 +297,15 @@ const login = async (req, res) => {
 };
 const signupStaff = async (req, res) => {
     try {
-        // No need to call staffSignupValidation here, it's used as middleware
+        // Extract values from the request body
         const {
             name,
             email,
             password,
-            department,
-            classTeacher,
-            counselor,
             staffId,
             contactNumber,
+            position,
+            classAssigned
         } = req.body;
 
         // Check if the user already exists
@@ -323,11 +322,10 @@ const signupStaff = async (req, res) => {
             name,
             email,
             password,
-            department,
-            classTeacher,
-            counselor,
             staffId,
             contactNumber,
+            position,
+            classAssigned
         });
 
         // Hash the password
