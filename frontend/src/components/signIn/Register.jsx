@@ -197,7 +197,7 @@ const Register = () => {
           <ChakraCard
             borderWidth='1px'
             borderRadius='md'
-            w='110vh'
+            w='100vh'
             p={6}
             m='auto'
             boxShadow='md'
@@ -220,7 +220,7 @@ const Register = () => {
                       value={signupInfo.name}
                       onChange={handleChange}
                       className={styles.chakraInput}
-                      w='70vw'
+                      // w='70vw'
                     />
                   </FormControl>
 
@@ -371,7 +371,7 @@ const Register = () => {
                     </Select>
                   </FormControl>
 
-                  <Button type="submit" colorScheme="teal">
+                  <Button type="submit" >
                     Register
                   </Button>
                 </Stack>

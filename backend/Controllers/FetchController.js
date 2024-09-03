@@ -149,11 +149,33 @@ const fetchTeachers = async (req, res) => {
     });
   }
 };
+const fetchTeacherById = async (req, res) => {
+  const { staffId } = req.params;
+
+  console.log(`Received request to fetch teacher with staffId: ${staffId}`);
+
+  try {
+    // Query the database to find the teacher by staff ID
+    const teacher = await Staff.findOne({ staffId: String(staffId) });
+
+    if (!teacher) {
+      console.log(`No teacher found with staffId: ${staffId}`);
+      return res.status(404).json({ message: 'Teacher not found' });
+    }
+
+    console.log(`Teacher found: ${JSON.stringify(teacher)}`);
+    res.status(200).json({ teacher });
+  } catch (error) {
+    console.error('Error fetching teacher:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
 
 module.exports = {
   fetchPendingByRegNo,
   fetchApprovedByRegNo,
   fetchDeclinedByRegNo,
   fetchExpiredByRegNo,
-  fetchTeachers
+  fetchTeachers,
+  fetchTeacherById
 };
