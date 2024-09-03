@@ -1,8 +1,8 @@
 const { Outpass } = require('../Models/Outpass');
 const { PL } = require('../Models/PL');
 const { Leave } = require('../Models/Leave');
+const {Staff} = require('../Models/staff')
 
-// Fetch pending requests by registration number
 const fetchPendingByRegNo = async (req, res) => {
     try {
         const { regNo } = req.params;
@@ -27,7 +27,7 @@ const fetchPendingByRegNo = async (req, res) => {
     }
 };
 
-// Fetch approved requests by registration number
+
 const fetchApprovedByRegNo = async (req, res) => {
     try {
         const { regNo } = req.params;
@@ -76,31 +76,28 @@ const fetchDeclinedByRegNo = async (req, res) => {
       });
   }
 };
+
 const fetchExpiredByRegNo = async (req, res) => {
   try {
     const { regNo } = req.params;
     
     console.log('Fetching expired items for registration number:', regNo);
 
-    // Get the current date
     const today = new Date();
     console.log('Current date:', today);
 
-    // Fetch expired outpasses
     const outpasses = await Outpass.find({
       registrationNumber: regNo,
       date: { $lt: today }
     }).exec();
     console.log('Fetched outpasses:', outpasses);
 
-    // Fetch expired PLs
     const pls = await PL.find({
       registrationNumber: regNo,
       endDate: { $lt: today }
     }).exec();
     console.log('Fetched PLs:', pls);
 
-    // Fetch expired leaves
     const leaves = await Leave.find({
       registrationNumber: regNo,
       endDate: { $lt: today }
@@ -122,9 +119,41 @@ const fetchExpiredByRegNo = async (req, res) => {
   }
 };
 
+const fetchTeachers = async (req, res) => {
+  try {
+    console.log('Fetch teachers request received'); // Debug log
+
+    // Fetching teachers from the database
+    const teachers = await Staff.find({ position: 'Class Teacher' });
+    
+    console.log('Teachers fetched:', teachers); // Debug log
+
+    if (teachers.length === 0) {
+      console.log('No class teachers found'); // Debug log
+      return res.status(404).json({
+        message: 'No Class Teachers found',
+        success: false
+      });
+    }
+
+    res.status(200).json({
+      message: 'Class Teachers fetched successfully',
+      success: true,
+      data: teachers
+    });
+  } catch (err) {
+    console.error('Error fetching teachers:', err); // Debug log
+    res.status(500).json({
+      message: 'Internal server error',
+      success: false
+    });
+  }
+};
+
 module.exports = {
   fetchPendingByRegNo,
   fetchApprovedByRegNo,
   fetchDeclinedByRegNo,
-  fetchExpiredByRegNo
+  fetchExpiredByRegNo,
+  fetchTeachers
 };
