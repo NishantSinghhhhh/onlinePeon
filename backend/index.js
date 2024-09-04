@@ -4,7 +4,7 @@ const cors = require('cors');
 const multer = require('multer');
 const authRoutes = require('./Routes/AuthRouter');
 const fetchRoutes = require('./Routes/fetchRouter')
-const fetchRoutesTeachers = require('./Routes/fetchRoutesTeachers')
+// const fetchRoutesTeachers = require('./Routes/')
 const { func } = require('joi');
 
 require('dotenv').config();
@@ -27,7 +27,7 @@ app.get('/ping', (req, res) => {
 app.use('/auth', authRoutes);
 app.use('/outpass', authRoutes); 
 app.use('/fetch', fetchRoutes)
-app.use('/fetchForTeachers', fetchRoutesTeachers)
+// app.use('/fetchForTeachers', fetchRoutesTeachers)
 app.use('/products', authRoutes);
 
 app.listen(PORT, () => {

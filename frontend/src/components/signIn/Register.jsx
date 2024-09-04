@@ -17,17 +17,20 @@ import {
 import { useNavigate } from 'react-router-dom';
 import styles from './Form.module.css'; // Import the CSS module
 
-const branches = ['COMP', 'ENTC', 'IT', 'Mech'];
-const years = ['FE', 'SE', 'TE', 'BE'];
-const classes = ['A', 'B'];
+// Replace the classes array with the provided class names
+const classNames = [
+  'FE-COMP-A', 'FE-COMP-B', 'FE-ENTC-A', 'FE-ENTC-B', 'FE-IT-A', 'FE-IT-B',
+  'FE-MECH', 'FE-ARE', 'SE-COMP-A', 'SE-COMP-B', 'SE-ENTC-A', 'SE-ENTC-B',
+  'SE-IT-A', 'SE-IT-B', 'SE-MECH', 'TE-COMP-A', 'TE-COMP-B', 'TE-ENTC-A',
+  'TE-ENTC-B', 'TE-IT-A', 'TE-IT-B', 'TE-MECH', 'BE-COMP-A', 'BE-COMP-B',
+  'BE-ENTC-A', 'BE-ENTC-B', 'BE-IT-A', 'BE-IT-B', 'BE-MECH'
+];
 
 const Register = () => {
   const [signupInfo, setSignupInfo] = useState({
     name: '',
     email: '',
     password: '',
-    branch: '',
-    year: '',
     class: '',
     rollNumber: '',
     registrationNumber: '',
@@ -54,8 +57,6 @@ const Register = () => {
         
         console.log('Fetched class teachers:', data); // Debug log
         
-        // Check the structure of data and update state accordingly
-        // Assuming the teacher names are in data.data
         setClassTeachers(data.data || []);
       } catch (err) {
         console.error('Failed to load class teachers:', err); // Debug log
@@ -84,8 +85,6 @@ const Register = () => {
       name,
       email,
       password,
-      branch,
-      year,
       class: className,
       rollNumber,
       registrationNumber,
@@ -94,7 +93,7 @@ const Register = () => {
       classTeacherName
     } = signupInfo;
 
-    if (!name || !email || !password || !branch || !year || !className || !rollNumber || !registrationNumber || !fatherName || !fatherPhoneNumber || !classTeacherName) {
+    if (!name || !email || !password || !className || !rollNumber || !registrationNumber || !fatherName || !fatherPhoneNumber || !classTeacherName) {
       return handleError('All fields are required.');
     }
 
@@ -112,8 +111,6 @@ const Register = () => {
       name,
       email,
       password,
-      branch,
-      year,
       className,
       rollNumber,
       registrationNumber,
@@ -133,8 +130,6 @@ const Register = () => {
           name,
           email,
           password,
-          branch,
-          year,
           class: className,
           rollNumber,
           registrationNumber,
@@ -193,7 +188,7 @@ const Register = () => {
     <>
       <div className={styles.Upper}>Register Here</div>
       <div className={styles.DIvision}>
-        <Box display="flex" mt='100px' flexDirection="column" justifyContent="center" alignItems="center" height="100vh" width="100vw">
+        <Box display="flex" mt='50px' flexDirection="column" justifyContent="center" alignItems="center" height="100vh" width="100vw">
           <ChakraCard
             borderWidth='1px'
             borderRadius='md'
@@ -220,7 +215,6 @@ const Register = () => {
                       value={signupInfo.name}
                       onChange={handleChange}
                       className={styles.chakraInput}
-                      // w='70vw'
                     />
                   </FormControl>
 
@@ -253,7 +247,7 @@ const Register = () => {
                     <Input
                       type="number"
                       name="rollNumber"
-                      placeholder="Enter your roll number (4 digits)"
+                      placeholder="Enter your roll number (4-digit number)"
                       value={signupInfo.rollNumber}
                       onChange={handleChange}
                       className={styles.chakraInput}
@@ -265,7 +259,7 @@ const Register = () => {
                     <Input
                       type="number"
                       name="registrationNumber"
-                      placeholder="Enter your registration number (5-6 digits)"
+                      placeholder="Enter your registration number (5-6 digit number)"
                       value={signupInfo.registrationNumber}
                       onChange={handleChange}
                       className={styles.chakraInput}
@@ -289,7 +283,7 @@ const Register = () => {
                     <Input
                       type="tel"
                       name="fatherPhoneNumber"
-                      placeholder="Enter your father's phone number (10 digits)"
+                      placeholder="Enter your father's phone number (10-digit number)"
                       value={signupInfo.fatherPhoneNumber}
                       onChange={handleChange}
                       className={styles.chakraInput}
@@ -297,11 +291,26 @@ const Register = () => {
                   </FormControl>
 
                   <FormControl isRequired>
+                    <FormLabel>Class</FormLabel>
+                    <Select
+                      name="class"
+                      placeholder="Select your class"
+                      value={signupInfo.class}
+                      onChange={handleChange}
+                      className={styles.chakraInput}
+                    >
+                      {classNames.map((className, index) => (
+                        <option key={index} value={className}>{className}</option>
+                      ))}
+                    </Select>
+                  </FormControl>
+
+                  <FormControl isRequired>
                     <FormLabel>Class Teacher's Name</FormLabel>
                     {loading ? (
                       <Text>Loading...</Text>
                     ) : error ? (
-                      <Text color="red.500">{error}</Text>
+                      <Text>{error}</Text>
                     ) : (
                       <Select
                         name="classTeacherName"
@@ -310,71 +319,18 @@ const Register = () => {
                         onChange={handleChange}
                         className={styles.chakraInput}
                       >
-                        {classTeachers.map(teacher => (
-                          <option key={teacher._id} value={teacher.name}>
-                            {teacher.name}
-                          </option>
+                        {classTeachers.map((teacher, index) => (
+                          <option key={index} value={teacher.name}>{teacher.name}</option>
                         ))}
                       </Select>
                     )}
                   </FormControl>
-
-
-                  <FormControl isRequired>
-                    <FormLabel>Branch</FormLabel>
-                    <Select
-                      name="branch"
-                      placeholder="Select branch"
-                      value={signupInfo.branch}
-                      onChange={handleChange}
-                      className={styles.chakraSelect}
-                    >
-                      {branches.map((branch) => (
-                        <option key={branch} value={branch}>
-                          {branch}
-                        </option>
-                      ))}
-                    </Select>
-                  </FormControl>
-
-                  <FormControl isRequired>
-                    <FormLabel>Year</FormLabel>
-                    <Select
-                      name="year"
-                      placeholder="Select year"
-                      value={signupInfo.year}
-                      onChange={handleChange}
-                      className={styles.chakraSelect}
-                    >
-                      {years.map((year) => (
-                        <option key={year} value={year}>
-                          {year}
-                        </option>
-                      ))}
-                    </Select>
-                  </FormControl>
-
-                  <FormControl isRequired>
-                    <FormLabel>Class</FormLabel>
-                    <Select
-                      name="class"
-                      placeholder="Select class"
-                      value={signupInfo.class}
-                      onChange={handleChange}
-                      className={styles.chakraSelect}
-                    >
-                      {classes.map((className) => (
-                        <option key={className} value={className}>
-                          {className}
-                        </option>
-                      ))}
-                    </Select>
-                  </FormControl>
-
-                  <Button type="submit" >
+                </Stack>
+                <CardFooter >
+                  <Button ml={-5} type="submit"  className={styles.submitButton}>
                     Register
                   </Button>
-                </Stack>
+                </CardFooter>
               </form>
             </CardBody>
           </ChakraCard>

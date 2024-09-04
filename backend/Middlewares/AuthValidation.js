@@ -5,24 +5,42 @@ const signupValidation = (req, res, next) => {
         name: Joi.string().min(3).max(100).required(),
         email: Joi.string().email().required(),
         password: Joi.string().min(4).max(100).required(),
-        branch: Joi.string().valid('COMP', 'ENTC', 'IT', 'Mech').required(),
-        year: Joi.string().valid('FE', 'SE', 'TE', 'BE').required(),
-        class: Joi.string().valid('A', 'B').required(),
         rollNumber: Joi.string().length(4).pattern(/^\d+$/).required(), // Exactly 4 digits
         registrationNumber: Joi.string().min(5).max(6).pattern(/^\d+$/).required(), // 5-6 digits
-        fatherName: Joi.string().required(), // Required field for father's name
+        fatherName: Joi.string().required(),
         fatherPhoneNumber: Joi.string().length(10).pattern(/^\d+$/).required(), // Exactly 10 digits
-        classTeacherName: Joi.string().valid('Mr. John Doe', 'Ms. Jane Smith', 'Mr. Albert Brown', 'Ms. Emily Davis').required() // List of possible class teachers
+        class: Joi.string().valid(
+            'FE-COMP-A', 'FE-COMP-B', 'FE-ENTC-A', 'FE-ENTC-B', 'FE-IT-A', 'FE-IT-B',
+            'FE-MECH', 'FE-ARE', 'SE-COMP-A', 'SE-COMP-B', 'SE-ENTC-A', 'SE-ENTC-B',
+            'SE-IT-A', 'SE-IT-B', 'SE-MECH', 'TE-COMP-A', 'TE-COMP-B', 'TE-ENTC-A',
+            'TE-ENTC-B', 'TE-IT-A', 'TE-IT-B', 'TE-MECH', 'BE-COMP-A', 'BE-COMP-B',
+            'BE-ENTC-A', 'BE-ENTC-B', 'BE-IT-A', 'BE-IT-B', 'BE-MECH'
+        ).required(),
+        classTeacherName: Joi.string().required() // No predefined values, just required
     });
 
-    const { error } = schema.validate(req.body);
+    // Validate the request body
+    const { error, value } = schema.validate(req.body, { abortEarly: false });
 
+    // Debugging output
+    console.log('Request Body:', req.body);
+    console.log('Validation Result:', value);
+    
     if (error) {
+        console.log('Validation Error:', error.details);
+
+        // Format error messages
+        const formattedErrors = error.details.map(err => ({
+            field: err.context.key,
+            message: err.message
+        }));
+
         return res.status(400).json({
             message: "Bad Request",
-            error: error.details
+            errors: formattedErrors
         });
     }
+    
     next();
 };
 
@@ -173,13 +191,17 @@ const plValidation = (req, res, next) => {
     console.log('Validation passed. Validated data:', JSON.stringify(value, null, 2));
     next();
 };
+
 const staffSignupValidation = (req, res, next) => {
     const schema = Joi.object({
         name: Joi.string().min(3).max(100).required(),
         email: Joi.string().email().required(),
         password: Joi.string().min(4).max(100).required(),
-        staffId: Joi.string().length(6).pattern(/^\d+$/).required(),
-        contactNumber: Joi.string().length(10).pattern(/^\d+$/).required(),
+        staffId: Joi.alternatives().try(
+            Joi.string().length(5).pattern(/^\d+$/), // 5 digits
+            Joi.string().length(6).pattern(/^\d+$/)  // 6 digits
+        ).required(),
+        contactNumber: Joi.string().length(10).pattern(/^\d+$/).required(), // Ensure contact number is exactly 10 digits
         position: Joi.string().valid(
             'HOD', 
             'Class Teacher', 
@@ -188,15 +210,14 @@ const staffSignupValidation = (req, res, next) => {
             'Director'
         ).required(),
         classAssigned: Joi.string().valid(
-            'FE-Comp-A', 'FE-Comp-B', 'FE-IT-A', 'FE-IT-B', 'FE-ENTC-A', 'FE-ENTC-B', 'FE-Mech-A', 'FE-Mech-B',
-            'SE-Comp-A', 'SE-Comp-B', 'SE-IT-A', 'SE-IT-B', 'SE-ENTC-A', 'SE-ENTC-B', 'SE-Mech-A', 'SE-Mech-B',
-            'TE-Comp-A', 'TE-Comp-B', 'TE-IT-A', 'TE-IT-B', 'TE-ENTC-A', 'TE-ENTC-B', 'TE-Mech-A', 'TE-Mech-B',
-            'BE-Comp-A', 'BE-Comp-B', 'BE-IT-A', 'BE-IT-B', 'BE-ENTC-A', 'BE-ENTC-B', 'BE-Mech-A', 'BE-Mech-B',
-            'ARE'
+            'FE-COMP-A', 'FE-COMP-B', 'FE-ENTC-A', 'FE-ENTC-B', 'FE-IT-A', 'FE-IT-B', 'FE-MECH', 'FE-ARE',
+            'SE-COMP-A', 'SE-COMP-B', 'SE-ENTC-A', 'SE-ENTC-B', 'SE-IT-A', 'SE-IT-B', 'SE-MECH',
+            'TE-COMP-A', 'TE-COMP-B', 'TE-ENTC-A', 'TE-ENTC-B', 'TE-IT-A', 'TE-IT-B', 'TE-MECH',
+            'BE-COMP-A', 'BE-COMP-B', 'BE-ENTC-A', 'BE-ENTC-B', 'BE-IT-A', 'BE-IT-B', 'BE-MECH'
         ).when('position', {
             is: Joi.string().valid('Class Teacher', 'HOD', 'Warden'),
             then: Joi.required(),
-            otherwise: Joi.forbidden()
+            otherwise: Joi.forbidden() // `classAssigned` is forbidden if position is not one of these
         }),
     });
 

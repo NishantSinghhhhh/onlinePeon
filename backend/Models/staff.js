@@ -29,19 +29,21 @@ const StaffSchema = new Schema({
   },
   position: {
     type: String,
-    enum: ['HOD', 'Class Teacher', 'Warden', 'Director', 'Joint Director'],
+    enum: ['HOD', 'Class Teacher', 'Warden', 'Joint Director', 'Director'],
     required: true
   },
   classAssigned: {
     type: String,
     enum: [
-      'FE-Comp-A', 'FE-Comp-B', 'FE-IT-A', 'FE-IT-B', 'FE-ENTC-A', 'FE-ENTC-B', 'FE-Mech-A', 'FE-Mech-B',
-      'SE-Comp-A', 'SE-Comp-B', 'SE-IT-A', 'SE-IT-B', 'SE-ENTC-A', 'SE-ENTC-B', 'SE-Mech-A', 'SE-Mech-B',
-      'TE-Comp-A', 'TE-Comp-B', 'TE-IT-A', 'TE-IT-B', 'TE-ENTC-A', 'TE-ENTC-B', 'TE-Mech-A', 'TE-Mech-B',
-      'BE-Comp-A', 'BE-Comp-B', 'BE-IT-A', 'BE-IT-B', 'BE-ENTC-A', 'BE-ENTC-B', 'BE-Mech-A', 'BE-Mech-B'
-    ], // Example class options
+      'FE-COMP-A', 'FE-COMP-B', 'FE-ENTC-A', 'FE-ENTC-B', 'FE-IT-A', 'FE-IT-B',
+      'FE-MECH', 'FE-ARE', 'SE-COMP-A', 'SE-COMP-B', 'SE-ENTC-A', 'SE-ENTC-B',
+      'SE-IT-A', 'SE-IT-B', 'SE-MECH', 'TE-COMP-A', 'TE-COMP-B', 'TE-ENTC-A',
+      'TE-ENTC-B', 'TE-IT-A', 'TE-IT-B', 'TE-MECH', 'BE-COMP-A', 'BE-COMP-B',
+      'BE-ENTC-A', 'BE-ENTC-B', 'BE-IT-A', 'BE-IT-B', 'BE-MECH'
+    ], // Class options
     required: function() {
-      return this.position === 'Class Teacher' || this.position === 'HOD' || this.position === 'Warden'; // Only required for specific positions
+      // Only required if the position is 'Class Teacher', 'HOD', or 'Warden'
+      return this.position === 'Class Teacher' || this.position === 'HOD' || this.position === 'Warden';
     }
   }
 });

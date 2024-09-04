@@ -181,23 +181,13 @@ const signup = async (req, res) => {
             name, 
             email, 
             password, 
-            branch, 
-            year, 
-            class: userClass, 
             rollNumber, 
             registrationNumber,
             fatherName, 
             fatherPhoneNumber,
+            class: userClass, 
             classTeacherName 
         } = req.body;
-
-        // Validate required fields
-        if (!name || !email || !password || !branch || !year || !userClass || !rollNumber || !registrationNumber || !fatherName || !fatherPhoneNumber || !classTeacherName) {
-            return res.status(400).json({
-                message: 'All fields are required',
-                success: false
-            });
-        }
 
         // Check if the user already exists
         const existingUser = await User.findOne({ email });
@@ -212,14 +202,12 @@ const signup = async (req, res) => {
         const user = new User({
             name,
             email,
-            password,
-            branch,
-            year,
-            class: userClass,
+            password, // Will be hashed before saving
             rollNumber,
             registrationNumber,
             fatherName,
             fatherPhoneNumber,
+            class: userClass,
             classTeacherName
         });
 
@@ -234,10 +222,11 @@ const signup = async (req, res) => {
             success: true
         });
     } catch (err) {
-        console.error(err); // Log the error to the server console for debugging
+        console.error('Error during signup:', err.stack); // Log the full error stack
         res.status(500).json({
             message: 'Internal server error',
-            success: false
+            success: false,
+            error: err.message // Send error message in response for debugging
         });
     }
 };
@@ -295,6 +284,7 @@ const login = async (req, res) => {
         });
     }
 };
+
 const signupStaff = async (req, res) => {
     try {
         // Extract values from the request body
@@ -317,21 +307,33 @@ const signupStaff = async (req, res) => {
             });
         }
 
-        // Create a new user instance
-        const newStaff = new Staff({
+        // Create a new user instance with required data
+        const newStaffData = {
             name,
             email,
             password,
             staffId,
             contactNumber,
-            position,
-            classAssigned
-        });
+            position
+        };
+
+        // Only add classAssigned if the position requires it
+        if (['Class Teacher', 'HOD', 'Warden'].includes(position)) {
+            if (!classAssigned) {
+                return res.status(400).json({
+                    message: 'Class assigned is required for the position',
+                    success: false
+                });
+            }
+            newStaffData.classAssigned = classAssigned;
+        }
+
+        const newStaff = new Staff(newStaffData);
 
         // Hash the password
         newStaff.password = await bcrypt.hash(password, 10);
 
-        // Save the new user to the database
+        // Save the new staff to the database
         await newStaff.save();
 
         res.status(201).json({
@@ -339,7 +341,7 @@ const signupStaff = async (req, res) => {
             success: true
         });
     } catch (err) {
-        console.error(err); // Log the error to the server console for debugging
+        console.error('Error during staff signup:', err); // Log detailed error information
         res.status(500).json({
             message: 'Internal server error',
             success: false
