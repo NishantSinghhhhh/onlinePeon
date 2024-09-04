@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const { db6 } = require('./db');
 
-// Define the StaffSchema
 const StaffSchema = new Schema({
   name: {
     type: String,
@@ -20,12 +19,12 @@ const StaffSchema = new Schema({
   staffId: {
     type: String,
     required: true,
-    match: /^\d{5,6}$/ // Ensure staff ID is between 5 and 6 digits
+    match: /^\d{5,6}$/ 
   },
   contactNumber: {
     type: String,
     required: true,
-    match: /^\d{10}$/ // Ensure contact number is exactly 10 digits
+    match: /^\d{10}$/ 
   },
   position: {
     type: String,
@@ -40,9 +39,8 @@ const StaffSchema = new Schema({
       'SE-IT-A', 'SE-IT-B', 'SE-MECH', 'TE-COMP-A', 'TE-COMP-B', 'TE-ENTC-A',
       'TE-ENTC-B', 'TE-IT-A', 'TE-IT-B', 'TE-MECH', 'BE-COMP-A', 'BE-COMP-B',
       'BE-ENTC-A', 'BE-ENTC-B', 'BE-IT-A', 'BE-IT-B', 'BE-MECH'
-    ], // Class options
+    ], 
     required: function() {
-      // Only required if the position is 'Class Teacher', 'HOD', or 'Warden'
       return this.position === 'Class Teacher' || this.position === 'HOD' || this.position === 'Warden';
     }
   }

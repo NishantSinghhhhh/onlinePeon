@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Stack, Heading, Text, Flex, Spinner, Alert, AlertIcon } from '@chakra-ui/react';
+import { Box, Stack, Heading, Text, Flex, Alert, AlertIcon, Button } from '@chakra-ui/react';
 import StaffNavbar from '../StaffNavbar/StaffNavbar';
 import OutpassCard from '../cards/outpassCard';
+import { HashLoader } from 'react-spinners';
 
 const StaffOutpass = () => {
   const [outpasses, setOutpasses] = useState([]);
@@ -11,29 +12,33 @@ const StaffOutpass = () => {
 
   const fetchOutpass = async (classAssigned) => {
     try {
-      console.log('Fetching outpasses for class:', classAssigned); // Debug log
+      console.log('Initiating fetchOutpass function');
+      console.log('Class assigned to fetch:', classAssigned);
 
-      // Fetch outpasses using the correct URL pattern
       const outpassResponse = await fetch(`http://localhost:8000/fetch/fetchOutpasses/${classAssigned}`);
 
-      console.log('Response status:', outpassResponse.status); // Debug log
-      console.log('Response URL:', outpassResponse.url); // Debug log
-      
-      // Check if the response is OK
+      console.log('Response received from the server');
+      console.log('Response status code:', outpassResponse.status);
+      console.log('Response URL:', outpassResponse.url);
+
       if (!outpassResponse.ok) {
-        const errorText = await outpassResponse.text(); // Get response text for debugging
-        console.error('Response error text:', errorText); // Debug log
+        console.log('Response status not OK:', outpassResponse.status);
+        const errorText = await outpassResponse.text();
+        console.error('Error details from server:', errorText);
         throw new Error('Failed to fetch outpasses');
       }
 
-      // Parse the response data
+      console.log('Parsing JSON from response');
       const outpassData = await outpassResponse.json();
-      console.log('Fetched outpass data:', outpassData); // Debug log
-      
-      return outpassData; // Return the fetched data
+
+      console.log('JSON parsing successful');
+      console.log('Fetched outpass data:', outpassData);
+
+      return outpassData;
     } catch (error) {
-      console.error('Error fetching outpasses:', error.message); // Log any errors
-      throw error; // Re-throw the error for handling in the calling code
+      console.error('Error encountered during fetch:', error.message);
+      console.error('Stack trace:', error.stack);
+      throw error;
     }
   };
 
@@ -50,18 +55,14 @@ const StaffOutpass = () => {
       const { staffId } = loginInfo;
 
       try {
-        // Fetch teacher information using staff ID
         const teacherResponse = await fetch(`http://localhost:8000/fetch/fetchTeacher/${staffId}`);
         const teacherData = await teacherResponse.json();
 
         if (!teacherResponse.ok) {
           throw new Error(teacherData.message || 'Failed to fetch teacher information');
         }
-
-        // Extract classAssigned from teacher data
         const classAssigned = teacherData.teacher?.classAssigned;
         if (classAssigned) {
-          // Fetch outpasses for the class
           const outpassData = await fetchOutpass(classAssigned);
           setOutpasses(outpassData.data || []);
         } else {
@@ -77,7 +78,6 @@ const StaffOutpass = () => {
 
     fetchTeacherAndOutpasses();
 
-    // Ensure loader is shown for at least 2 seconds
     const timer = setTimeout(() => {
       setShowLoader(false);
     }, 2000);
@@ -88,7 +88,7 @@ const StaffOutpass = () => {
   if (loading || showLoader) {
     return (
       <Flex direction="column" align="center" justify="center" p={5} minH="100vh">
-        <Spinner size="xl" />
+        <HashLoader color="#000000" loading={loading || showLoader} size={50} />
         <Text mt={4}>Loading...</Text>
       </Flex>
     );
@@ -97,10 +97,11 @@ const StaffOutpass = () => {
   if (error) {
     return (
       <Flex direction="column" align="center" justify="center" p={5} minH="100vh">
-        <Alert status="error">
+        <Alert status="error" variant="left-accent" borderRadius="md" boxShadow="lg" mb={4}>
           <AlertIcon />
           {error}
         </Alert>
+        <Button colorScheme="teal" onClick={() => window.location.reload()}>Try Again</Button>
       </Flex>
     );
   }
@@ -117,7 +118,7 @@ const StaffOutpass = () => {
             ))}
           </Stack>
         ) : (
-          <Text>No outpasses found.</Text>
+          <Text fontSize="xl" color="gray.600">No Pending Outpasses are Present</Text>
         )}
       </Flex>
     </>

@@ -21,21 +21,23 @@ const OutpassCard = ({ data }) => {
 
   return (
     <>
-      <Card borderWidth={1} m="auto" mb="40px" borderRadius="md" boxShadow="md" width="800px" p={4}>
-        <CardBody>
-          <Flex direction="column" spacing={3}>
-            <Text fontWeight="bold" fontSize="lg">
-              {data.firstName} {data.lastName}
-            </Text>
-            <Text fontSize="md" mb={4}>
-              {data.reason}
-            </Text>
-            <Button mt={4} colorScheme="gray" variant="solid" onClick={onOpen}>
-              See More
-            </Button>
-          </Flex>
-        </CardBody>
-      </Card>
+      <Flex justify="center" mb="40px">
+        <Card borderWidth={1} borderRadius="md" boxShadow="md" width="800px" p={4}>
+          <CardBody>
+            <Flex direction="column" spacing={3}>
+              <Text fontWeight="bold" fontSize="lg">
+                {data.firstName} {data.lastName}
+              </Text>
+              <Text fontSize="md" mb={4}>
+                {data.reason}
+              </Text>
+              <Button mt={4} colorScheme="gray" variant="solid" onClick={onOpen}>
+                See More
+              </Button>
+            </Flex>
+          </CardBody>
+        </Card>
+      </Flex>
 
       <Modal isOpen={isOpen} onClose={onClose} size="2xl">
         <ModalOverlay bg='rgba(0, 0, 0, 0.6)' />
