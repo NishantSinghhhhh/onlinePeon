@@ -14,6 +14,7 @@ import {
   ModalCloseButton,
   ModalBody,
   ModalFooter,
+  Divider
 } from '@chakra-ui/react';
 
 const OutpassCard = ({ data }) => {
@@ -22,16 +23,33 @@ const OutpassCard = ({ data }) => {
   return (
     <>
       <Flex justify="center" mb="40px">
-        <Card borderWidth={1} borderRadius="md" boxShadow="md" width="800px" p={4}>
+        <Card
+          borderWidth={1}
+          mb="20px"
+          borderRadius="md"
+          boxShadow="md"
+          width="90%"
+          maxW="800px"
+          mx="auto"
+          p={4}
+          bg="white"
+          borderColor="gray.200"
+        >
           <CardBody>
             <Flex direction="column" spacing={3}>
-              <Text fontWeight="bold" fontSize="lg">
+              <Text fontWeight="bold" fontSize="xl" mb={2}>
                 {data.firstName} {data.lastName}
               </Text>
-              <Text fontSize="md" mb={4}>
+              <Text fontSize="md" mb={4} color="gray.600">
                 {data.reason}
               </Text>
-              <Button mt={4} colorScheme="gray" variant="solid" onClick={onOpen}>
+              <Button
+                mt={4}
+                variant="solid"
+                onClick={onOpen}
+                size="md"
+                width="full"
+              >
                 See More
               </Button>
             </Flex>
@@ -40,44 +58,32 @@ const OutpassCard = ({ data }) => {
       </Flex>
 
       <Modal isOpen={isOpen} onClose={onClose} size="2xl">
-        <ModalOverlay bg='rgba(0, 0, 0, 0.6)' />
+        <ModalOverlay />
         <ModalContent>
           <ModalHeader>Outpass Details</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Flex direction="column" spacing={3}>
-              <Flex justify="space-between" mb={2}>
-                <Text fontWeight="semibold">First Name:</Text>
-                <Text>{data.firstName}</Text>
-              </Flex>
-              <Flex justify="space-between" mb={2}>
-                <Text fontWeight="semibold">Last Name:</Text>
-                <Text>{data.lastName}</Text>
-              </Flex>
-              <Flex justify="space-between" mb={2}>
-                <Text fontWeight="semibold">Registration Number:</Text>
-                <Text>{data.registrationNumber}</Text>
-              </Flex>
-              <Flex justify="space-between" mb={2}>
-                <Text fontWeight="semibold">Reason:</Text>
-                <Text>{data.reason}</Text>
-              </Flex>
-              <Flex justify="space-between" mb={2}>
-                <Text fontWeight="semibold">Date:</Text>
-                <Text>{new Date(data.date).toLocaleDateString()}</Text>
-              </Flex>
-              <Flex justify="space-between" mb={2}>
-                <Text fontWeight="semibold">Start Hour:</Text>
-                <Text>{data.startHour}</Text>
-              </Flex>
-              <Flex justify="space-between" mb={2}>
-                <Text fontWeight="semibold">End Hour:</Text>
-                <Text>{data.endHour}</Text>
-              </Flex>
-              <Flex justify="space-between" mb={2}>
-                <Text fontWeight="semibold">Contact Number:</Text>
-                <Text>{data.contactNumber}</Text>
-              </Flex>
+            <Flex direction="column" spacing={3} p={4}>
+              {[
+                { label: 'First Name', value: data.firstName },
+                { label: 'Last Name', value: data.lastName },
+                { label: 'Registration Number', value: data.registrationNumber },
+                { label: 'Reason', value: data.reason },
+                { label: 'Date', value: new Date(data.date).toLocaleDateString() },
+                { label: 'Start Hour', value: data.startHour },
+                { label: 'End Hour', value: data.endHour },
+                { label: 'Contact Number', value: data.contactNumber }
+              ].map((item, index) => (
+                <Box key={index} mb={2}>
+                  <Flex justify="space-between" align="center">
+                    <Text fontWeight="semibold" color="gray.700">
+                      {item.label}:
+                    </Text>
+                    <Text>{item.value}</Text>
+                  </Flex>
+                  {index < 7 && <Divider my={2} />}
+                </Box>
+              ))}
             </Flex>
           </ModalBody>
           <ModalFooter>

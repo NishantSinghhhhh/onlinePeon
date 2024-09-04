@@ -1,73 +1,127 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { Box, Stack, Heading, Text, Flex, Alert, AlertIcon, Button } from '@chakra-ui/react';
 import StaffNavbar from '../StaffNavbar/StaffNavbar';
-import { Box, Text } from '@chakra-ui/react';
 import PLCard from '../cards/PLCard'; // Replace OutpassCard with PLCard
-
-// Sample card data
-const cardData = [
-  {
-    firstName: "John",
-    lastName: "Doe",
-    className: "FE-IT-B",
-    rollNumber: "5678",
-    classesMissed: 5,
-    reason: "Business Meeting",
-    startDate: "2024-08-20T10:00:00.000+00:00",
-    endDate: "2024-08-20T17:00:00.000+00:00",
-    createdAt: "2024-08-20T09:00:00.000+00:00",
-    updatedAt: "2024-08-20T09:30:00.000+00:00",
-  },
-  {
-    firstName: "Jane",
-    lastName: "Smith",
-    className: "FE-IT-A",
-    rollNumber: "9101",
-    classesMissed: 3,
-    reason: "Family Event",
-    startDate: "2024-08-21T13:30:00.000+00:00",
-    endDate: "2024-08-21T18:30:00.000+00:00",
-    createdAt: "2024-08-21T12:00:00.000+00:00",
-    updatedAt: "2024-08-21T12:45:00.000+00:00",
-  },
-  {
-    firstName: "Alice",
-    lastName: "Johnson",
-    className: "FE-IT-C",
-    rollNumber: "1121",
-    classesMissed: 2,
-    reason: "Doctor's Appointment",
-    startDate: "2024-08-22T10:00:00.000+00:00",
-    endDate: "2024-08-22T12:00:00.000+00:00",
-    createdAt: "2024-08-22T09:30:00.000+00:00",
-    updatedAt: "2024-08-22T10:15:00.000+00:00",
-  },
-  {
-    firstName: "Bob",
-    lastName: "Brown",
-    className: "FE-IT-D",
-    rollNumber: "3141",
-    classesMissed: 7,
-    reason: "Conference",
-    startDate: "2024-08-23T07:30:00.000+00:00",
-    endDate: "2024-08-23T16:00:00.000+00:00",
-    createdAt: "2024-08-23T07:00:00.000+00:00",
-    updatedAt: "2024-08-23T07:45:00.000+00:00",
-  },
-];
+import { HashLoader } from 'react-spinners';
 
 const StaffPL = () => {
+  const [plData, setPlData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [showLoader, setShowLoader] = useState(true);
+
+  const fetchPL = async (classAssigned) => {
+    try {
+      console.log('Initiating fetchPL function');
+      console.log('Class assigned to fetch:', classAssigned);
+
+      const plResponse = await fetch(`http://localhost:8000/fetch/fetchPLs/${classAssigned}`);
+
+      console.log('Response received from the server');
+      console.log('Response status code:', plResponse.status);
+      console.log('Response URL:', plResponse.url);
+
+      if (!plResponse.ok) {
+        console.log('Response status not OK:', plResponse.status);
+        const errorText = await plResponse.text();
+        console.error('Error details from server:', errorText);
+        throw new Error('Failed to fetch PL data');
+      }
+
+      console.log('Parsing JSON from response');
+      const plData = await plResponse.json();
+
+      console.log('JSON parsing successful');
+      console.log('Fetched PL data:', plData);
+
+      return plData;
+    } catch (error) {
+      console.error('Error encountered during fetch:', error.message);
+      console.error('Stack trace:', error.stack);
+      throw error;
+    }
+  };
+
+  useEffect(() => {
+    const fetchTeacherAndPL = async () => {
+      const loginInfo = JSON.parse(localStorage.getItem('loginInfo'));
+      if (!loginInfo) {
+        setError('No login information found. Please log in again.');
+        setLoading(false);
+        setShowLoader(false);
+        return;
+      }
+
+      const { staffId } = loginInfo;
+
+      try {
+        const teacherResponse = await fetch(`http://localhost:8000/fetch/fetchTeacher/${staffId}`);
+        const teacherData = await teacherResponse.json();
+
+        if (!teacherResponse.ok) {
+          throw new Error(teacherData.message || 'Failed to fetch teacher information');
+        }
+        const classAssigned = teacherData.teacher?.classAssigned;
+        if (classAssigned) {
+          const plData = await fetchPL(classAssigned);
+          setPlData(plData.data || []);
+        } else {
+          setError('No class assigned for the teacher.');
+        }
+      } catch (err) {
+        setError(err.message || 'An unexpected error occurred');
+      } finally {
+        setLoading(false);
+        setShowLoader(false);
+      }
+    };
+
+    fetchTeacherAndPL();
+
+    const timer = setTimeout(() => {
+      setShowLoader(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading || showLoader) {
+    return (
+      <Flex direction="column" align="center" justify="center" p={5} minH="100vh">
+        <HashLoader color="#000000" loading={loading || showLoader} size={50} />
+        <Text mt={4}>Loading...</Text>
+      </Flex>
+    );
+  }
+
+  if (error) {
+    return (
+      <Flex direction="column" align="center" justify="center" p={5} minH="100vh">
+        <Alert status="error" variant="left-accent" borderRadius="md" boxShadow="lg" mb={4}>
+          <AlertIcon />
+          {error}
+        </Alert>
+        <Button colorScheme="teal" onClick={() => window.location.reload()}>Try Again</Button>
+      </Flex>
+    );
+  }
+
   return (
-    <div>
+    <>
       <StaffNavbar />
-      <Box p={6} maxW="4xl" mx="auto" mt={4}>
-        <Text m="auto" fontSize="2xl" fontWeight="bold" mb={4}>
-          Leave Details
-        </Text>
-        {cardData.map((card, index) => (
-          <PLCard key={index} data={card} />
-        ))}
-      </Box>
-    </div>
+      <Flex direction="column" align="center" justify="center" p={5}>
+        <Heading as="h2" size="lg" mb={4}>PL Details</Heading>
+        {plData.length > 0 ? (
+          <Stack spacing={4} maxW="md" w="full">
+            {plData.map((pl, index) => (
+              <PLCard key={index} data={pl} />
+            ))}
+          </Stack>
+        ) : (
+          <Text fontSize="xl" color="gray.600">No Pending PL are Present</Text>
+        )}
+      </Flex>
+    </>
   );
 };
 

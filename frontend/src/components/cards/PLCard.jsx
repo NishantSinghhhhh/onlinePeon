@@ -1,78 +1,102 @@
 import React from 'react';
-import { Box, Flex, Text, Button, Card, CardBody, useDisclosure, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter } from '@chakra-ui/react';
+import {
+  Box,
+  Flex,
+  Text,
+  Button,
+  Card,
+  CardBody,
+  useDisclosure,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
+  Divider
+} from '@chakra-ui/react';
 
 const PLCard = ({ data }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
     <>
-      <Card borderWidth={1} mb="40px" borderRadius="md" boxShadow="md" width="900px" p={4}>
-        <CardBody>
-          <Flex direction="column" spacing={3}>
-            <Text fontWeight="bold" fontSize="lg">{data.firstName} {data.lastName}</Text>
-            <Text fontSize="md" mb={4}>{data.reason}</Text>
-            <Button mt={4} colorScheme="gray" variant="solid" onClick={onOpen}>
-              See More
-            </Button>
-          </Flex>
-        </CardBody>
-      </Card>
+      <Flex justify="center" mb="40px">
+        <Card
+          borderWidth={1}
+          borderRadius="lg"
+          boxShadow="lg"
+          width={{ base: '90%', md: '80%', lg: '70%' }}
+          maxW="800px"
+          mx="auto"
+          p={4}
+          backgroundColor="white"
+          borderColor="gray.200"
+        >
+          <CardBody>
+            <Flex direction="column" spacing={3}>
+              <Text fontWeight="bold" fontSize="xl" mb={2}>
+                {data.firstName} {data.lastName}
+              </Text>
+              <Text fontSize="md" mb={4} color="gray.600">
+                {data.reason}
+              </Text>
+              <Button
+                mt={4}
+                // colorScheme="teal"
+                variant="solid"
+                onClick={onOpen}
+                size="md"
+                width="full"
+              >
+                See More
+              </Button>
+            </Flex>
+          </CardBody>
+        </Card>
+      </Flex>
 
-      <Modal isOpen={isOpen} onClose={onClose} size="xl">
-        <ModalOverlay bg="blackAlpha.300" />
+      <Modal isOpen={isOpen} onClose={onClose} size="2xl">
+        <ModalOverlay bg='rgba(0, 0, 0, 0.6)' />
         <ModalContent>
           <ModalHeader>Leave Details</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Flex direction="column" spacing={3}>
-              <Flex justify="space-between" mb={2}>
-                <Text fontWeight="semibold">First Name:</Text>
-                <Text>{data.firstName}</Text>
-              </Flex>
-              <Flex justify="space-between" mb={2}>
-                <Text fontWeight="semibold">Last Name:</Text>
-                <Text>{data.lastName}</Text>
-              </Flex>
-              <Flex justify="space-between" mb={2}>
-                <Text fontWeight="semibold">Class Name:</Text>
-                <Text>{data.className}</Text>
-              </Flex>
-              <Flex justify="space-between" mb={2}>
-                <Text fontWeight="semibold">Roll Number:</Text>
-                <Text>{data.rollNumber}</Text>
-              </Flex>
-              <Flex justify="space-between" mb={2}>
-                <Text fontWeight="semibold">Classes Missed:</Text>
-                <Text>{data.classesMissed}</Text>
-              </Flex>
-              <Flex justify="space-between" mb={2}>
-                <Text fontWeight="semibold">Reason:</Text>
-                <Text>{data.reason}</Text>
-              </Flex>
-              <Flex justify="space-between" mb={2}>
-                <Text fontWeight="semibold">Start Date:</Text>
-                <Text>{new Date(data.startDate).toLocaleDateString()}</Text>
-              </Flex>
-              <Flex justify="space-between" mb={2}>
-                <Text fontWeight="semibold">End Date:</Text>
-                <Text>{new Date(data.endDate).toLocaleDateString()}</Text>
-              </Flex>
-              <Flex justify="space-between" mb={2}>
-                <Text fontWeight="semibold">Created At:</Text>
-                <Text>{new Date(data.createdAt).toLocaleString()}</Text>
-              </Flex>
-              <Flex justify="space-between" mb={2}>
-                <Text fontWeight="semibold">Updated At:</Text>
-                <Text>{new Date(data.updatedAt).toLocaleString()}</Text>
-              </Flex>
-              {/* You can remove or handle the Document part if not needed */}
-              <Flex justify="space-between" mb={2}>
-                <Text fontWeight="semibold">Document:</Text>
-                <Box border="1px solid gray" borderRadius="md" p={2} mt={2}>
-                  {/* Display a placeholder or handle the document */}
-                  <Text>No Document Available</Text>
+            <Flex direction="column" spacing={3} p={4}>
+              {[
+                { label: 'First Name', value: data.firstName },
+                { label: 'Last Name', value: data.lastName },
+                { label: 'Class Name', value: data.className },
+                { label: 'Roll Number', value: data.rollNumber },
+                { label: 'Classes Missed', value: data.classesMissed },
+                { label: 'Reason', value: data.reason },
+                { label: 'Start Date', value: new Date(data.startDate).toLocaleDateString() },
+                { label: 'End Date', value: new Date(data.endDate).toLocaleDateString() },
+                { label: 'Created At', value: new Date(data.createdAt).toLocaleString() },
+                { label: 'Updated At', value: new Date(data.updatedAt).toLocaleString() },
+              ].map((item, index) => (
+                <Box key={index} mb={2}>
+                  <Flex justify="space-between" align="center">
+                    <Text fontWeight="semibold" color="gray.700">
+                      {item.label}:
+                    </Text>
+                    <Text>{item.value}</Text>
+                  </Flex>
+                  {index < 8 && <Divider my={2} />}
                 </Box>
-              </Flex>
+              ))}
+              {/* Display a placeholder or handle the document */}
+              <Box mb={2}>
+                <Flex justify="space-between" align="center">
+                  <Text fontWeight="semibold" color="gray.700">
+                    Document:
+                  </Text>
+                  <Box border="1px solid gray" borderRadius="md" p={2} mt={2} bg="gray.50">
+                    <Text>No Document Available</Text>
+                  </Box>
+                </Flex>
+              </Box>
             </Flex>
           </ModalBody>
           <ModalFooter>

@@ -1,80 +1,127 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { Box, Stack, Heading, Text, Flex, Alert, AlertIcon, Button } from '@chakra-ui/react';
 import StaffNavbar from '../StaffNavbar/StaffNavbar';
 import LeaveCard from '../cards/LeaveCard';
-import { Box, Text,SimpleGrid } from '@chakra-ui/react';
+import { HashLoader } from 'react-spinners';
 
-const leaveData = [
-    {
-      id: "66c3a7a2497856f6a6bce9a5",
-      firstName: "Nishant",
-      lastName: "Singh",
-      registrationNumber: "1234",
-      reasonForLeave: "Ghar jana hain",
-      startDate: "2024-08-20T19:58:15.000+00:00",
-      endDate: "2024-08-27T19:58:15.000+00:00",
-      placeOfResidence: "Kota",
-      attendancePercentage: 95,
-      contactNumber: "2134567897",
-      createdAt: "2024-08-19T20:14:26.741+00:00",
-      updatedAt: "2024-08-19T20:14:26.741+00:00"
-    },
-    {
-      id: "77d4b8a3498e72f6a7bce9a6",
-      firstName: "Riya",
-      lastName: "Sharma",
-      registrationNumber: "5678",
-      reasonForLeave: "Family Event",
-      startDate: "2024-09-01T09:30:00.000+00:00",
-      endDate: "2024-09-05T18:00:00.000+00:00",
-      placeOfResidence: "Jaipur",
-      attendancePercentage: 89,
-      contactNumber: "9876543210",
-      createdAt: "2024-08-22T15:20:00.000+00:00",
-      updatedAt: "2024-08-22T15:20:00.000+00:00"
-    },
-    {
-      id: "88e5c9b5599d72f6a7bce9a7",
-      firstName: "Amit",
-      lastName: "Kumar",
-      registrationNumber: "9101",
-      reasonForLeave: "Personal Reasons",
-      startDate: "2024-09-10T10:00:00.000+00:00",
-      endDate: "2024-09-12T17:00:00.000+00:00",
-      placeOfResidence: "Delhi",
-      attendancePercentage: 92,
-      contactNumber: "1122334455",
-      createdAt: "2024-08-23T11:45:00.000+00:00",
-      updatedAt: "2024-08-23T11:45:00.000+00:00"
-    },
-    {
-      id: "99f6d1c469b972f6a7bce9a8",
-      firstName: "Pooja",
-      lastName: "Mehta",
-      registrationNumber: "1122",
-      reasonForLeave: "Medical Check-up",
-      startDate: "2024-09-15T08:30:00.000+00:00",
-      endDate: "2024-09-18T16:30:00.000+00:00",
-      placeOfResidence: "Mumbai",
-      attendancePercentage: 90,
-      contactNumber: "2233445566",
-      createdAt: "2024-08-25T09:00:00.000+00:00",
-      updatedAt: "2024-08-25T09:00:00.000+00:00"
-    }
-  ];
-  
 const StaffLeave = () => {
+  const [leaves, setLeaves] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [showLoader, setShowLoader] = useState(true);
+
+  const fetchLeaveData = async (classAssigned) => {
+    try {
+      console.log('Initiating fetchLeaveData function');
+      console.log('Class assigned to fetch:', classAssigned);
+
+      const leaveResponse = await fetch(`http://localhost:8000/fetch/fetchLeaves/${classAssigned}`);
+
+      console.log('Response received from the server');
+      console.log('Response status code:', leaveResponse.status);
+      console.log('Response URL:', leaveResponse.url);
+
+      if (!leaveResponse.ok) {
+        console.log('Response status not OK:', leaveResponse.status);
+        const errorText = await leaveResponse.text();
+        console.error('Error details from server:', errorText);
+        throw new Error('Failed to fetch leaves');
+      }
+
+      console.log('Parsing JSON from response');
+      const leaveData = await leaveResponse.json();
+
+      console.log('JSON parsing successful');
+      console.log('Fetched leave data:', leaveData);
+
+      return leaveData;
+    } catch (error) {
+      console.error('Error encountered during fetch:', error.message);
+      console.error('Stack trace:', error.stack);
+      throw error;
+    }
+  };
+
+  useEffect(() => {
+    const fetchTeacherAndLeaves = async () => {
+      const loginInfo = JSON.parse(localStorage.getItem('loginInfo'));
+      if (!loginInfo) {
+        setError('No login information found. Please log in again.');
+        setLoading(false);
+        setShowLoader(false);
+        return;
+      }
+
+      const { staffId } = loginInfo;
+
+      try {
+        const teacherResponse = await fetch(`http://localhost:8000/fetch/fetchTeacher/${staffId}`);
+        const teacherData = await teacherResponse.json();
+
+        if (!teacherResponse.ok) {
+          throw new Error(teacherData.message || 'Failed to fetch teacher information');
+        }
+        const classAssigned = teacherData.teacher?.classAssigned;
+        if (classAssigned) {
+          const leaveData = await fetchLeaveData(classAssigned);
+          setLeaves(leaveData.data || []);
+        } else {
+          setError('No class assigned for the teacher.');
+        }
+      } catch (err) {
+        setError(err.message || 'An unexpected error occurred');
+      } finally {
+        setLoading(false);
+        setShowLoader(false);
+      }
+    };
+
+    fetchTeacherAndLeaves();
+
+    const timer = setTimeout(() => {
+      setShowLoader(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading || showLoader) {
+    return (
+      <Flex direction="column" align="center" justify="center" p={5} minH="100vh">
+        <HashLoader color="#000000" loading={loading || showLoader} size={50} />
+        <Text mt={4}>Loading...</Text>
+      </Flex>
+    );
+  }
+
+  if (error) {
+    return (
+      <Flex direction="column" align="center" justify="center" p={5} minH="100vh">
+        <Alert status="error" variant="left-accent" borderRadius="md" boxShadow="lg" mb={4}>
+          <AlertIcon />
+          {error}
+        </Alert>
+        <Button colorScheme="teal" onClick={() => window.location.reload()}>Try Again</Button>
+      </Flex>
+    );
+  }
+
   return (
-    <div>
-    <StaffNavbar />
-    <Box p={6}  maxW="4xl" mx="auto" mt={4}>
-    <Text  m="auto" fontSize="2xl" fontWeight="bold" mb={4}>
-          Leave Details
-    </Text>
-          {leaveData.map(data => (
-            <LeaveCard key={data.id} data={data} />
-          ))}
-    </Box>
-    </div>
+    <>
+      <StaffNavbar />
+      <Flex direction="column" align="center" justify="center" p={5}>
+        <Heading as="h2" size="lg" mb={4}>Leave Details</Heading>
+        {leaves.length > 0 ? (
+          <Stack spacing={4} maxW="md" w="full">
+            {leaves.map((leave, index) => (
+              <LeaveCard key={index} data={leave} />
+            ))}
+          </Stack>
+        ) : (
+          <Text fontSize="xl" color="gray.600">No Pending Leaves are Present</Text>
+        )}
+      </Flex>
+    </>
   );
 };
 
