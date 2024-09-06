@@ -16,8 +16,7 @@ import {
   TabList,
   Tab,
   TabPanels,
-  TabPanel,
-  Box
+  TabPanel
 } from '@chakra-ui/react';
 import { HamburgerIcon } from '@chakra-ui/icons';
 import HashLoader from 'react-spinners/HashLoader';
@@ -25,30 +24,6 @@ import StaffNavbar from '../StaffNavbar/StaffNavbar';
 import OutpassCard from '../cards/outpassCard';
 import LeaveCard from '../cards/LeaveCard';
 import PLCard from '../cards/PLCard';
-
-const OutpassesContent = ({ data }) => (
-  <div>
-    {data.map((outpass, index) => (
-      <OutpassCard key={index} data={outpass} />
-    ))}
-  </div>
-);
-
-const LeavesContent = ({ data }) => (
-  <div>
-    {data.map((leave, index) => (
-      <LeaveCard key={index} data={leave} />
-    ))}
-  </div>
-);
-
-const PLContent = ({ data }) => (
-  <div>
-    {data.map((pl, index) => (
-      <PLCard key={index} data={pl} />
-    ))}
-  </div>
-);
 
 const StaffDone = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -183,14 +158,18 @@ const StaffDone = () => {
     onClose(); // Close the drawer
   };
 
+  const handleCardClick = (data) => {
+    console.log(data); // Log card data to the console
+  };
+
   const renderContent = () => {
     switch (selectedDrawerOption) {
       case 'Outpasses':
-        return <OutpassesContent data={outpasses} />;
+        return <OutpassesContent data={outpasses} onClick={handleCardClick} />;
       case 'Leaves':
-        return <LeavesContent data={leaves} />;
+        return <LeavesContent data={leaves} onClick={handleCardClick} />;
       case 'Pls':
-        return <PLContent data={pls} />;
+        return <PLContent data={pls} onClick={handleCardClick} />;
       default:
         return null;
     }
@@ -251,25 +230,20 @@ const StaffDone = () => {
               onClick={() => setActiveTab('Approved')}
               bg={activeTab === 'Approved' ? 'green.400' : 'gray.200'}
               color={activeTab === 'Approved' ? 'white' : 'black'}
-              _selected={{ bg: 'green.500', color: 'white' }}
             >
               Approved
             </Tab>
             <Tab
-              onClick={() => setActiveTab('Declined')}
-              bg={activeTab === 'Declined' ? 'red.400' : 'gray.200'}
-              color={activeTab === 'Declined' ? 'white' : 'black'}
-              _selected={{ bg: 'red.500', color: 'white' }}
+              onClick={() => setActiveTab('Rejected')}
+              bg={activeTab === 'Rejected' ? 'red.400' : 'gray.200'}
+              color={activeTab === 'Rejected' ? 'white' : 'black'}
             >
-              Declined
+              Rejected
             </Tab>
           </TabList>
           <TabPanels>
             <TabPanel>
-              {activeTab === 'Approved' && renderContent()}
-            </TabPanel>
-            <TabPanel>
-              {activeTab === 'Declined' && renderContent()}
+              {renderContent()}
             </TabPanel>
           </TabPanels>
         </Tabs>
@@ -277,5 +251,42 @@ const StaffDone = () => {
     </div>
   );
 };
+
+// Components to display content based on the data
+const OutpassesContent = ({ data, onClick }) => (
+  <Flex direction="column" align="center">
+    {data.length ? (
+      data.map((item, index) => (
+        <OutpassCard key={index} data={item} onClick={onClick} />
+      ))
+    ) : (
+      <Text>No Outpasses available</Text>
+    )}
+  </Flex>
+);
+
+const LeavesContent = ({ data, onClick }) => (
+  <Flex direction="column" align="center">
+    {data.length ? (
+      data.map((item, index) => (
+        <LeaveCard key={index} data={item} onClick={onClick} />
+      ))
+    ) : (
+      <Text>No Leaves available</Text>
+    )}
+  </Flex>
+);
+
+const PLContent = ({ data, onClick }) => (
+  <Flex direction="column" align="center">
+    {data.length ? (
+      data.map((item, index) => (
+        <PLCard key={index} data={item} onClick={onClick} />
+      ))
+    ) : (
+      <Text>No PLs available</Text>
+    )}
+  </Flex>
+);
 
 export default StaffDone;
