@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Stack, Heading, Text, Flex, Alert, AlertIcon, Button } from '@chakra-ui/react';
 import StaffNavbar from '../StaffNavbar/StaffNavbar';
-import LeaveCard from '../cards/LeaveCard';
+import LeaveCard from '../cards/LeaveCard'; // Assuming LeaveCard accepts an onClick prop
 import { HashLoader } from 'react-spinners';
 
 const StaffLeave = () => {
@@ -10,34 +10,20 @@ const StaffLeave = () => {
   const [error, setError] = useState('');
   const [showLoader, setShowLoader] = useState(true);
 
+  // Function to fetch leave data
   const fetchLeaveData = async (classAssigned) => {
     try {
-      console.log('Initiating fetchLeaveData function');
-      console.log('Class assigned to fetch:', classAssigned);
-
       const leaveResponse = await fetch(`http://localhost:8000/fetch/fetchLeaves/${classAssigned}`);
-
-      console.log('Response received from the server');
-      console.log('Response status code:', leaveResponse.status);
-      console.log('Response URL:', leaveResponse.url);
-
       if (!leaveResponse.ok) {
-        console.log('Response status not OK:', leaveResponse.status);
-        const errorText = await leaveResponse.text();
-        console.error('Error details from server:', errorText);
         throw new Error('Failed to fetch leaves');
       }
-
-      console.log('Parsing JSON from response');
       const leaveData = await leaveResponse.json();
 
-      console.log('JSON parsing successful');
-      console.log('Fetched leave data:', leaveData);
+      // Apply filter here
+      const filteredLeaves = leaveData.data.filter(outpass => outpass.extraDataArray[0] === 0);
 
-      return leaveData;
+      return filteredLeaves;
     } catch (error) {
-      console.error('Error encountered during fetch:', error.message);
-      console.error('Stack trace:', error.stack);
       throw error;
     }
   };
@@ -61,10 +47,11 @@ const StaffLeave = () => {
         if (!teacherResponse.ok) {
           throw new Error(teacherData.message || 'Failed to fetch teacher information');
         }
+
         const classAssigned = teacherData.teacher?.classAssigned;
         if (classAssigned) {
           const leaveData = await fetchLeaveData(classAssigned);
-          setLeaves(leaveData.data || []);
+          setLeaves(leaveData); // Set filtered data
         } else {
           setError('No class assigned for the teacher.');
         }
@@ -78,6 +65,7 @@ const StaffLeave = () => {
 
     fetchTeacherAndLeaves();
 
+    // Set a delay to hide loader
     const timer = setTimeout(() => {
       setShowLoader(false);
     }, 2000);
@@ -85,8 +73,12 @@ const StaffLeave = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Updated filtering logic
-  
+  // Handling click on leave card
+  const handleCardClick = (leaveData) => {
+    console.log('Leave card clicked:', leaveData);
+  };
+
+  // Rendering states
   if (loading || showLoader) {
     return (
       <Flex direction="column" align="center" justify="center" p={5} minH="100vh">
@@ -95,7 +87,7 @@ const StaffLeave = () => {
       </Flex>
     );
   }
-  
+
   if (error) {
     return (
       <Flex direction="column" align="center" justify="center" p={5} minH="100vh">
@@ -107,17 +99,20 @@ const StaffLeave = () => {
       </Flex>
     );
   }
-  const filteredLeaves = leaves.filter(leave => leave.extraDataArray[0] === 0);
-  
+
   return (
     <>
       <StaffNavbar />
       <Flex direction="column" align="center" justify="center" p={5}>
         <Heading as="h2" size="lg" mb={4}>Leave Details</Heading>
-        {filteredLeaves.length > 0 ? (
+        {leaves.length > 0 ? (
           <Stack spacing={4} maxW="md" w="full">
-            {filteredLeaves.map((leave, index) => (
-              <LeaveCard key={index} data={leave} />
+            {leaves.map((leave, index) => (
+              <LeaveCard
+                key={index}
+                data={leave}
+                onClick={() => handleCardClick(leave)} // Handle card click
+              />
             ))}
           </Stack>
         ) : (

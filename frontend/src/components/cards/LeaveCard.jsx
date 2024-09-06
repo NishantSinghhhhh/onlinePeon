@@ -14,38 +14,55 @@ import {
   ModalCloseButton,
   ModalBody,
   ModalFooter,
-  Divider
+  Divider,
+  useToast
 } from '@chakra-ui/react';
 import axios from 'axios';
+import PropTypes from 'prop-types';
 
-const LeaveCard = ({ data }) => {
+const LeaveCard = ({ data, onClick, onUpdate }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const toast = useToast();
 
-  const handleStatusUpdate = async (status, position) => {
-    console.log('Handling status update:', status);
-
+  const handleStatusUpdate = async (status) => {
     try {
       const response = await axios.put(`http://localhost:8000/update/updateLeave/${data._id}`, {
         status,
-        position
+        position: 0
       });
 
-      console.log('API response:', response);
-
-      if (response.data.success) {
-        console.log('Leave updated successfully:', response.data);
-        // Optionally, you might want to refresh the data or handle UI update here
-        // For example, you can call a function to update the parent component state
+      if (response.data.message === 'Leave status updated successfully') {
+        toast({
+          title: "Leave Updated",
+          description: `Status changed to ${status === 1 ? 'Approved' : 'Declined'}`,
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+        if (onUpdate) {
+          onUpdate(data._id, status);
+        }
       } else {
-        console.error('Failed to update:', response.data.message);
+        toast({
+          title: "Update Failed",
+          description: `Failed to update leave: ${response.data.message}`,
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
       }
     } catch (error) {
-      console.error('Error updating leave:', error.message);
+      toast({
+        title: "Error",
+        description: `An error occurred while updating the leave: ${error.response ? error.response.data.message : error.message}`,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
     }
+    onClose();
   };
-
-  console.log('LeaveCard data:', data);
-
+  
   return (
     <>
       <Card
@@ -59,6 +76,7 @@ const LeaveCard = ({ data }) => {
         p={4}
         bg="white"
         borderColor="gray.200"
+        onClick={onClick}
       >
         <CardBody>
           <Flex direction="column" spacing={3}>
@@ -71,7 +89,10 @@ const LeaveCard = ({ data }) => {
             <Button
               mt={4}
               variant="solid"
-              onClick={onOpen}
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpen();
+              }}
               size="md"
               width="full"
             >
@@ -114,17 +135,10 @@ const LeaveCard = ({ data }) => {
             </Flex>
           </ModalBody>
           <ModalFooter>
-            <Button
-              colorScheme="green"
-              onClick={() => handleStatusUpdate(1, 0)}
-              mr={3}
-            >
+            <Button colorScheme="green" mr={3} onClick={() => handleStatusUpdate(1)}>
               Approve
             </Button>
-            <Button
-              colorScheme="red"
-              onClick={() => handleStatusUpdate(-1, 0)}
-            >
+            <Button variant="outline" onClick={() => handleStatusUpdate(-1)}>
               Decline
             </Button>
           </ModalFooter>
@@ -132,6 +146,12 @@ const LeaveCard = ({ data }) => {
       </Modal>
     </>
   );
+};
+
+LeaveCard.propTypes = {
+  data: PropTypes.object.isRequired,
+  onClick: PropTypes.func,
+  onUpdate: PropTypes.func.isRequired,
 };
 
 export default LeaveCard;

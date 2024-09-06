@@ -16,17 +16,17 @@ import {
   ModalFooter,
   Divider
 } from '@chakra-ui/react';
-import axios from 'axios'; // To make API calls
+import axios from 'axios';
 
 const OutpassCard = ({ data }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   // Function to handle approve/decline action
-  const handleStatusUpdate = async (status, position) => {
+  const handleStatusUpdate = async (status) => {
     try {
       const response = await axios.put(`http://localhost:8000/update/updateOutpass/${data._id}`, {
-        status, 
-        position // e.g. position could be 0 for now, adjust based on your needs
+        status,
+        position: 0 // Assuming position is 0, adjust based on your needs
       });
 
       if (response.data.success) {
@@ -41,40 +41,38 @@ const OutpassCard = ({ data }) => {
 
   return (
     <>
-      <Flex justify="center" mb="40px">
-        <Card
-          borderWidth={1}
-          mb="20px"
-          borderRadius="md"
-          boxShadow="md"
-          width="90%"
-          maxW="800px"
-          mx="auto"
-          p={4}
-          bg="white"
-          borderColor="gray.200"
-        >
-          <CardBody>
-            <Flex direction="column" spacing={3}>
-              <Text fontWeight="bold" fontSize="xl" mb={2}>
-                {data.firstName} {data.lastName}
-              </Text>
-              <Text fontSize="md" mb={4} color="gray.600">
-                {data.reason}
-              </Text>
-              <Button
-                mt={4}
-                variant="solid"
-                onClick={onOpen}
-                size="md"
-                width="full"
-              >
-                See More
-              </Button>
-            </Flex>
-          </CardBody>
-        </Card>
-      </Flex>
+      <Card
+        borderWidth={1}
+        mb="20px"
+        borderRadius="md"
+        boxShadow="md"
+        width="90%"
+        maxW="800px"
+        mx="auto"
+        p={4}
+        bg="white"
+        borderColor="gray.200"
+      >
+        <CardBody>
+          <Flex direction="column" spacing={3}>
+            <Text fontWeight="bold" fontSize="xl" mb={2}>
+              {data.firstName} {data.lastName}
+            </Text>
+            <Text fontSize="md" mb={4} color="gray.600">
+              {data.reason}
+            </Text>
+            <Button
+              mt={4}
+              variant="solid"
+              onClick={onOpen} // Opens the modal
+              size="md"
+              width="full"
+            >
+              See More
+            </Button>
+          </Flex>
+        </CardBody>
+      </Card>
 
       <Modal isOpen={isOpen} onClose={onClose} size="2xl">
         <ModalOverlay />
@@ -109,13 +107,13 @@ const OutpassCard = ({ data }) => {
             <Button 
               colorScheme="green" 
               mr={3} 
-              onClick={() => handleStatusUpdate(1, 0)} // Approve: send status=1
+              onClick={() => handleStatusUpdate(1)} // Approve: send status=1
             >
               Approve
             </Button>
             <Button 
               variant="outline" 
-              onClick={() => handleStatusUpdate(-1, 0)} // Decline: send status=-1
+              onClick={() => handleStatusUpdate(-1)} // Decline: send status=-1
             >
               Decline
             </Button>

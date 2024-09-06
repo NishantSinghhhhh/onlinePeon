@@ -1,64 +1,52 @@
 const { Outpass } = require('../Models/Outpass');
 const { PL } = require('../Models/PL');
 const { Leave } = require('../Models/Leave');
+const mongoose = require('mongoose'); // Import mongoose
 
 exports.updateLeaveStatus = async (req, res) => {
     try {
-        const { id } = req.params;
+        const leaveId = req.params.id; // Changed from req.params.leaveId
         const { status, position } = req.body;
 
-        if (!id || position === undefined || status === undefined) {
-            return res.status(400).json({
-                message: 'ID, position, and status are required',
-                success: false
-            });
+        console.log("this is running");
+        console.log('Received update request:');
+        console.log('Leave ID:', leaveId);
+        console.log('Status:', status);
+        console.log('Position:', position);
+
+        if (!mongoose.Types.ObjectId.isValid(leaveId)) {
+            console.log('Invalid leave ID');
+            return res.status(400).json({ message: 'Invalid leave ID' });
         }
 
-        if (position < 0 || position > 3) {
-            return res.status(400).json({
-                message: 'Position must be between 0 and 3',
-                success: false
-            });
-        }
-
-        if (status !== 1 && status !== -1) {
-            return res.status(400).json({
-                message: 'Status must be 1 (approved) or -1 (declined)',
-                success: false
-            });
-        }
-
-        const leave = await Leave.findById(id);
-
+        const leave = await Leave.findById(leaveId);
         if (!leave) {
-            return res.status(404).json({
-                message: 'Leave not found',
-                success: false
-            });
+            console.log('Leave not found');
+            return res.status(404).json({ message: 'Leave not found' });
         }
-        leave.extraDataArray[position] = status;
-        await leave.save();
-        
 
         console.log('Before update:', leave.extraDataArray);
 
+        // Validate position
+        if (position < 0 || position >= leave.extraDataArray.length) {
+            console.log('Position out of bounds');
+            return res.status(400).json({ message: 'Position out of bounds' });
+        }
+
+        leave.extraDataArray[position] = status;
+
         console.log('After update:', leave.extraDataArray);
 
-        res.status(200).json({
-            message: 'Leave updated successfully',
-            success: true,
-            data: leave
-        });
+        const savedLeave = await leave.save();
+        console.log('Saved leave:', savedLeave);
+
+        res.status(200).json({ message: 'Leave status updated successfully', leave: savedLeave });
+
     } catch (err) {
-        console.error('Error updating leave:', { message: err.message, stack: err.stack });
-        res.status(500).json({
-            message: 'Internal server error',
-            success: false,
-            error: err.message
-        });
+        console.error('Error in updateLeaveStatus:', err);
+        res.status(500).json({ message: 'Error updating leave status', error: err.message });
     }
 };
-
 
 exports.updateOutpassStatus = async (req, res) => {
     try {
@@ -158,69 +146,6 @@ exports.updatePLStatus = async (req, res) => {
         });
     } catch (err) {
         console.error('Error updating PL:', { message: err.message, stack: err.stack });
-        res.status(500).json({
-            message: 'Internal server error',
-            success: false,
-            error: err.message
-        });
-    }
-};
-
-exports.updateLeaveStatus = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { status } = req.body; // Removed position
-
-        // Debugging: Log received request parameters
-        console.log('Request received with ID:', id);
-        console.log('Status received:', status);
-
-        // Validate request parameters
-        if (!id || status === undefined) {
-            console.log('Validation failed: ID or status missing');
-            return res.status(400).json({
-                message: 'ID and status are required',
-                success: false
-            });
-        }
-
-        if (status !== 1 && status !== -1) {
-            console.log('Validation failed: Invalid status value');
-            return res.status(400).json({
-                message: 'Status must be 1 (approved) or -1 (declined)',
-                success: false
-            });
-        }
-
-        // Find and update the leave document
-        const leave = await Leave.findById(id);
-
-        // Debugging: Log whether the leave was found
-        if (!leave) {
-            console.log('Leave not found for ID:', id);
-            return res.status(404).json({
-                message: 'Leave not found',
-                success: false
-            });
-        }
-
-        // Assuming extraDataArray is the field to update
-        // If you have a different field or logic, adjust accordingly
-        leave.status = status; // Adjust according to your schema
-        await leave.save();
-
-        // Debugging: Log successful update
-        console.log('Leave updated successfully:', leave);
-
-        res.status(200).json({
-            message: 'Leave updated successfully',
-            success: true,
-            data: leave
-        });
-    } catch (err) {
-        // Debugging: Log the error details
-        console.error('Error updating leave:', { message: err.message, stack: err.stack });
-
         res.status(500).json({
             message: 'Internal server error',
             success: false,
