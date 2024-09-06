@@ -6,14 +6,11 @@ const LeaveSchema = new Schema({
     firstName: {
         type: String,
         required: true,
-        minlength: 2,
-        maxlength: 50
+       
     },
     lastName: {
         type: String,
         required: true,
-        minlength: 2,
-        maxlength: 50
     },
     registrationNumber: {
         type: String,
@@ -23,7 +20,6 @@ const LeaveSchema = new Schema({
     reasonForLeave: {
         type: String,
         required: true,
-        minlength: 10
     },
     startDate: {
         type: Date,
@@ -60,8 +56,14 @@ const LeaveSchema = new Schema({
         ] 
     },
     extraDataArray: {
-        type: [Number], // Array of numbers
-        required: false // Set to true if this field is mandatory
+        type: [Number],
+        required: true,
+        validate: {
+            validator: function(array) {
+                return array.length === 4; // Ensure the array has exactly 4 elements
+            },
+            message: 'extraDataArray must contain exactly 4 numbers'
+        }
     }
 }, {
     timestamps: true // Automatically adds createdAt and updatedAt fields

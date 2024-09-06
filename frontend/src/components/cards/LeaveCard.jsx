@@ -16,9 +16,35 @@ import {
   ModalFooter,
   Divider
 } from '@chakra-ui/react';
+import axios from 'axios';
 
 const LeaveCard = ({ data }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const handleStatusUpdate = async (status, position) => {
+    console.log('Handling status update:', status);
+
+    try {
+      const response = await axios.put(`http://localhost:8000/update/updateLeave/${data._id}`, {
+        status,
+        position
+      });
+
+      console.log('API response:', response);
+
+      if (response.data.success) {
+        console.log('Leave updated successfully:', response.data);
+        // Optionally, you might want to refresh the data or handle UI update here
+        // For example, you can call a function to update the parent component state
+      } else {
+        console.error('Failed to update:', response.data.message);
+      }
+    } catch (error) {
+      console.error('Error updating leave:', error.message);
+    }
+  };
+
+  console.log('LeaveCard data:', data);
 
   return (
     <>
@@ -44,7 +70,6 @@ const LeaveCard = ({ data }) => {
             </Text>
             <Button
               mt={4}
-          
               variant="solid"
               onClick={onOpen}
               size="md"
@@ -89,10 +114,17 @@ const LeaveCard = ({ data }) => {
             </Flex>
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme="green" mr={3}>
+            <Button
+              colorScheme="green"
+              onClick={() => handleStatusUpdate(1, 0)}
+              mr={3}
+            >
               Approve
             </Button>
-            <Button variant="outline" onClick={onClose}>
+            <Button
+              colorScheme="red"
+              onClick={() => handleStatusUpdate(-1, 0)}
+            >
               Decline
             </Button>
           </ModalFooter>

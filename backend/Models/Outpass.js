@@ -60,7 +60,11 @@ const OutpassSchema = new Schema({
             message: 'extraDataArray must contain exactly 4 numbers'
         }
     }
-});
+},
+{
+    timestamps: true
+}
+);
 
 const Outpass = db2.model('Outpass', OutpassSchema);
 

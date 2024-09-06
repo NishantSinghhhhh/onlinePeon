@@ -106,19 +106,21 @@ const StaffOutpass = () => {
     );
   }
 
+  const filteredOutpasses = outpasses.filter(outpass => outpass.extraDataArray[0] === 0);
+
   return (
     <>
       <StaffNavbar />
       <Flex direction="column" align="center" justify="center" p={5}>
         <Heading as="h2" size="lg" mb={4}>Outpass Details</Heading>
-        {outpasses.length > 0 ? (
+        {filteredOutpasses.length > 0 ? (
           <Stack spacing={4} maxW="md" w="full">
-            {outpasses.map((outpass, index) => (
+            {filteredOutpasses.map((outpass, index) => (
               <OutpassCard key={index} data={outpass} />
             ))}
           </Stack>
         ) : (
-          <Text fontSize="xl" color="gray.600">No Pending Outpasses are Present</Text>
+          <Text fontSize="xl" color="gray.600">No live outpasses are there.</Text>
         )}
       </Flex>
     </>

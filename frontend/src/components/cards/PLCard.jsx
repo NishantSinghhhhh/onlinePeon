@@ -16,9 +16,28 @@ import {
   ModalFooter,
   Divider
 } from '@chakra-ui/react';
+import axios from 'axios'; // To make API calls
 
 const PLCard = ({ data }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  // Function to handle approve/decline action
+  const handleStatusUpdate = async (status) => {
+    try {
+      const response = await axios.put(`http://localhost:8000/update/updatePL/${data._id}`, {
+        status
+      });
+
+      if (response.data.success) {
+        console.log('PL updated successfully:', response.data);
+        // Optionally refresh the data or handle UI update here
+      } else {
+        console.error('Failed to update:', response.data.message);
+      }
+    } catch (error) {
+      console.error('Error updating PL:', error.message);
+    }
+  };
 
   return (
     <>
@@ -44,7 +63,6 @@ const PLCard = ({ data }) => {
               </Text>
               <Button
                 mt={4}
-                // colorScheme="teal"
                 variant="solid"
                 onClick={onOpen}
                 size="md"
@@ -60,7 +78,7 @@ const PLCard = ({ data }) => {
       <Modal isOpen={isOpen} onClose={onClose} size="2xl">
         <ModalOverlay bg='rgba(0, 0, 0, 0.6)' />
         <ModalContent>
-          <ModalHeader>Leave Details</ModalHeader>
+          <ModalHeader>PL Details</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <Flex direction="column" spacing={3} p={4}>
@@ -100,10 +118,17 @@ const PLCard = ({ data }) => {
             </Flex>
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme="green" mr={3}>
+            <Button 
+              colorScheme="green" 
+              mr={3} 
+              onClick={() => handleStatusUpdate(1)} // Approve: send status=1
+            >
               Approve
             </Button>
-            <Button variant="outline" onClick={onClose}>
+            <Button 
+              variant="outline" 
+              onClick={() => handleStatusUpdate(-1)} // Decline: send status=-1
+            >
               Decline
             </Button>
           </ModalFooter>

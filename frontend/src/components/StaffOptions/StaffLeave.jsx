@@ -85,6 +85,8 @@ const StaffLeave = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  // Updated filtering logic
+  
   if (loading || showLoader) {
     return (
       <Flex direction="column" align="center" justify="center" p={5} minH="100vh">
@@ -93,7 +95,7 @@ const StaffLeave = () => {
       </Flex>
     );
   }
-
+  
   if (error) {
     return (
       <Flex direction="column" align="center" justify="center" p={5} minH="100vh">
@@ -105,15 +107,16 @@ const StaffLeave = () => {
       </Flex>
     );
   }
-
+  const filteredLeaves = leaves.filter(leave => leave.extraDataArray[0] === 0);
+  
   return (
     <>
       <StaffNavbar />
       <Flex direction="column" align="center" justify="center" p={5}>
         <Heading as="h2" size="lg" mb={4}>Leave Details</Heading>
-        {leaves.length > 0 ? (
+        {filteredLeaves.length > 0 ? (
           <Stack spacing={4} maxW="md" w="full">
-            {leaves.map((leave, index) => (
+            {filteredLeaves.map((leave, index) => (
               <LeaveCard key={index} data={leave} />
             ))}
           </Stack>
