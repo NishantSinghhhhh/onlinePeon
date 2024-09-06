@@ -101,19 +101,23 @@ exports.updateOutpassStatus = async (req, res) => {
     }
 };
 
+
 exports.updatePLStatus = async (req, res) => {
     try {
         const { id } = req.params;
         const { status, position } = req.body;
 
+        // Validate input
         if (!id || position === undefined || status === undefined) {
+            console.log('Validation failed: ID, position, or status is missing');
             return res.status(400).json({
                 message: 'ID, position, and status are required',
                 success: false
             });
         }
 
-        if (position < 0 || position > 3) {
+        if (typeof position !== 'number' || position < 0 || position > 3) {
+            console.log('Validation failed: Position is out of range');
             return res.status(400).json({
                 message: 'Position must be between 0 and 3',
                 success: false
@@ -121,17 +125,38 @@ exports.updatePLStatus = async (req, res) => {
         }
 
         if (status !== 1 && status !== -1) {
+            console.log('Validation failed: Status is invalid');
             return res.status(400).json({
                 message: 'Status must be 1 (approved) or -1 (declined)',
                 success: false
             });
         }
 
+        // Fetch the PL document
         const pl = await PL.findById(id);
 
         if (!pl) {
+            console.log(`PL with ID ${id} not found`);
             return res.status(404).json({
                 message: 'PL not found',
+                success: false
+            });
+        }
+
+        // Update the PL document
+        if (!Array.isArray(pl.extraDataArray)) {
+            console.log('PL document does not have an extraDataArray');
+            return res.status(500).json({
+                message: 'Server error: extraDataArray not found on PL document',
+                success: false
+            });
+        }
+
+        // Ensure extraDataArray is large enough
+        if (position >= pl.extraDataArray.length) {
+            console.log('Validation failed: Position is out of bounds of extraDataArray');
+            return res.status(400).json({
+                message: 'Position is out of bounds',
                 success: false
             });
         }
@@ -139,6 +164,7 @@ exports.updatePLStatus = async (req, res) => {
         pl.extraDataArray[position] = status;
         await pl.save();
 
+        console.log(`PL with ID ${id} updated successfully`);
         res.status(200).json({
             message: 'PL updated successfully',
             success: true,

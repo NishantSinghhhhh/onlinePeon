@@ -22,15 +22,16 @@ const PLCard = ({ data }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   // Function to handle approve/decline action
-  const handleStatusUpdate = async (status) => {
+  const handleStatusUpdate = async (status, position) => {
     try {
       const response = await axios.put(`http://localhost:8000/update/updatePL/${data._id}`, {
-        status
+        status,
+        position
       });
 
       if (response.data.success) {
         console.log('PL updated successfully:', response.data);
-        // Optionally refresh the data or handle UI update here
+        window.location.reload(); // Reload the page to see updated data
       } else {
         console.error('Failed to update:', response.data.message);
       }
@@ -121,13 +122,13 @@ const PLCard = ({ data }) => {
             <Button 
               colorScheme="green" 
               mr={3} 
-              onClick={() => handleStatusUpdate(1)} // Approve: send status=1
+              onClick={() => handleStatusUpdate(1, 0)} // Approve: send status=1 and position=0
             >
               Approve
             </Button>
             <Button 
               variant="outline" 
-              onClick={() => handleStatusUpdate(-1)} // Decline: send status=-1
+              onClick={() => handleStatusUpdate(-1, 0)} // Decline: send status=-1 and position=0
             >
               Decline
             </Button>

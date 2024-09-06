@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Stack, Heading, Text, Flex, Alert, AlertIcon, Button } from '@chakra-ui/react';
 import StaffNavbar from '../StaffNavbar/StaffNavbar';
-import PLCard from '../cards/PLCard'; // Replace OutpassCard with PLCard
+import PLCard from '../cards/PLCard'; // Assuming PLCard accepts a data prop
 import { HashLoader } from 'react-spinners';
 
 const StaffPL = () => {
@@ -10,6 +10,7 @@ const StaffPL = () => {
   const [error, setError] = useState('');
   const [showLoader, setShowLoader] = useState(true);
 
+  // Function to fetch and filter PL data
   const fetchPL = async (classAssigned) => {
     try {
       console.log('Initiating fetchPL function');
@@ -34,7 +35,10 @@ const StaffPL = () => {
       console.log('JSON parsing successful');
       console.log('Fetched PL data:', plData);
 
-      return plData;
+      // Apply filter here
+      const filteredPLData = plData.data.filter(pl => pl.extraDataArray[0] === 0);
+
+      return filteredPLData;
     } catch (error) {
       console.error('Error encountered during fetch:', error.message);
       console.error('Stack trace:', error.stack);
@@ -61,10 +65,11 @@ const StaffPL = () => {
         if (!teacherResponse.ok) {
           throw new Error(teacherData.message || 'Failed to fetch teacher information');
         }
+
         const classAssigned = teacherData.teacher?.classAssigned;
         if (classAssigned) {
           const plData = await fetchPL(classAssigned);
-          setPlData(plData.data || []);
+          setPlData(plData || []);
         } else {
           setError('No class assigned for the teacher.');
         }
