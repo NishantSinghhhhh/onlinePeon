@@ -18,6 +18,9 @@ import StaffOutpass from './components/StaffOptions/StaffOutpass';
 import StaffDone from './components/StaffOptions/StaffDone'
 import StaffLeave from './components/StaffOptions/StaffLeave';
 import StaffPL from './components/StaffOptions/StaffPL';
+import HOD from './components/positions/HOD'
+import WARDEN from './components/positions/Warden'
+
 // import Upload from './Forms/upload';
 function App() {
   return (
@@ -40,6 +43,8 @@ function App() {
         <Route path='/StaffDone' element={<StaffDone/>}/>
         <Route path='/StaffLeave' element={<StaffLeave/>}/>
         <Route path='/StaffPL' element={<StaffPL/>}/>
+        <Route path='/HOD' element={<HOD/>}/>
+        <Route path='/warden' element={<WARDEN/>}/>
         {/* <Route path='/uploaddoc' element={<Upload/>}/> */}
       </Routes>
     </Router>

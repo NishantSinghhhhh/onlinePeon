@@ -362,6 +362,8 @@ const staffLogin = async (req, res) => {
 
         // Find staff by email and staffId
         const staff = await Staff.findOne({ email, staffId });
+        console.log('Staff data found:', staff);
+
         if (!staff) {
             return res.status(403).json({
                 message: "Authentication failed, email, password, or staff ID is incorrect",
@@ -385,13 +387,22 @@ const staffLogin = async (req, res) => {
             { expiresIn: '24h' }
         );
 
-        // Send success response
+        console.log('JWT Token:', jwtToken);
+
+        // Send success response with additional staff details
         res.status(200).json({
             message: "Login successful",
             success: true,
             jwtToken,
-            email,
-            name: staff.name
+            staff: {
+                name: staff.name,
+                email: staff.email,
+                staffId: staff.staffId,
+                contactNumber: staff.contactNumber,
+                position: staff.position,
+                classAssigned: staff.classAssigned,
+                _id: staff._id
+            }
         });
 
     } catch (err) {
@@ -402,7 +413,6 @@ const staffLogin = async (req, res) => {
         });
     }
 };
-
 
 module.exports = {
     signup,
