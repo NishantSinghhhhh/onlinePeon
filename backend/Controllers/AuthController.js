@@ -295,7 +295,8 @@ const signupStaff = async (req, res) => {
             staffId,
             contactNumber,
             position,
-            classAssigned
+            classAssigned,
+            branchAssigned // Added branchAssigned for HOD
         } = req.body;
 
         // Check if the user already exists
@@ -317,8 +318,8 @@ const signupStaff = async (req, res) => {
             position
         };
 
-        // Only add classAssigned if the position requires it
-        if (['Class Teacher', 'HOD', 'Warden'].includes(position)) {
+        // Add `classAssigned` if the position requires it
+        if (['Class Teacher','Warden'].includes(position)) {
             if (!classAssigned) {
                 return res.status(400).json({
                     message: 'Class assigned is required for the position',
@@ -328,6 +329,18 @@ const signupStaff = async (req, res) => {
             newStaffData.classAssigned = classAssigned;
         }
 
+        // Add `branchAssigned` if the position is HOD
+        if (position === 'HOD') {
+            if (!branchAssigned) {
+                return res.status(400).json({
+                    message: 'Branch assigned is required for HOD',
+                    success: false
+                });
+            }
+            newStaffData.branchAssigned = branchAssigned;
+        }
+
+        // Create a new Staff document
         const newStaff = new Staff(newStaffData);
 
         // Hash the password
@@ -348,6 +361,7 @@ const signupStaff = async (req, res) => {
         });
     }
 };
+
 
 const staffLogin = async (req, res) => {
     try {

@@ -25,6 +25,7 @@ const StaffRegistration = () => {
     contactNumber: '',
     position: '', // Add position state
     classAssigned: '', // Add classAssigned state
+    branchAssigned: '', // Add branchAssigned state for HOD
   });
 
   const toast = useToast(); // Initialize useToast
@@ -50,13 +51,14 @@ const StaffRegistration = () => {
         staffId, 
         contactNumber,
         position,
-        classAssigned, // Add classAssigned to destructuring
+        classAssigned, 
+        branchAssigned // Add branchAssigned to destructuring
     } = signupInfo;
 
     // Check for empty fields
     if (!name || !email || !password || !staffId || !contactNumber || !position || 
         (position === 'Class Teacher' && !classAssigned) ||
-        (position === 'HOD' && !classAssigned) ||
+        (position === 'HOD' && !branchAssigned) || // Validate branchAssigned for HOD
         (position === 'Warden' && !classAssigned)) { // Validation for Class Teacher, HOD, and Warden
         return handleError('All fields are required.');
     }
@@ -83,7 +85,8 @@ const StaffRegistration = () => {
                 staffId,
                 contactNumber,
                 position,
-                classAssigned: (position === 'Class Teacher' || position === 'HOD' || position === 'Warden') ? classAssigned : undefined, // Only send classAssigned if position is "Class Teacher", "HOD", or "Warden"
+                classAssigned: (position === 'Class Teacher' || position === 'Warden') ? classAssigned : undefined, // Only send classAssigned if position is "Class Teacher" or "Warden"
+                branchAssigned: (position === 'HOD') ? branchAssigned : undefined, // Only send branchAssigned if position is "HOD"
             })
         });
 
@@ -232,8 +235,27 @@ const StaffRegistration = () => {
                     </Select>
                   </FormControl>
 
-                  {(signupInfo.position === 'Class Teacher' || signupInfo.position === 'HOD' || signupInfo.position === 'Warden') && (
-                    <FormControl isRequired>
+                  {signupInfo.position === 'HOD' && (
+                    <FormControl >
+                      <FormLabel>Assigned Branch</FormLabel>
+                      <Select
+                        name="branchAssigned"
+                        placeholder="Select your branch"
+                        value={signupInfo.branchAssigned}
+                        onChange={handleChange}
+                        className={styles.chakraInput}
+                      >
+                        <option value="ASGE">ASGE</option>
+                        <option value="COMP">COMP</option>
+                        <option value="MECH">MECH</option>
+                        <option value="IT">IT</option>
+                        <option value="ENTC">ENTC</option>
+                      </Select>
+                    </FormControl>
+                  )}
+
+                  {signupInfo.position === 'Class Teacher' && (
+                    <FormControl>
                       <FormLabel>Assigned Class</FormLabel>
                       <Select
                         name="classAssigned"
@@ -255,8 +277,24 @@ const StaffRegistration = () => {
                     </FormControl>
                   )}
 
-                  <Button type="submit" 
-                  >Register</Button>
+                  {signupInfo.position === 'Warden' && (
+                    <FormControl >
+                      <FormLabel>Assigned Class</FormLabel>
+                      <Select
+                        name="classAssigned"
+                        placeholder="Select your Year"
+                        value={signupInfo.classAssigned}
+                        onChange={handleChange}
+                        className={styles.chakraInput}
+                      >
+                        {['FE-WARDEN', 'SE-WARDEN', 'TE-WARDEN', 'BE-WARDEN'].map((cls) => (
+                          <option key={cls} value={cls}>{cls}</option>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  )}
+
+                  <Button type="submit">Register</Button>
                 </Stack>
               </form>
             </CardBody>

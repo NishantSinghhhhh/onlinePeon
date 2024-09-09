@@ -199,33 +199,49 @@ const staffSignupValidation = (req, res, next) => {
         name: Joi.string().min(3).max(100).required(),
         email: Joi.string().email().required(),
         password: Joi.string().min(4).max(100).required(),
-        staffId: Joi.alternatives().try(
-            Joi.string().length(5).pattern(/^\d+$/), // 5 digits
-            Joi.string().length(6).pattern(/^\d+$/)  // 6 digits
-        ).required(),
+        staffId: Joi.string().length(5).pattern(/^\d+$/).allow(null)
+            .when('position', {
+                is: Joi.string().valid('Class Teacher', 'HOD', 'Warden'),
+                then: Joi.string().length(5).pattern(/^\d+$/).required(),
+                otherwise: Joi.string().allow('')
+            })
+            .concat(
+                Joi.string().length(6).pattern(/^\d+$/).allow(null)
+                .when('position', {
+                    is: Joi.string().valid('Class Teacher', 'HOD', 'Warden'),
+                    then: Joi.string().length(6).pattern(/^\d+$/).required(),
+                    otherwise: Joi.string().allow('')
+                })
+            ),
         contactNumber: Joi.string().length(10).pattern(/^\d+$/).required(), // Ensure contact number is exactly 10 digits
         position: Joi.string().valid(
-            'HOD', 
-            'Class Teacher', 
-            'Warden', 
-            'Joint Director', 
+            'HOD',
+            'Class Teacher',
+            'Warden',
+            'Joint Director',
             'Director'
         ).required(),
         classAssigned: Joi.string().valid(
             'FE-COMP-A', 'FE-COMP-B', 'FE-ENTC-A', 'FE-ENTC-B', 'FE-IT-A', 'FE-IT-B', 'FE-MECH', 'FE-ARE',
             'SE-COMP-A', 'SE-COMP-B', 'SE-ENTC-A', 'SE-ENTC-B', 'SE-IT-A', 'SE-IT-B', 'SE-MECH',
             'TE-COMP-A', 'TE-COMP-B', 'TE-ENTC-A', 'TE-ENTC-B', 'TE-IT-A', 'TE-IT-B', 'TE-MECH',
-            'BE-COMP-A', 'BE-COMP-B', 'BE-ENTC-A', 'BE-ENTC-B', 'BE-IT-A', 'BE-IT-B', 'BE-MECH'
+            'BE-COMP-A', 'BE-COMP-B', 'BE-ENTC-A', 'BE-ENTC-B', 'BE-IT-A', 'BE-IT-B', 'BE-MECH',
+            'FE-WARDEN', 'SE-WARDEN', 'TE-WARDEN', 'BE-WARDEN', ''
         ).when('position', {
-            is: Joi.string().valid('Class Teacher', 'HOD', 'Warden'),
+            is: Joi.string().valid('Class Teacher', 'Warden'),
             then: Joi.required(),
-            otherwise: Joi.forbidden() // `classAssigned` is forbidden if position is not one of these
+            otherwise: Joi.forbidden()
         }),
+        branchAssigned: Joi.string().valid('ASGE', 'COMP', 'MECH', 'IT', 'ENTC').when('position', {
+            is: Joi.string().valid('HOD'),
+            then: Joi.required(),
+            otherwise: Joi.forbidden()
+        })
     });
 
     console.log("Request Body:", req.body);
 
-    const { error } = schema.validate(req.body);
+    const { error } = schema.validate(req.body, { abortEarly: false });
 
     if (error) {
         console.log("Validation Error Details:", error.details);
@@ -238,6 +254,7 @@ const staffSignupValidation = (req, res, next) => {
             }))
         });
     }
+
     next();
 };
 
