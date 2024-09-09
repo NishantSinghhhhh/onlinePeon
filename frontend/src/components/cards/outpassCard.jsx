@@ -39,6 +39,9 @@ const OutpassCard = ({ data, onStatusChange }) => {
             <Text fontWeight="bold" fontSize="xl" mb={2}>
               {data.firstName} {data.lastName}
             </Text>
+            <Text fontSize="md" mb={2} color="gray.600">
+              {data.className} {/* Render the className here */}
+            </Text>
             <Text fontSize="md" mb={4} color="gray.600">
               {data.reason}
             </Text>
@@ -65,6 +68,7 @@ const OutpassCard = ({ data, onStatusChange }) => {
               {[
                 { label: 'First Name', value: data.firstName },
                 { label: 'Last Name', value: data.lastName },
+                { label: 'Class Name', value: data.className }, // Add className to modal details
                 { label: 'Registration Number', value: data.registrationNumber },
                 { label: 'Reason', value: data.reason },
                 { label: 'Date', value: new Date(data.date).toLocaleDateString() },
@@ -79,7 +83,7 @@ const OutpassCard = ({ data, onStatusChange }) => {
                     </Text>
                     <Text>{item.value}</Text>
                   </Flex>
-                  {index < 7 && <Divider my={2} />}
+                  {index < 8 && <Divider my={2} />}
                 </Box>
               ))}
             </Flex>

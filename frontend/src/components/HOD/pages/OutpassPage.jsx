@@ -22,6 +22,14 @@ const OutpassPage = () => {
         setOutpasses(result.data);
         console.log('All Outpasses:', result.data);
         filterAndSortOutpasses(result.data);
+
+        // Log the position of the user
+        const loginInfo = JSON.parse(localStorage.getItem('loginInfo'));
+        if (loginInfo) {
+          const { branchAssigned, classAssigned } = loginInfo;
+          console.log('User Branch Assigned:', branchAssigned);
+          console.log('User Class Assigned:', classAssigned); // Log classAssigned
+        }
       } else {
         throw new Error('Failed to fetch outpasses');
       }
@@ -35,23 +43,28 @@ const OutpassPage = () => {
 
   const filterAndSortOutpasses = (outpasses) => {
     const loginInfo = JSON.parse(localStorage.getItem('loginInfo'));
-    
+
     if (!loginInfo) {
       setError('No login information found. Please log in again.');
       return;
     }
-    const { branchAssigned } = loginInfo || {};
 
-    // const { branchAssigned } = loginInfo;
+    const { branchAssigned, classAssigned } = loginInfo;
 
-    if (!branchAssigned) {
-      setError('Branch assigned information is missing.');
+    if (!branchAssigned || !classAssigned) {
+      setError('Branch or class assigned information is missing.');
       return;
     }
 
+    // Example filter logic using classAssigned
     const filtered = outpasses.filter(outpass =>
-      outpass.className.includes(branchAssigned)
+      outpass.className.toLowerCase().includes(branchAssigned.toLowerCase()) &&
+      !outpass.className.toLowerCase().includes('fe') &&
+      outpass.extraDataArray && outpass.extraDataArray[0] === 1
     );
+
+    // Log the filtered result
+    console.log('Filtered Outpasses:', filtered);
 
     const sorted = filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
 

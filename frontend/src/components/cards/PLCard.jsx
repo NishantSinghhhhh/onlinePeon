@@ -16,7 +16,7 @@ import {
   ModalFooter,
   Divider
 } from '@chakra-ui/react';
-import axios from 'axios'; 
+import axios from 'axios';
 
 const PLCard = ({ data, onStatusChange }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -40,6 +40,9 @@ const PLCard = ({ data, onStatusChange }) => {
             <Text fontWeight="bold" fontSize="xl" mb={2}>
               {data.firstName} {data.lastName}
             </Text>
+            <Text fontSize="md" mb={2} color="gray.600">
+              {data.className} {/* Add the class name here */}
+            </Text>
             <Text fontSize="md" mb={4} color="gray.600">
               {data.reason}
             </Text>
@@ -57,7 +60,7 @@ const PLCard = ({ data, onStatusChange }) => {
       </Card>
 
       <Modal isOpen={isOpen} onClose={onClose} size="2xl">
-        <ModalOverlay bg="rgba(0, 0, 0, 0.6)" />
+        <ModalOverlay />
         <ModalContent>
           <ModalHeader>PL Details</ModalHeader>
           <ModalCloseButton />
@@ -66,7 +69,7 @@ const PLCard = ({ data, onStatusChange }) => {
               {[
                 { label: 'First Name', value: data.firstName },
                 { label: 'Last Name', value: data.lastName },
-                { label: 'Class Name', value: data.className },
+                { label: 'Class Name', value: data.className }, // Add className to modal details
                 { label: 'Roll Number', value: data.rollNumber },
                 { label: 'Classes Missed', value: data.classesMissed },
                 { label: 'Reason', value: data.reason },
@@ -82,10 +85,9 @@ const PLCard = ({ data, onStatusChange }) => {
                     </Text>
                     <Text>{item.value}</Text>
                   </Flex>
-                  {index < 8 && <Divider my={2} />}
+                  {index < 9 && <Divider my={2} />}
                 </Box>
               ))}
-
               <Box mb={2}>
                 <Flex justify="space-between" align="center">
                   <Text fontWeight="semibold" color="gray.700">

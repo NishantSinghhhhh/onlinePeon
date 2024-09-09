@@ -361,8 +361,6 @@ const signupStaff = async (req, res) => {
         });
     }
 };
-
-
 const staffLogin = async (req, res) => {
     try {
         const { staffId, email, password } = req.body;
@@ -403,7 +401,7 @@ const staffLogin = async (req, res) => {
 
         console.log('JWT Token:', jwtToken);
 
-        // Send success response with additional staff details
+        // Send success response with additional staff details, including classAssigned and branchAssigned
         res.status(200).json({
             message: "Login successful",
             success: true,
@@ -414,7 +412,8 @@ const staffLogin = async (req, res) => {
                 staffId: staff.staffId,
                 contactNumber: staff.contactNumber,
                 position: staff.position,
-                classAssigned: staff.classAssigned,
+                branchAssigned: staff.branchAssigned, // Ensure this field is included
+                classAssigned: staff.classAssigned,   // Add this field if available
                 _id: staff._id
             }
         });

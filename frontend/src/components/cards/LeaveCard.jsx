@@ -45,7 +45,7 @@ const LeaveCard = ({ data, onStatusChange }) => {
             <Button
               mt={4}
               variant="solid"
-              onClick={onOpen} // Opens the modal
+              onClick={onOpen}
               size="md"
               width="full"
             >
@@ -84,16 +84,16 @@ const LeaveCard = ({ data, onStatusChange }) => {
             </Flex>
           </ModalBody>
           <ModalFooter>
-            <Button 
-              colorScheme="green" 
-              mr={3} 
-              onClick={() => onStatusChange(data._id, 1)} // Approve: send status=1
+            <Button
+              colorScheme="green"
+              mr={3}
+              onClick={() => onStatusChange(data._id, 1)}
             >
               Approve
             </Button>
-            <Button 
-              variant="outline" 
-              onClick={() => onStatusChange(data._id, -1)} // Decline: send status=-1
+            <Button
+              variant="outline"
+              onClick={() => onStatusChange(data._id, -1)}
             >
               Decline
             </Button>
