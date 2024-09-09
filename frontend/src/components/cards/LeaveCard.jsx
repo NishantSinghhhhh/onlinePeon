@@ -14,55 +14,12 @@ import {
   ModalCloseButton,
   ModalBody,
   ModalFooter,
-  Divider,
-  useToast
+  Divider
 } from '@chakra-ui/react';
-import axios from 'axios';
-import PropTypes from 'prop-types';
 
-const LeaveCard = ({ data, onClick, onUpdate }) => {
+const LeaveCard = ({ data, onStatusChange }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const toast = useToast();
 
-  const handleStatusUpdate = async (status) => {
-    try {
-      const response = await axios.put(`http://localhost:8000/update/updateLeave/${data._id}`, {
-        status,
-        position: 0
-      });
-
-      if (response.data.message === 'Leave status updated successfully') {
-        toast({
-          title: "Leave Updated",
-          description: `Status changed to ${status === 1 ? 'Approved' : 'Declined'}`,
-          status: "success",
-          duration: 3000,
-          isClosable: true,
-        });
-        if (onUpdate) {
-          onUpdate(data._id, status);
-        }
-      } else {
-        toast({
-          title: "Update Failed",
-          description: `Failed to update leave: ${response.data.message}`,
-          status: "error",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: `An error occurred while updating the leave: ${error.response ? error.response.data.message : error.message}`,
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-    }
-    onClose();
-  };
-  
   return (
     <>
       <Card
@@ -76,7 +33,6 @@ const LeaveCard = ({ data, onClick, onUpdate }) => {
         p={4}
         bg="white"
         borderColor="gray.200"
-        onClick={onClick}
       >
         <CardBody>
           <Flex direction="column" spacing={3}>
@@ -89,10 +45,7 @@ const LeaveCard = ({ data, onClick, onUpdate }) => {
             <Button
               mt={4}
               variant="solid"
-              onClick={(e) => {
-                e.stopPropagation();
-                onOpen();
-              }}
+              onClick={onOpen} // Opens the modal
               size="md"
               width="full"
             >
@@ -102,7 +55,7 @@ const LeaveCard = ({ data, onClick, onUpdate }) => {
         </CardBody>
       </Card>
 
-      <Modal isOpen={isOpen} onClose={onClose} size="xl">
+      <Modal isOpen={isOpen} onClose={onClose} size="2xl">
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Leave Details</ModalHeader>
@@ -116,29 +69,32 @@ const LeaveCard = ({ data, onClick, onUpdate }) => {
                 { label: 'Reason For Leave', value: data.reasonForLeave },
                 { label: 'Start Date', value: new Date(data.startDate).toLocaleDateString() },
                 { label: 'End Date', value: new Date(data.endDate).toLocaleDateString() },
-                { label: 'Place Of Residence', value: data.placeOfResidence },
-                { label: 'Attendance Percentage', value: `${data.attendancePercentage}%` },
-                { label: 'Contact Number', value: data.contactNumber },
-                { label: 'Created At', value: new Date(data.createdAt).toLocaleDateString() },
-                { label: 'Updated At', value: new Date(data.updatedAt).toLocaleDateString() }
+                { label: 'Contact Number', value: data.contactNumber }
               ].map((item, index) => (
                 <Box key={index} mb={2}>
-                  <Flex justify="space-between">
+                  <Flex justify="space-between" align="center">
                     <Text fontWeight="semibold" color="gray.700">
                       {item.label}:
                     </Text>
                     <Text>{item.value}</Text>
                   </Flex>
-                  {index < 10 && <Divider my={2} />}
+                  {index < 6 && <Divider my={2} />}
                 </Box>
               ))}
             </Flex>
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme="green" mr={3} onClick={() => handleStatusUpdate(1)}>
+            <Button 
+              colorScheme="green" 
+              mr={3} 
+              onClick={() => onStatusChange(data._id, 1)} // Approve: send status=1
+            >
               Approve
             </Button>
-            <Button variant="outline" onClick={() => handleStatusUpdate(-1)}>
+            <Button 
+              variant="outline" 
+              onClick={() => onStatusChange(data._id, -1)} // Decline: send status=-1
+            >
               Decline
             </Button>
           </ModalFooter>
@@ -146,12 +102,6 @@ const LeaveCard = ({ data, onClick, onUpdate }) => {
       </Modal>
     </>
   );
-};
-
-LeaveCard.propTypes = {
-  data: PropTypes.object.isRequired,
-  onClick: PropTypes.func,
-  onUpdate: PropTypes.func.isRequired,
 };
 
 export default LeaveCard;

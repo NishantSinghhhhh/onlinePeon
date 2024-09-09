@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Stack, Heading, Text, Flex, Alert, AlertIcon, Button } from '@chakra-ui/react';
 import StaffNavbar from '../StaffNavbar/StaffNavbar';
-import LeaveCard from '../cards/LeaveCard'; // Assuming LeaveCard accepts an onClick prop
+import LeaveCard from '../cards/LeaveCard'; // Assuming LeaveCard accepts onClick and onStatusChange props
 import { HashLoader } from 'react-spinners';
+import axios from 'axios';
 
 const StaffLeave = () => {
   const [leaves, setLeaves] = useState([]);
@@ -18,11 +19,7 @@ const StaffLeave = () => {
         throw new Error('Failed to fetch leaves');
       }
       const leaveData = await leaveResponse.json();
-
-      // Apply filter here
-      const filteredLeaves = leaveData.data.filter(outpass => outpass.extraDataArray[0] === 0);
-
-      return filteredLeaves;
+      return leaveData;
     } catch (error) {
       throw error;
     }
@@ -51,7 +48,7 @@ const StaffLeave = () => {
         const classAssigned = teacherData.teacher?.classAssigned;
         if (classAssigned) {
           const leaveData = await fetchLeaveData(classAssigned);
-          setLeaves(leaveData); 
+          setLeaves(leaveData.data || []);
         } else {
           setError('No class assigned for the teacher.');
         }
@@ -73,9 +70,27 @@ const StaffLeave = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Handling click on leave card
-  const handleCardClick = (leaveData) => {
-    console.log('Leave card clicked:', leaveData);
+  const handleStatusChange = async (leaveId, status) => {
+    try {
+
+      const position = 0;
+
+      const response = await axios.put(`http://localhost:8000/update/updateLeave/${leaveId}`, {
+        status,
+        position,
+      });
+
+      if (response.data.success) {
+        console.log('Outpass updated successfully:', response.data);
+        setLeaves(prevOutpasses =>
+          prevOutpasses.filter(outpass => outpass._id !== leaveId)
+        );
+      } else {
+        console.error('Failed to update:', response.data.message);
+      }
+    } catch (error) {
+      console.error('Error updating outpass:', error.message);
+    }
   };
 
   // Rendering states
@@ -100,18 +115,20 @@ const StaffLeave = () => {
     );
   }
 
+  const filteredLeaves = leaves.filter(leave => leave.extraDataArray[0] === 0);
+
   return (
     <>
       <StaffNavbar />
       <Flex direction="column" align="center" justify="center" p={5}>
         <Heading as="h2" size="lg" mb={4}>Leave Details</Heading>
-        {leaves.length > 0 ? (
+        {filteredLeaves.length > 0 ? (
           <Stack spacing={4} maxW="md" w="full">
-            {leaves.map((leave, index) => (
-              <LeaveCard
-                key={index}
-                data={leave}
-                onClick={() => handleCardClick(leave)} // Handle card click
+            {filteredLeaves.map((leave, index) => (
+              <LeaveCard 
+                key={index} 
+                data={leave} 
+                onStatusChange={handleStatusChange} // Pass the function as a prop
               />
             ))}
           </Stack>

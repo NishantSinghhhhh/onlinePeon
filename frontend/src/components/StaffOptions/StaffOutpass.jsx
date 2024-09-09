@@ -3,6 +3,7 @@ import { Box, Stack, Heading, Text, Flex, Alert, AlertIcon, Button } from '@chak
 import StaffNavbar from '../StaffNavbar/StaffNavbar';
 import OutpassCard from '../cards/outpassCard';
 import { HashLoader } from 'react-spinners';
+import axios from 'axios';
 
 const StaffOutpass = () => {
   const [outpasses, setOutpasses] = useState([]);
@@ -12,32 +13,11 @@ const StaffOutpass = () => {
 
   const fetchOutpass = async (classAssigned) => {
     try {
-      console.log('Initiating fetchOutpass function');
-      console.log('Class assigned to fetch:', classAssigned);
-
       const outpassResponse = await fetch(`http://localhost:8000/fetch/fetchOutpasses/${classAssigned}`);
-
-      console.log('Response received from the server');
-      console.log('Response status code:', outpassResponse.status);
-      console.log('Response URL:', outpassResponse.url);
-
-      if (!outpassResponse.ok) {
-        console.log('Response status not OK:', outpassResponse.status);
-        const errorText = await outpassResponse.text();
-        console.error('Error details from server:', errorText);
-        throw new Error('Failed to fetch outpasses');
-      }
-
-      console.log('Parsing JSON from response');
+      if (!outpassResponse.ok) throw new Error('Failed to fetch outpasses');
       const outpassData = await outpassResponse.json();
-
-      console.log('JSON parsing successful');
-      console.log('Fetched outpass data:', outpassData);
-
       return outpassData;
     } catch (error) {
-      console.error('Error encountered during fetch:', error.message);
-      console.error('Stack trace:', error.stack);
       throw error;
     }
   };
@@ -57,10 +37,8 @@ const StaffOutpass = () => {
       try {
         const teacherResponse = await fetch(`http://localhost:8000/fetch/fetchTeacher/${staffId}`);
         const teacherData = await teacherResponse.json();
+        if (!teacherResponse.ok) throw new Error(teacherData.message);
 
-        if (!teacherResponse.ok) {
-          throw new Error(teacherData.message || 'Failed to fetch teacher information');
-        }
         const classAssigned = teacherData.teacher?.classAssigned;
         if (classAssigned) {
           const outpassData = await fetchOutpass(classAssigned);
@@ -84,6 +62,29 @@ const StaffOutpass = () => {
 
     return () => clearTimeout(timer);
   }, []);
+
+  const handleStatusChange = async (outpassId, status) => {
+    try {
+
+      const position = 0;
+
+      const response = await axios.put(`http://localhost:8000/update/updateOutpass/${outpassId}`, {
+        status,
+        position,
+      });
+
+      if (response.data.success) {
+        console.log('Outpass updated successfully:', response.data);
+        setOutpasses(prevOutpasses =>
+          prevOutpasses.filter(outpass => outpass._id !== outpassId)
+        );
+      } else {
+        console.error('Failed to update:', response.data.message);
+      }
+    } catch (error) {
+      console.error('Error updating outpass:', error.message);
+    }
+  };
 
   if (loading || showLoader) {
     return (
@@ -116,7 +117,11 @@ const StaffOutpass = () => {
         {filteredOutpasses.length > 0 ? (
           <Stack spacing={4} maxW="md" w="full">
             {filteredOutpasses.map((outpass, index) => (
-              <OutpassCard key={index} data={outpass} />
+              <OutpassCard 
+                key={index} 
+                data={outpass} 
+                onStatusChange={handleStatusChange} 
+              />
             ))}
           </Stack>
         ) : (

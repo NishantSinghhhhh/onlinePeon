@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import HodNavbar from './navbar';
-import LeaveCard from '../../cards/LeaveCard'; // Import the LeaveCard component
+import PLCard from '../../cards/PLCard'; // Import the PLCard component
 import { Box, Flex, Spinner, Text } from '@chakra-ui/react';
 import axios from 'axios';
 
@@ -32,19 +32,11 @@ const PLpage = () => {
     fetchLeaves();
   }, []);
 
-  const handleUpdate = (id, status) => {
-    setLeaves((prevLeaves) =>
-      prevLeaves.map((leave) =>
-        leave._id === id ? { ...leave, status } : leave
-      )
-    );
-  };
-
   return (
     <div>
       <HodNavbar />
       <Box p={4}>
-        <Text fontSize="2xl" mb={4}>Leave Page</Text>
+        <Text fontSize="2xl" mb={4}>Permitted Leave Page</Text>
         {loading ? (
           <Flex justify="center" align="center" height="100vh">
             <Spinner size="lg" />
@@ -55,10 +47,9 @@ const PLpage = () => {
           <Box>
             {leaves.length > 0 ? (
               leaves.map((leave) => (
-                <LeaveCard
+                <PLCard
                   key={leave._id}
                   data={leave}
-                  onUpdate={handleUpdate}
                 />
               ))
             ) : (

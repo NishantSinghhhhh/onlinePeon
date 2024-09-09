@@ -16,28 +16,9 @@ import {
   ModalFooter,
   Divider
 } from '@chakra-ui/react';
-import axios from 'axios';
 
-const OutpassCard = ({ data }) => {
+const OutpassCard = ({ data, onStatusChange }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-
-  // Function to handle approve/decline action
-  const handleStatusUpdate = async (status) => {
-    try {
-      const response = await axios.put(`http://localhost:8000/update/updateOutpass/${data._id}`, {
-        status,
-        position: 0 // Assuming position is 0, adjust based on your needs
-      });
-
-      if (response.data.success) {
-        console.log('Outpass updated successfully:', response.data);
-      } else {
-        console.error('Failed to update:', response.data.message);
-      }
-    } catch (error) {
-      console.error('Error updating outpass:', error.message);
-    }
-  };
 
   return (
     <>
@@ -107,13 +88,13 @@ const OutpassCard = ({ data }) => {
             <Button 
               colorScheme="green" 
               mr={3} 
-              onClick={() => handleStatusUpdate(1)} // Approve: send status=1
+              onClick={() => onStatusChange(data._id, 1)} // Approve: send status=1
             >
               Approve
             </Button>
             <Button 
               variant="outline" 
-              onClick={() => handleStatusUpdate(-1)} // Decline: send status=-1
+              onClick={() => onStatusChange(data._id, -1)} // Decline: send status=-1
             >
               Decline
             </Button>

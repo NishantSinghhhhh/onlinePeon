@@ -114,13 +114,13 @@ const SignInCard = () => {
     }
   
     try {
-      const url = `http://localhost:8000/auth/loginStaff`;
+      const url = 'http://localhost:8000/auth/loginStaff';
       console.log('Sending request:', { email, password, staffId, isStudent: false });
   
       const response = await fetch(url, {
-        method: "POST",
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, staffId, isStudent: false })
+        body: JSON.stringify({ email, password, staffId, isStudent: false }),
       });
   
       const result = await response.json();
@@ -146,7 +146,9 @@ const SignInCard = () => {
         localStorage.setItem('loginInfo', JSON.stringify({
           email: staff.email,
           staffId: staff.staffId,
-          isStudent: false
+          isStudent: false,
+          position: staff.position,
+          branchAssigned: staff.branchAssigned // Added branchAssigned to store it
         }));
   
         // Navigate based on the position

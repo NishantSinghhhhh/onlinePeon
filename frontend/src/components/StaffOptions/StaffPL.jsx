@@ -3,6 +3,7 @@ import { Box, Stack, Heading, Text, Flex, Alert, AlertIcon, Button } from '@chak
 import StaffNavbar from '../StaffNavbar/StaffNavbar';
 import PLCard from '../cards/PLCard'; // Assuming PLCard accepts a data prop
 import { HashLoader } from 'react-spinners';
+import axios from 'axios';
 
 const StaffPL = () => {
   const [plData, setPlData] = useState([]);
@@ -13,36 +14,10 @@ const StaffPL = () => {
   // Function to fetch and filter PL data
   const fetchPL = async (classAssigned) => {
     try {
-      console.log('Initiating fetchPL function');
-      console.log('Class assigned to fetch:', classAssigned);
-
-      const plResponse = await fetch(`http://localhost:8000/fetch/fetchPLs/${classAssigned}`);
-
-      console.log('Response received from the server');
-      console.log('Response status code:', plResponse.status);
-      console.log('Response URL:', plResponse.url);
-
-      if (!plResponse.ok) {
-        console.log('Response status not OK:', plResponse.status);
-        const errorText = await plResponse.text();
-        console.error('Error details from server:', errorText);
-        throw new Error('Failed to fetch PL data');
-      }
-
-      console.log('Parsing JSON from response');
-      const plData = await plResponse.json();
-
-      console.log('JSON parsing successful');
-      console.log('Fetched PL data:', plData);
-
-      // Apply filter here
-      const filteredPLData = plData.data.filter(pl => pl.extraDataArray[0] === 0);
-
-      return filteredPLData;
+      const response = await axios.get(`http://localhost:8000/fetch/fetchPLs/${classAssigned}`);
+      return response.data;
     } catch (error) {
-      console.error('Error encountered during fetch:', error.message);
-      console.error('Stack trace:', error.stack);
-      throw error;
+      throw new Error('Failed to fetch PL data');
     }
   };
 
@@ -59,17 +34,19 @@ const StaffPL = () => {
       const { staffId } = loginInfo;
 
       try {
-        const teacherResponse = await fetch(`http://localhost:8000/fetch/fetchTeacher/${staffId}`);
-        const teacherData = await teacherResponse.json();
+        const teacherResponse = await axios.get(`http://localhost:8000/fetch/fetchTeacher/${staffId}`);
+        const teacherData = teacherResponse.data;
 
-        if (!teacherResponse.ok) {
+        if (teacherResponse.status !== 200) {
           throw new Error(teacherData.message || 'Failed to fetch teacher information');
         }
 
         const classAssigned = teacherData.teacher?.classAssigned;
         if (classAssigned) {
           const plData = await fetchPL(classAssigned);
-          setPlData(plData || []);
+          // Apply filter here
+          const filteredPLData = plData.data.filter(pl => pl.extraDataArray[0] === 0);
+          setPlData(filteredPLData || []);
         } else {
           setError('No class assigned for the teacher.');
         }
@@ -89,6 +66,28 @@ const StaffPL = () => {
 
     return () => clearTimeout(timer);
   }, []);
+
+  const handleStatusChange = async (plId, status) => {
+    try {
+      const position = 0; // Adjust this as needed
+
+      const response = await axios.put(`http://localhost:8000/update/updatePL/${plId}`, {
+        status,
+        position,
+      });
+
+      if (response.data.success) {
+        console.log('PL updated successfully:', response.data);
+        setPlData(prevPLData =>
+          prevPLData.filter(pl => pl._id !== plId)
+        );
+      } else {
+        console.error('Failed to update:', response.data.message);
+      }
+    } catch (error) {
+      console.error('Error updating PL:', error.message);
+    }
+  };
 
   if (loading || showLoader) {
     return (
@@ -119,7 +118,11 @@ const StaffPL = () => {
         {plData.length > 0 ? (
           <Stack spacing={4} maxW="md" w="full">
             {plData.map((pl, index) => (
-              <PLCard key={index} data={pl} />
+              <PLCard 
+                key={index} 
+                data={pl} 
+                onStatusChange={handleStatusChange} 
+              />
             ))}
           </Stack>
         ) : (
