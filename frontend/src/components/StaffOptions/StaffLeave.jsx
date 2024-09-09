@@ -51,7 +51,7 @@ const StaffLeave = () => {
         const classAssigned = teacherData.teacher?.classAssigned;
         if (classAssigned) {
           const leaveData = await fetchLeaveData(classAssigned);
-          setLeaves(leaveData); // Set filtered data
+          setLeaves(leaveData); 
         } else {
           setError('No class assigned for the teacher.');
         }

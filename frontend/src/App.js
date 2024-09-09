@@ -18,10 +18,14 @@ import StaffOutpass from './components/StaffOptions/StaffOutpass';
 import StaffDone from './components/StaffOptions/StaffDone'
 import StaffLeave from './components/StaffOptions/StaffLeave';
 import StaffPL from './components/StaffOptions/StaffPL';
-import HOD from './components/positions/HOD'
+import HOD from './components/HOD/HOD'
 import WARDEN from './components/positions/Warden'
+import HODLeavePage from './components/HOD/pages/LeavePage'
+import HODOutpassPage from './components/HOD/pages/OutpassPage'
+import HODPLpage from './components/HOD/pages/PLpage'
+import HODdonepage from './components/HOD/pages/DonePage'
 
-// import Upload from './Forms/upload';
+
 function App() {
   return (
     <div className="App">
@@ -45,7 +49,10 @@ function App() {
         <Route path='/StaffPL' element={<StaffPL/>}/>
         <Route path='/HOD' element={<HOD/>}/>
         <Route path='/warden' element={<WARDEN/>}/>
-        {/* <Route path='/uploaddoc' element={<Upload/>}/> */}
+        <Route path='/HODLeavePage' element={<HODLeavePage/>}/>
+        <Route path='/HODOutpassPage' element={<HODOutpassPage/>}/>
+        <Route path='/HODPLpage' element={<HODPLpage/>}/>
+        <Route path='/HODdonepage' element={<HODdonepage/>}/>
       </Routes>
     </Router>
     </div>

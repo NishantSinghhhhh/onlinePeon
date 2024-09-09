@@ -1,8 +1,11 @@
 import React from 'react'
+import HodNavbar from './pages/navbar'
 
 const HOD = () => {
   return (
-    <div>HOD</div>
+    <div>
+      <HodNavbar/>
+    </div>
   )
 }
 

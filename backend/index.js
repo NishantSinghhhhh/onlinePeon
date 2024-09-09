@@ -5,6 +5,7 @@ const multer = require('multer');
 const authRoutes = require('./Routes/AuthRouter');
 const fetchRoutes = require('./Routes/fetchRouter')
 const fetchRoutesTeachers = require('./Routes/fetchRoutesTeachers')
+const fetchAll = require('./Routes/fetchAll')
 const { func } = require('joi');
 const updateRoutes = require('./Routes/updateRoutes');
 require('./Models/db');
@@ -28,7 +29,7 @@ app.use('/fetch', fetchRoutes)
 app.use('/fetch', fetchRoutesTeachers)
 app.use('/update', updateRoutes);
 app.use('/products', authRoutes);
-
+app.use('/fetchAll',fetchAll )
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
