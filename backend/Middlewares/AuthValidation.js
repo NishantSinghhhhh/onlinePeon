@@ -193,7 +193,6 @@ const plValidation = (req, res, next) => {
     console.log('Validation passed. Validated data:', JSON.stringify(value, null, 2));
     next();
 };
-
 const staffSignupValidation = (req, res, next) => {
     const schema = Joi.object({
         name: Joi.string().min(3).max(100).required(),
@@ -213,13 +212,14 @@ const staffSignupValidation = (req, res, next) => {
                     otherwise: Joi.string().allow('')
                 })
             ),
-        contactNumber: Joi.string().length(10).pattern(/^\d+$/).required(), // Ensure contact number is exactly 10 digits
+        contactNumber: Joi.string().length(10).pattern(/^\d+$/).required(),
         position: Joi.string().valid(
             'HOD',
             'Class Teacher',
             'Warden',
             'Joint Director',
-            'Director'
+            'Director',
+            'Principal'
         ).required(),
         classAssigned: Joi.string().valid(
             'FE-COMP-A', 'FE-COMP-B', 'FE-ENTC-A', 'FE-ENTC-B', 'FE-IT-A', 'FE-IT-B', 'FE-MECH', 'FE-ARE',
@@ -239,12 +239,9 @@ const staffSignupValidation = (req, res, next) => {
         })
     });
 
-    console.log("Request Body:", req.body);
-
     const { error } = schema.validate(req.body, { abortEarly: false });
 
     if (error) {
-        console.log("Validation Error Details:", error.details);
         return res.status(400).json({
             message: "Bad Request",
             error: error.details.map(err => ({
@@ -257,6 +254,7 @@ const staffSignupValidation = (req, res, next) => {
 
     next();
 };
+
 
 const loginStaffValidation = (req, res, next) => {
     const schema = Joi.object({

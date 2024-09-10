@@ -232,6 +232,7 @@ const StaffRegistration = () => {
                       <option value="Warden">Warden</option>
                       <option value="Joint Director">Joint Director</option>
                       <option value="Director">Director</option>
+                      <option value="Principal">Principal</option> {/* Added Principal */}
                     </Select>
                   </FormControl>
 

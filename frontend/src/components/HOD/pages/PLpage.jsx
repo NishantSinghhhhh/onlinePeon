@@ -13,7 +13,7 @@ const PLpage = () => {
   const [error, setError] = useState('');
   const [showLoader, setShowLoader] = useState(true);
 
-  // Access loginInfo from LoginContext
+
   const { loginInfo } = useContext(LoginContext);
 
   const fetchPLs = async () => {
@@ -27,9 +27,8 @@ const PLpage = () => {
         console.log('All PLs:', result.data);
         filterAndSortPLs(result.data);
 
-        // Log the position of the user from the context
         console.log('Logged in as:', loginInfo.name);
-        console.log('User Position:', loginInfo.position); // Log staff position
+        console.log('User Position:', loginInfo.position); 
         console.log('Class of the User:', loginInfo.classAssigned);
         console.log('Branch Assigned:', loginInfo.branchAssigned);
       } else {

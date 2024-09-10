@@ -18,12 +18,22 @@ import StaffOutpass from './components/StaffOptions/StaffOutpass';
 import StaffDone from './components/StaffOptions/StaffDone'
 import StaffLeave from './components/StaffOptions/StaffLeave';
 import StaffPL from './components/StaffOptions/StaffPL';
-import HOD from './components/HOD/HOD'
-import WARDEN from './components/positions/Warden'
-import HODLeavePage from './components/HOD/pages/LeavePage'
-import HODOutpassPage from './components/HOD/pages/OutpassPage'
-import HODPLpage from './components/HOD/pages/PLpage'
-import HODdonepage from './components/HOD/pages/DonePage'
+import WARDEN from './components/HOD/WARDEN'
+// import WARDEN from './components/positions/Warden'
+import WARDENLeavePage from './components/HOD/pages/LeavePage'
+import WARDENOutpassPage from './components/HOD/pages/OutpassPage'
+import WARDENPLpage from './components/HOD/pages/PLpage'
+import WARDENdonepage from './components/HOD/pages/DonePage'
+import HOD from './components/MainHod/mainHod'
+import HODLeavePage from './components/MainHod/pages/LeavePage'
+import HODOutpassPage from './components/MainHod/pages/OutpassPage'
+import HODPLpage from './components/MainHod/pages/PLpage'
+import HODdonePage from './components/MainHod/pages/DonePage'
+import Admin from './components/Admin/Admin'
+import AdminOutpass from './components/Admin/pages/AdminOutpassPage'
+import AdminLeavePage from './components/Admin/pages/AdminLeavePage';
+import AdminPLpage from './components/Admin/pages/AdminPLpage';
+
 import { LoginProvider } from './context/LoginContext';
 
 function App() {
@@ -48,12 +58,20 @@ function App() {
         <Route path='/StaffDone' element={<StaffDone/>}/>
         <Route path='/StaffLeave' element={<StaffLeave/>}/>
         <Route path='/StaffPL' element={<StaffPL/>}/>
+        <Route path='/WARDEN' element={<WARDEN/>}/>
         <Route path='/HOD' element={<HOD/>}/>
-        <Route path='/warden' element={<WARDEN/>}/>
+        <Route path='/WARDENLeavePage' element={<WARDENLeavePage/>}/>
+        <Route path='/WARDENOutpassPage' element={<WARDENOutpassPage/>}/>
+        <Route path='/WARDENPLpage' element={<WARDENPLpage/>}/>
+        <Route path='/WARDENdonepage' element={<WARDENdonepage/>}/>
         <Route path='/HODLeavePage' element={<HODLeavePage/>}/>
         <Route path='/HODOutpassPage' element={<HODOutpassPage/>}/>
         <Route path='/HODPLpage' element={<HODPLpage/>}/>
-        <Route path='/HODdonepage' element={<HODdonepage/>}/>
+        <Route path='/HODdonePage' element={<HODdonePage/>}/>
+        <Route path='/Admin' element={<Admin/>}/>
+        <Route path='/AdminOutpass' element={<AdminOutpass/>}/>
+        <Route path='/AdminLeavePage' element={<AdminLeavePage/>}/>
+        <Route path='/AdminPLpage' element={<AdminPLpage/>}/>
       </Routes>
     </Router>
 </LoginProvider>

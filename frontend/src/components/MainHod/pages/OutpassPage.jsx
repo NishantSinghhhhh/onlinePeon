@@ -13,7 +13,6 @@ const OutpassPage = () => {
   const [error, setError] = useState('');
   const [showLoader, setShowLoader] = useState(true);
 
-  // Access loginInfo from LoginContext
   const { loginInfo } = useContext(LoginContext);
 
   const fetchOutpasses = async () => {
@@ -27,11 +26,14 @@ const OutpassPage = () => {
         console.log('All Outpasses:', result.data);
         filterAndSortOutpasses(result.data);
 
-        // Log the position of the user from the context
         console.log('Logged in as:', loginInfo.name);
         console.log('User Position:', loginInfo.position); // Log staff position
-        console.log('Class of the User', loginInfo.classAssigned);
+        console.log('Class of the User:', loginInfo.classAssigned);
         console.log('Branch Assigned:', loginInfo.branchAssigned);
+
+        if (loginInfo.position.toLowerCase() === 'hod') {
+          console.log('HOD Branch:', loginInfo.branchAssigned);
+        }
       } else {
         throw new Error('Failed to fetch outpasses');
       }
@@ -43,26 +45,35 @@ const OutpassPage = () => {
     }
   };
 
+  const extractBranchFromClassName = (className) => {
+    const parts = className.split('-');
+    return parts.length > 1 ? parts[1] : null;
+  };
+
   const filterAndSortOutpasses = (outpasses) => {
-    if (!loginInfo.position || loginInfo.position.toLowerCase() !== 'warden') {
-      setError('Unauthorized access. Please log in with a Warden account.');
+    if (!loginInfo.position) {
+      setError('No position information found. Please log in again.');
       return;
     }
 
-    // Extract the class level (e.g., FE, SE, TE, BE) from the className string
-    const extractClassLevel = (className) => {
-      const match = className.match(/(FE|SE|TE|BE)/);
-      return match ? match[0] : null;
-    };
-
-    const assignedClassLevel = extractClassLevel(loginInfo.classAssigned);
     const assignedBranch = loginInfo.branchAssigned;
 
-    const filtered = outpasses.filter(outpass => {
-      const outpassClassLevel = extractClassLevel(outpass.className);
-      return outpassClassLevel === assignedClassLevel &&
-             JSON.stringify(outpass.extraDataArray) === JSON.stringify([1, 1, 0, 0]);
-    });
+    let filtered;
+
+    if (loginInfo.position.toLowerCase() === 'hod') {
+      filtered = outpasses.filter(outpass => {
+        const outpassBranch = extractBranchFromClassName(outpass.className);
+        return outpassBranch === assignedBranch &&
+               JSON.stringify(outpass.extraDataArray) === JSON.stringify([1, 0, 0, 0]);
+      });
+    } else {
+      filtered = outpasses.filter(outpass => {
+        const outpassBranch = extractBranchFromClassName(outpass.className);
+        return outpassBranch === assignedBranch &&
+               !outpass.className.toLowerCase().includes('fe') &&
+               outpass.extraDataArray && outpass.extraDataArray[0] === 1;
+      });
+    }
 
     console.log('Filtered Outpasses:', filtered);
 
@@ -83,31 +94,21 @@ const OutpassPage = () => {
 
   const handleStatusChange = async (outpassId, status) => {
     try {
-      const position = 2; // Assuming 2 is for Warden
-      const newExtraDataArray = [1, 1, status === 'approved' ? 1 : -1, 0];
-
-      console.log('Updating outpass with ID:', outpassId);
-      console.log('Status:', status);
-      console.log('Position:', position);
-      console.log('New extraDataArray:', newExtraDataArray);
+      console.log(`Sending update request for outpass ${outpassId} with status ${status}`);
+      const position = 1; // Static value
 
       const response = await axios.put(`http://localhost:8000/update/updateOutpass/${outpassId}`, {
         status,
         position,
-        extraDataArray: newExtraDataArray
       });
-
-      console.log('Backend response:', response.data);
 
       if (response.data.success) {
         console.log('Outpass updated successfully:', response.data);
-
         setFilteredOutpasses(prevOutpasses =>
-          prevOutpasses.map(outpass =>
-            outpass._id === outpassId 
-              ? { ...outpass, status, extraDataArray: newExtraDataArray } 
-              : outpass
-          )
+          prevOutpasses.filter(outpass => outpass._id !== outpassId)
+        );
+        setOutpasses(prevOutpasses =>
+          prevOutpasses.filter(outpass => outpass._id !== outpassId)
         );
       } else {
         console.error('Failed to update:', response.data.message);

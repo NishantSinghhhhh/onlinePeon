@@ -284,7 +284,6 @@ const login = async (req, res) => {
         });
     }
 };
-
 const signupStaff = async (req, res) => {
     try {
         // Extract values from the request body
@@ -296,7 +295,7 @@ const signupStaff = async (req, res) => {
             contactNumber,
             position,
             classAssigned,
-            branchAssigned // Added branchAssigned for HOD
+            branchAssigned
         } = req.body;
 
         // Check if the user already exists
@@ -319,7 +318,7 @@ const signupStaff = async (req, res) => {
         };
 
         // Add `classAssigned` if the position requires it
-        if (['Class Teacher','Warden'].includes(position)) {
+        if (['Class Teacher', 'Warden'].includes(position)) {
             if (!classAssigned) {
                 return res.status(400).json({
                     message: 'Class assigned is required for the position',
@@ -340,10 +339,9 @@ const signupStaff = async (req, res) => {
             newStaffData.branchAssigned = branchAssigned;
         }
 
-        // Create a new Staff document
         const newStaff = new Staff(newStaffData);
 
-        // Hash the password
+  
         newStaff.password = await bcrypt.hash(password, 10);
 
         // Save the new staff to the database
@@ -357,10 +355,12 @@ const signupStaff = async (req, res) => {
         console.error('Error during staff signup:', err); // Log detailed error information
         res.status(500).json({
             message: 'Internal server error',
-            success: false
+            success: false,
+            error: err.message // Include the error message for debugging
         });
     }
 };
+
 const staffLogin = async (req, res) => {
     try {
         const { staffId, email, password } = req.body;

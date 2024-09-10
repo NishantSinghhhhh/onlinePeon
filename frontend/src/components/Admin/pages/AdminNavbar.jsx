@@ -16,7 +16,10 @@ const StaffNavbar = () => {
   const location = useLocation(); 
   const { loginInfo } = useContext(LoginContext); // Access loginInfo from LoginContext
 
-
+//   import AdminOutpass from './components/Admin/pages/AdminOutpassPage'
+//   import AdminLeavePage from './components/Admin/pages/AdminLeavePage';
+//   import AdminPLpage from './components/Admin/pages/AdminPLpage';
+  
   const isWarden = loginInfo.position.toLowerCase() === 'warden';
 
   return (
@@ -40,11 +43,11 @@ const StaffNavbar = () => {
             <BreadcrumbItem>
               <BreadcrumbLink
                 as={Link}
-                to='/WARDENOutpassPage'
+                to='/AdminOutpass'
                 className={styles['breadcrumb-link']}
-                bg={location.pathname === '/WARDENOutpassPage' ? 'gray.600' : 'transparent'}
-                color={location.pathname === '/WARDENOutpassPage' ? 'white' : 'gray.300'}
-                fontWeight={location.pathname === '/WARDENOutpassPage' ? 'bold' : 'normal'}
+                bg={location.pathname === '/AdminOutpass' ? 'gray.600' : 'transparent'}
+                color={location.pathname === '/AdminOutpass' ? 'white' : 'gray.300'}
+                fontWeight={location.pathname === '/AdminOutpass' ? 'bold' : 'normal'}
               >
                 Outpass
               </BreadcrumbLink>
@@ -53,32 +56,32 @@ const StaffNavbar = () => {
             <BreadcrumbItem>
               <BreadcrumbLink
                 as={Link}
-                to='/WARDENLeavePage'
+                to='/AdminLeavePage'
                 className={styles['breadcrumb-link']}
-                bg={location.pathname === '/WARDENLeavePage' ? 'gray.600' : 'transparent'}
-                color={location.pathname === '/WARDENLeavePage' ? 'white' : 'gray.300'}
-                fontWeight={location.pathname === '/WARDENLeavePage' ? 'bold' : 'normal'}
+                bg={location.pathname === '/AdminLeavePage' ? 'gray.600' : 'transparent'}
+                color={location.pathname === '/AdminLeavePage' ? 'white' : 'gray.300'}
+                fontWeight={location.pathname === '/AdminLeavePage' ? 'bold' : 'normal'}
               >
                 Leave
               </BreadcrumbLink>
             </BreadcrumbItem>
 
-            {!isWarden && ( // Conditionally render the PL section
+           
               <BreadcrumbItem>
                 <BreadcrumbLink
                   as={Link}
-                  to='/WARDENPLpage'
+                  to='/AdminPLpage'
                   className={styles['breadcrumb-link']}
-                  bg={location.pathname === '/WARDENPLpage' ? 'gray.600' : 'transparent'}
-                  color={location.pathname === '/WARDENPLpage' ? 'white' : 'gray.300'}
-                  fontWeight={location.pathname === '/WARDENPLpage' ? 'bold' : 'normal'}
+                  bg={location.pathname === '/AdminPLpage' ? 'gray.600' : 'transparent'}
+                  color={location.pathname === '/AdminPLpage' ? 'white' : 'gray.300'}
+                  fontWeight={location.pathname === '/AdminPLpage' ? 'bold' : 'normal'}
                 >
                   PL
                 </BreadcrumbLink>
               </BreadcrumbItem>
-            )}
+           
 
-            <BreadcrumbItem>
+            {/* <BreadcrumbItem>
               <BreadcrumbLink
                 as={Link}
                 to='/WARDENdonepage'
@@ -89,7 +92,7 @@ const StaffNavbar = () => {
               >
                 Seen
               </BreadcrumbLink>
-            </BreadcrumbItem>
+            </BreadcrumbItem> */}
           </Breadcrumb>
         </Flex>
 

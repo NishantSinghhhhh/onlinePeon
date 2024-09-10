@@ -2,11 +2,17 @@ import React from 'react';
 import { Eye, Calendar, Clock } from 'lucide-react';
 import styles from './SeenOutpassCard.module.css'; // Import the CSS Module
 
-const SeenOutpassCard = ({ data }) => {
+const SeenOutpassCard = ({ data, role }) => {
   const { firstName, lastName, className, reason, date, startHour, endHour, extraDataArray, type } = data;
 
-  const isApproved = extraDataArray[2] === 1;
-  const isDeclined = extraDataArray[2] === -1;
+  // Role-based approval/decline logic
+  const isApproved = role === 'Warden'
+    ? extraDataArray[2] === 1 // Warden approval check
+    : extraDataArray[1] === 1; // HOD approval check
+
+  const isDeclined = role === 'Warden'
+    ? extraDataArray[2] === -1 // Warden decline check
+    : extraDataArray[1] === -1; // HOD decline check
 
   return (
     <div className={styles.card}>

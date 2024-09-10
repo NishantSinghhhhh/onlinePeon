@@ -28,7 +28,7 @@ const StaffSchema = new Schema({
   },
   position: {
     type: String,
-    enum: ['HOD', 'Class Teacher', 'Warden', 'Joint Director', 'Director'],
+    enum: ['HOD', 'Class Teacher', 'Warden', 'Joint Director', 'Director', 'Principal'],
     required: true
   },
   classAssigned: {

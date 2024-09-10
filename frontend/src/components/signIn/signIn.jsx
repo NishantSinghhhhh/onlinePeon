@@ -128,17 +128,28 @@ const SignInCard = () => {
           staffId: staff.staffId,
           email: staff.email,
           contactNumber: staff.contactNumber,
-          classAssigned: staff.classAssigned || staff.branchAssigned
+          classAssigned: staff.classAssigned,
+          branchAssigned: staff.branchAssigned
         });
 
-        if (staff.position === 'Class Teacher') {
-          setTimeout(() => navigate('/StaffHome'), 1000);
-        } else if (staff.position === 'HOD') {
-          setTimeout(() => navigate('/HOD'), 1000);
-        } else if (staff.position === 'Warden') {
-          setTimeout(() => navigate('/HOD'), 1000);
-        } else {
-          setTimeout(() => navigate('/DefaultStaffHome'), 1000);
+        // Redirect based on position
+        switch (staff.position) {
+          case 'Class Teacher':
+            setTimeout(() => navigate('/StaffHome'), 1000);
+            break;
+          case 'HOD':
+            setTimeout(() => navigate('/HOD'), 1000);
+            break;
+          case 'Warden':
+            setTimeout(() => navigate('/WARDEN'), 1000);
+            break;
+          case 'Joint Director':
+          case 'Director':
+          case 'Principal':
+            setTimeout(() => navigate('/Admin'), 1000);
+            break;
+          default:
+            setTimeout(() => navigate('/DefaultStaffHome'), 1000);
         }
       } else if (success && !staff) {
         handleError('Login successful, but staff details are missing');
@@ -239,7 +250,7 @@ const SignInCard = () => {
                   <Input
                     type='text'
                     name='staffId'
-                    placeholder='                    Enter your Staff ID'
+                    placeholder='Enter your Staff ID'
                     value={loginInfo.staffId}
                     onChange={handleChange}
                     required
@@ -285,4 +296,3 @@ const SignInCard = () => {
 };
 
 export default SignInCard;
-

@@ -1,21 +1,24 @@
 import React, { useState, useEffect, useContext } from 'react';
-import HodNavbar from './navbar'; // Adjust the path to HodNavbar
+import HODnavbar from './navbar'; // Adjust the path to HODnavbar
 import SeenOutpassCard from '../../seenCard/seenOutpassCard'; // Adjust the path to SeenOutpassCard
 import SeenLeaveCard from '../../seenCard/seenLeaveCard'; // Adjust the path to SeenLeaveCard
+import SeenPLCard from '../../seenCard/seenPLcard'; // Adjust the path to SeenPLCard
 import { LoginContext } from '../../../context/LoginContext'; // Adjust the path to LoginContext
 import styles from './navbar.module.css'; // Import CSS Module for DonePage
 
 const DonePage = () => {
   const [outpasses, setOutpasses] = useState([]);
   const [leaves, setLeaves] = useState([]);
+  const [PLs, setPLs] = useState([]); // New state for PLs
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const { loginInfo } = useContext(LoginContext);
+  const { loginInfo } = useContext(LoginContext); // Assuming loginInfo contains branch/class info
 
   useEffect(() => {
-    if (loginInfo.position === 'Warden') {
+    if (loginInfo.position === 'HOD') {
       fetchOutpasses();
       fetchLeaves();
+      fetchPLs(); // Fetch PLs when the component mounts
     } else {
       setError('You do not have permission to view this page.');
       setLoading(false);
@@ -29,9 +32,8 @@ const DonePage = () => {
       const result = await response.json();
 
       if (result.success) {
-        const filteredOutpasses = filterAndSortOutpasses(result.data);
+        const filteredOutpasses = filterOutpassesByStatusAndBranch(result.data);
         setOutpasses(filteredOutpasses);
-        console.log('Filtered Outpasses:', filteredOutpasses);
       } else {
         throw new Error('Failed to fetch outpasses');
       }
@@ -49,9 +51,8 @@ const DonePage = () => {
       const result = await response.json();
 
       if (result.success) {
-        const filteredLeaves = filterAndSortLeaves(result.data);
+        const filteredLeaves = filterLeavesByStatusAndBranch(result.data);
         setLeaves(filteredLeaves);
-        console.log('Filtered Leaves:', filteredLeaves);
       } else {
         throw new Error('Failed to fetch leaves');
       }
@@ -62,33 +63,50 @@ const DonePage = () => {
     }
   };
 
-  const filterAndSortOutpasses = (data) => {
-    const assignedClassLevel = extractClassLevel(loginInfo.classAssigned);
-    const approvedStatus = [1, 1, 1, 0];
-    const declinedStatus = [1, 1, -1, 0];
+  const fetchPLs = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/fetchAll/fetchAllPLs');
+      if (!response.ok) throw new Error('Failed to fetch PL requests');
+      const result = await response.json();
 
+      if (result.success) {
+        setPLs(result.data);
+        filterAndSortPLs(result.data); // Implement filter and sort logic for PLs
+      } else {
+        throw new Error('Failed to fetch PL requests');
+      }
+    } catch (error) {
+      setError(error.message || 'An unexpected error occurred');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filterOutpassesByStatusAndBranch = (data) => {
     return data
-      .filter(item => {
-        const itemClassLevel = extractClassLevel(item.className);
-        return itemClassLevel === assignedClassLevel &&
-          (arraysEqual(item.extraDataArray, approvedStatus) || arraysEqual(item.extraDataArray, declinedStatus));
-      })
+      .filter(outpass => 
+        outpass.branch === loginInfo.branch && 
+        (arraysEqual(outpass.extraDataArray, [1, 1, 0, 0]) || arraysEqual(outpass.extraDataArray, [1, -1, 0, 0]))
+      )
       .sort((a, b) => new Date(b.date) - new Date(a.date));
   };
 
-  const filterAndSortLeaves = (data) => {
-    const assignedBranch = loginInfo.branchAssigned;
-    const approvedStatus = 1;
-    const declinedStatus = -1;
-
+  const filterLeavesByStatusAndBranch = (data) => {
     return data
-      .filter(item => item.branch === assignedBranch &&
-        (item.extraDataArray[2] === approvedStatus || item.extraDataArray[2] === declinedStatus))
+      .filter(leave => 
+        leave.branch === loginInfo.branch && 
+        (arraysEqual(leave.extraDataArray, [1, 1, 0, 0]) || arraysEqual(leave.extraDataArray, [1, -1, 0, 0]))
+      )
       .sort((a, b) => new Date(b.date) - new Date(a.date));
   };
 
-  const extractClassLevel = (className) => {
-    return className.split('-')[0];
+  const filterAndSortPLs = (data) => {
+    return data
+      .filter(pl => 
+        pl.branch === loginInfo.branch && 
+        (arraysEqual(pl.extraDataArray, [1, 1, 0, 0]) || arraysEqual(pl.extraDataArray, [1, -1, 0, 0]))
+      )
+      .sort((a, b) => new Date(b.date) - new Date(a.date));
   };
 
   const arraysEqual = (arr1, arr2) => {
@@ -98,17 +116,20 @@ const DonePage = () => {
   if (loading) return <div>Loading...</div>;
   if (error) return <div className={styles.error}>{error}</div>;
 
-  const approvedOutpasses = outpasses.filter(outpass => outpass.extraDataArray[2] === 1);
-  const declinedOutpasses = outpasses.filter(outpass => outpass.extraDataArray[2] === -1);
+  const approvedOutpasses = outpasses.filter(outpass => arraysEqual(outpass.extraDataArray, [1, 1, 0, 0]));
+  const declinedOutpasses = outpasses.filter(outpass => arraysEqual(outpass.extraDataArray, [1, -1, 0, 0]));
 
-  const approvedLeaves = leaves.filter(leave => leave.extraDataArray[2] === 1);
-  const declinedLeaves = leaves.filter(leave => leave.extraDataArray[2] === -1);
+  const approvedLeaves = leaves.filter(leave => arraysEqual(leave.extraDataArray, [1, 1, 0, 0]));
+  const declinedLeaves = leaves.filter(leave => arraysEqual(leave.extraDataArray, [1, -1, 0, 0]));
+
+  const approvedPLs = PLs.filter(pl => arraysEqual(pl.extraDataArray, [1, 1, 0, 0]));
+  const declinedPLs = PLs.filter(pl => arraysEqual(pl.extraDataArray, [1, -1, 0, 0]));
 
   return (
     <div className={styles.container}>
-      <HodNavbar />
+      <HODnavbar />
       <div className={styles.main}>
-        <h2 className={styles.title}>Seen Outpasses and Leaves</h2>
+        <h2 className={styles.title}>Seen Outpasses, Leaves, and PLs</h2>
         <div className={styles.grid}>
           <div className={styles.column}>
             <h3 className={styles.columnTitle}>Approved Outpasses</h3>
@@ -132,6 +153,18 @@ const DonePage = () => {
             <h3 className={styles.columnTitle}>Declined Leaves</h3>
             {declinedLeaves.map(leave => (
               <SeenLeaveCard key={leave._id} data={leave} />
+            ))}
+          </div>
+          <div className={styles.column}>
+            <h3 className={styles.columnTitle}>Approved PLs</h3>
+            {approvedPLs.map(pl => (
+              <SeenPLCard key={pl._id} data={pl} />
+            ))}
+          </div>
+          <div className={styles.column}>
+            <h3 className={styles.columnTitle}>Declined PLs</h3>
+            {declinedPLs.map(pl => (
+              <SeenPLCard key={pl._id} data={pl} />
             ))}
           </div>
         </div>

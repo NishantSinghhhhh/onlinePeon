@@ -6,7 +6,7 @@ import { HashLoader } from 'react-spinners';
 import axios from 'axios';
 import { LoginContext } from '../../../context/LoginContext';
 
-const LeaveRequestPage = () => {
+const LeavePage = () => {
   const [leaves, setLeaves] = useState([]);
   const [filteredLeaves, setFilteredLeaves] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -28,8 +28,8 @@ const LeaveRequestPage = () => {
 
         console.log('Logged in as:', loginInfo.name);
         console.log('User Position:', loginInfo.position);
-        console.log('Class of the User', loginInfo.classAssigned);
-        console.log('Branch of the User', loginInfo.branchAssigned);
+        console.log('Class of the User:', loginInfo.classAssigned);
+        console.log('Branch of the User:', loginInfo.branchAssigned);
       } else {
         throw new Error('Failed to fetch leaves');
       }
@@ -42,34 +42,42 @@ const LeaveRequestPage = () => {
   };
 
   const filterAndSortLeaves = (leaves) => {
-    if (!loginInfo.position || loginInfo.position.toLowerCase() !== 'warden') {
-      setError('Unauthorized access. Only wardens can view this page.');
+    // Ensure only HODs can access this page
+    if (!loginInfo.position || loginInfo.position.toLowerCase() !== 'hod') {
+      setError('Unauthorized access. Only HODs can view this page.');
       return;
     }
   
-    const extractClassLevel = (className) => {
-      if (!className) return null;
-      const match = className.match(/(FE|SE|TE|BE)/);
-      return match ? match[0] : null;
-    };
-  
-    const assignedClassLevel = extractClassLevel(loginInfo.classAssigned);
+    const assignedBranch = loginInfo.branchAssigned;
   
     const filtered = leaves.filter(leave => {
-      const leaveClassLevel = extractClassLevel(leave.className);
-      const extraDataArray = JSON.stringify(leave.extraDataArray);
-      
-      // Exclude leaves with extraDataArray values of [1,1,1,0] or [1,1,-1,0]
-      return leaveClassLevel === assignedClassLevel &&
-             extraDataArray === JSON.stringify([1, 1, 0, 0]) &&
-             ![JSON.stringify([1, 1, 1, 0]), JSON.stringify([1, 1, -1, 0])].includes(extraDataArray);
+      const leaveBranch = extractBranchFromClassName(leave.className); // Extract branch from className
+  
+      // Check if the branch in the className matches the assignedBranch and exclude FE students
+      if (leaveBranch === assignedBranch && !leave.className.toLowerCase().includes('fe')) {
+        
+        // Apply the logic for extraDataArray
+        const extraDataArray = JSON.stringify(leave.extraDataArray);
+        
+        // Include leaves with extraDataArray === [1, 0, 0, 0] and exclude other combinations
+        return extraDataArray === JSON.stringify([1, 0, 0, 0]);
+      }
+  
+      return false;
     });
   
     console.log('Filtered Leaves:', filtered);
   
-    const sorted = filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+    const sorted = filtered.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
   
     setFilteredLeaves(sorted);
+  };
+  
+  // Helper function to extract the branch from className
+  const extractBranchFromClassName = (className) => {
+    // Extract the branch part from className, assuming it's in the format SE-<BRANCH>-B
+    const parts = className.split('-');
+    return parts.length > 1 ? parts[1] : '';
   };
   
 
@@ -85,27 +93,30 @@ const LeaveRequestPage = () => {
 
   const handleStatusChange = async (leaveId, status) => {
     try {
-      const position = 2;  // Assuming 2 is for Warden
-      const newExtraDataArray = [1, 1, status === 'approved' ? 1 : -1, 0];
-
+      console.log(`Sending update request for leave ${leaveId} with status ${status}`);
+  
+      const position = 1; // Static value for HOD
+      
       const response = await axios.put(`http://localhost:8000/update/updateLeave/${leaveId}`, {
         status,
         position,
-        extraDataArray: newExtraDataArray
       });
-
+  
       if (response.data && response.data.success) {
         console.log('Leave updated successfully:', response.data);
+        
+        // Remove the leave from filteredLeaves and leaves state
         setFilteredLeaves(prevLeaves =>
-          prevLeaves.map(leave =>
-            leave._id === leaveId ? { ...leave, status, extraDataArray: newExtraDataArray } : leave
-          )
+          prevLeaves.filter(leave => leave._id !== leaveId)
+        );
+        setLeaves(prevLeaves =>
+          prevLeaves.filter(leave => leave._id !== leaveId)
         );
       } else {
-        console.error('Failed to update:', response.data ? response.data.message : 'No message');
+        console.error('Failed to update:', response.data.message);
       }
     } catch (error) {
-      console.error('Error updating leave:', error.response ? error.response.data : error.message);
+      console.error('Error updating leave:', error.message);
     }
   };
 
@@ -153,4 +164,4 @@ const LeaveRequestPage = () => {
   );
 };
 
-export default LeaveRequestPage;
+export default LeavePage;
