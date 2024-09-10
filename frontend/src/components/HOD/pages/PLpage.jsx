@@ -1,76 +1,111 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
+import { Box, Stack, Heading, Text, Flex, Alert, AlertIcon, Button } from '@chakra-ui/react';
 import HodNavbar from './navbar';
-import PLCard from '../../cards/PLCard'; // Updated import
-import { Box, Flex, Spinner, Text, Button } from '@chakra-ui/react';
+import PLCard from '../../cards/PLCard';
+import { HashLoader } from 'react-spinners';
 import axios from 'axios';
+import { LoginContext } from '../../../context/LoginContext'; // Import the context
 
 const PLpage = () => {
   const [leaves, setLeaves] = useState([]);
   const [filteredLeaves, setFilteredLeaves] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState('');
+  const [showLoader, setShowLoader] = useState(true);
 
-  useEffect(() => {
-    const fetchPLs = async () => {
-      try {
-        const response = await axios.get('http://localhost:8000/fetchAll/fetchAllPLs');
-        console.log('Fetched PL data:', response.data);
+  // Access loginInfo from LoginContext
+  const { loginInfo } = useContext(LoginContext);
 
-        if (response.data && response.data.success) {
-          setLeaves(response.data.data || []);
-          filterAndSortPLs(response.data.data || []);
-        } else {
-          setError('Failed to fetch PLs.');
-        }
-      } catch (error) {
-        console.error('Error fetching PLs:', error);
-        setError('An error occurred while fetching PLs.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPLs();
-  }, []);
-
-  const filterAndSortPLs = (pls) => {
+  const fetchPLs = async () => {
     try {
-      const loginInfo = JSON.parse(localStorage.getItem('loginInfo') || '{}');
-  
-      if (!loginInfo || !loginInfo.branchAssigned) {
-        setError('Login information or branch assignment is missing.');
-        return;
+      const response = await fetch('http://localhost:8000/fetchAll/fetchAllPLs');
+      if (!response.ok) throw new Error('Failed to fetch permitted leaves');
+      const result = await response.json();
+
+      if (result.success) {
+        setLeaves(result.data);
+        console.log('All PLs:', result.data);
+        filterAndSortPLs(result.data);
+
+        // Log the position of the user from the context
+        console.log('Logged in as:', loginInfo.name);
+        console.log('User Position:', loginInfo.position); // Log staff position
+        console.log('Class of the User:', loginInfo.classAssigned);
+        console.log('Branch Assigned:', loginInfo.branchAssigned);
+      } else {
+        throw new Error('Failed to fetch permitted leaves');
       }
-  
-      const { branchAssigned } = loginInfo;
-  
-      const filtered = pls.filter(pl => 
-        pl.className && 
-        pl.className.toLowerCase().includes(branchAssigned.toLowerCase()) &&
-        pl.extraDataArray && 
-        pl.extraDataArray[0] === 1 && // Ensure extraDataArray[0] === 1
-        pl.extraDataArray[1] !== 1 // Exclude if extraDataArray[1] === 1
-      );
-  
-      const sorted = filtered.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
-  
-      setFilteredLeaves(sorted);
     } catch (error) {
-      console.error('Error in filterAndSortPLs:', error);
-      setError('An error occurred while processing PLs.');
+      setError(error.message || 'An unexpected error occurred');
+    } finally {
+      setLoading(false);
+      setShowLoader(false);
     }
   };
 
+  const extractClassLevel = (className) => {
+    const match = className.match(/(FE|SE|TE|BE)/);
+    return match ? match[0] : null;
+  };
+
+  const filterAndSortPLs = (pls) => {
+    if (!loginInfo.position) {
+      setError('No position information found. Please log in again.');
+      return;
+    }
+
+    const assignedClassLevel = extractClassLevel(loginInfo.classAssigned);
+    const assignedBranch = loginInfo.branchAssigned;
+
+    let filtered;
+
+    if (loginInfo.position.toLowerCase() === 'warden') {
+      filtered = pls.filter(pl => {
+        const plClassLevel = extractClassLevel(pl.className);
+        return plClassLevel === assignedClassLevel &&
+          JSON.stringify(pl.extraDataArray) === JSON.stringify([1, 1, 0, 0]);
+      });
+    } else if (loginInfo.position.toLowerCase() === 'hod') {
+      filtered = pls.filter(pl => {
+        return pl.branchAssigned === assignedBranch &&
+          JSON.stringify(pl.extraDataArray) === JSON.stringify([1, 0, 0, 0]);
+      });
+    } else {
+      filtered = pls.filter(pl => {
+        const plClassLevel = extractClassLevel(pl.className);
+        return plClassLevel === assignedClassLevel &&
+          !pl.className.toLowerCase().includes('fe') &&
+          pl.extraDataArray && pl.extraDataArray[0] === 1;
+      });
+    }
+
+    console.log('Filtered PLs:', filtered);
+
+    const sorted = filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    setFilteredLeaves(sorted);
+  };
+
+  useEffect(() => {
+    fetchPLs();
+
+    const timer = setTimeout(() => {
+      setShowLoader(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   const handleStatusChange = async (plId, status) => {
     try {
-      const position = 1; // This can be modified as necessary
-  
+      const position = 1;
+
       const response = await axios.put(`http://localhost:8000/update/updatePL/${plId}`, {
         status,
         position,
       });
-  
-      if (response.data && response.data.success) {
+
+      if (response.data.success) {
         console.log('PL updated successfully:', response.data);
         setFilteredLeaves(prevPLs =>
           prevPLs.map(pl =>
@@ -78,44 +113,54 @@ const PLpage = () => {
           )
         );
       } else {
-        console.error('Failed to update:', response.data ? response.data.message : 'Unknown error');
+        console.error('Failed to update:', response.data.message);
       }
     } catch (error) {
       console.error('Error updating PL:', error.message);
     }
   };
 
+  if (loading || showLoader) {
+    return (
+      <Flex direction="column" align="center" justify="center" p={5} minH="100vh">
+        <HashLoader color="#000000" loading={loading || showLoader} size={50} />
+        <Text mt={4}>Loading...</Text>
+      </Flex>
+    );
+  }
+
+  if (error) {
+    return (
+      <Flex direction="column" align="center" justify="center" p={5} minH="100vh">
+        <Alert status="error" variant="left-accent" borderRadius="md" boxShadow="lg" mb={4}>
+          <AlertIcon />
+          {error}
+        </Alert>
+        <Button colorScheme="teal" onClick={() => window.location.reload()}>Try Again</Button>
+      </Flex>
+    );
+  }
+
   return (
-    <div>
+    <>
       <HodNavbar />
-      <Box p={4}>
-        <Text fontSize="2xl" mb={4}>Permitted Leave Page</Text>
-        {loading ? (
-          <Flex justify="center" align="center" height="100vh">
-            <Spinner size="lg" />
-          </Flex>
-        ) : error ? (
-          <Flex direction="column" align="center" justify="center" height="100vh">
-            <Text color="red.500">{error}</Text>
-            <Button colorScheme="teal" onClick={() => window.location.reload()}>Try Again</Button>
-          </Flex>
+      <Flex direction="column" align="center" justify="center" p={5}>
+        <Heading as="h2" size="lg" mb={4}>Permitted Leave Requests</Heading>
+        {filteredLeaves.length > 0 ? (
+          <Stack spacing={4} maxW="md" w="full">
+            {filteredLeaves.map((leave) => (
+              <PLCard
+                key={leave._id}
+                data={leave}
+                onStatusChange={handleStatusChange}
+              />
+            ))}
+          </Stack>
         ) : (
-          <Box>
-            {filteredLeaves.length > 0 ? (
-              filteredLeaves.map((leave) => (
-                <PLCard
-                  key={leave._id}
-                  data={leave}
-                  onStatusChange={handleStatusChange} // Pass the status change handler
-                />
-              ))
-            ) : (
-              <Text>No permitted leaves found.</Text>
-            )}
-          </Box>
+          <Text fontSize="xl" color="gray.600">No permitted leaves found.</Text>
         )}
-      </Box>
-    </div>
+      </Flex>
+    </>
   );
 };
 

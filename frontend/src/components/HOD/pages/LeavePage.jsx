@@ -7,8 +7,8 @@ import axios from 'axios';
 import { LoginContext } from '../../../context/LoginContext'; // Import the context
 
 const LeavePage = () => {
-  const [leaves, setLeaves] = useState([]);
-  const [filteredLeaves, setFilteredLeaves] = useState([]);
+  const [outpasses, setOutpasses] = useState([]);
+  const [filteredOutpasses, setFilteredOutpasses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showLoader, setShowLoader] = useState(true);
@@ -16,23 +16,24 @@ const LeavePage = () => {
   // Access loginInfo from LoginContext
   const { loginInfo } = useContext(LoginContext);
 
-  const fetchLeaves = async () => {
+  const fetchOutpasses = async () => {
     try {
-      const response = await fetch('http://localhost:8000/fetchAll/fetchAllLeaves');
-      if (!response.ok) throw new Error('Failed to fetch leaves');
+      const response = await fetch('http://localhost:8000/fetchAll/fetchAllOutpasses');
+      if (!response.ok) throw new Error('Failed to fetch outpasses');
       const result = await response.json();
 
       if (result.success) {
-        setLeaves(result.data);
-        console.log('All Leaves:', result.data);
-        filterAndSortLeaves(result.data);
+        setOutpasses(result.data);
+        console.log('All Outpasses:', result.data);
+        filterAndSortOutpasses(result.data);
 
         // Log the position of the user from the context
         console.log('Logged in as:', loginInfo.name);
         console.log('User Position:', loginInfo.position); // Log staff position
         console.log('Class of the User', loginInfo.classAssigned);
+        console.log('Branch of the User', loginInfo.branchAssigned); // Log branch assigned
       } else {
-        throw new Error('Failed to fetch leaves');
+        throw new Error('Failed to fetch outpasses');
       }
     } catch (error) {
       setError(error.message || 'An unexpected error occurred');
@@ -42,7 +43,7 @@ const LeavePage = () => {
     }
   };
 
-  const filterAndSortLeaves = (leaves) => {
+  const filterAndSortOutpasses = (outpasses) => {
     if (!loginInfo.position) {
       setError('No position information found. Please log in again.');
       return;
@@ -50,47 +51,45 @@ const LeavePage = () => {
 
     // Extract the class level (e.g., FE, SE, TE, BE) from the className string
     const extractClassLevel = (className) => {
+      if (!className) return null;
       const match = className.match(/(FE|SE|TE|BE)/);
       return match ? match[0] : null;
     };
 
     const assignedClassLevel = extractClassLevel(loginInfo.classAssigned);
-
-    if (!assignedClassLevel) {
-      setError('Invalid class assigned in your login info. Please log in again.');
-      return;
-    }
+    const assignedBranch = loginInfo.branchAssigned;
 
     let filtered;
 
     if (loginInfo.position.toLowerCase() === 'warden') {
-      // Warden-specific logic
-      filtered = leaves.filter(leave => {
-        const leaveClassLevel = extractClassLevel(leave.className);
-        return leaveClassLevel === assignedClassLevel &&
-               JSON.stringify(leave.extraDataArray) === JSON.stringify([1, 1, 0, 0]);
+      filtered = outpasses.filter(outpass => {
+        const outpassClassLevel = extractClassLevel(outpass.className);
+        return outpassClassLevel === assignedClassLevel &&
+               JSON.stringify(outpass.extraDataArray) === JSON.stringify([1, 1, 0, 0]);
+      });
+    } else if (loginInfo.position.toLowerCase() === 'hod') {
+      filtered = outpasses.filter(outpass => {
+        return outpass.branchAssigned === assignedBranch &&
+               JSON.stringify(outpass.extraDataArray) === JSON.stringify([1, 0, 0, 0]);
       });
     } else {
-      // Normal logic for HOD or other roles
-      filtered = leaves.filter(leave => {
-        const leaveClassLevel = extractClassLevel(leave.className);
-        return leaveClassLevel === assignedClassLevel &&
-               !leave.className.toLowerCase().includes('fe') &&
-               leave.extraDataArray && leave.extraDataArray[0] === 1;
+      filtered = outpasses.filter(outpass => {
+        const outpassClassLevel = extractClassLevel(outpass.className);
+        return outpassClassLevel === assignedClassLevel &&
+               !outpass.className.toLowerCase().includes('fe') &&
+               outpass.extraDataArray && outpass.extraDataArray[0] === 1;
       });
     }
 
-    // Log the filtered result
-    console.log('Filtered Leaves:', filtered);
+    console.log('Filtered Outpasses:', filtered);
 
-    // Sort the leaves by date
     const sorted = filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-    setFilteredLeaves(sorted);
+    setFilteredOutpasses(sorted);
   };
 
   useEffect(() => {
-    fetchLeaves();
+    fetchOutpasses();
 
     const timer = setTimeout(() => {
       setShowLoader(false);
@@ -98,23 +97,23 @@ const LeavePage = () => {
 
     return () => clearTimeout(timer);
   }, []);
-  
-  const handleStatusChange = async (leaveId, status) => {
+
+  const handleStatusChange = async (outpassId, status) => {
     try {
       // Determine position based on the user's role
       const position = loginInfo.position.toLowerCase() === 'warden' ? 2 : 1;
-  
-      const response = await axios.put(`http://localhost:8000/update/updateLeave/${leaveId}`, {
+
+      const response = await axios.put(`http://localhost:8000/update/updateOutpass/${outpassId}`, {
         status,
         position,
       });
-  
+
       // Check the response structure and handle accordingly
       if (response.data && response.data.success) {
-        console.log('Leave updated successfully:', response.data);
-        setFilteredLeaves(prevLeaves =>
-          prevLeaves.map(leave =>
-            leave._id === leaveId ? { ...leave, status } : leave
+        console.log('Outpass updated successfully:', response.data);
+        setFilteredOutpasses(prevOutpasses =>
+          prevOutpasses.map(outpass =>
+            outpass._id === outpassId ? { ...outpass, status } : outpass
           )
         );
       } else {
@@ -123,10 +122,9 @@ const LeavePage = () => {
       }
     } catch (error) {
       // Log detailed error information
-      console.error('Error updating leave:', error.response ? error.response.data : error.message);
+      console.error('Error updating outpass:', error.response ? error.response.data : error.message);
     }
   };
-  
 
   if (loading || showLoader) {
     return (
@@ -153,19 +151,19 @@ const LeavePage = () => {
     <>
       <HodNavbar />
       <Flex direction="column" align="center" justify="center" p={5}>
-        <Heading as="h2" size="lg" mb={4}>Leave Requests</Heading>
-        {filteredLeaves.length > 0 ? (
+        <Heading as="h2" size="lg" mb={4}>Outpasses</Heading>
+        {filteredOutpasses.length > 0 ? (
           <Stack spacing={4} maxW="md" w="full">
-            {filteredLeaves.map((leave) => (
+            {filteredOutpasses.map((outpass) => (
               <LeaveCard 
-                key={leave._id} 
-                data={leave} 
+                key={outpass._id} 
+                data={outpass} 
                 onStatusChange={handleStatusChange} 
               />
             ))}
           </Stack>
         ) : (
-          <Text fontSize="xl" color="gray.600">No leaves found.</Text>
+          <Text fontSize="xl" color="gray.600">No outpasses found.</Text>
         )}
       </Flex>
     </>

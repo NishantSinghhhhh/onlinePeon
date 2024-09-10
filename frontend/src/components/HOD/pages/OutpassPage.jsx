@@ -30,7 +30,8 @@ const OutpassPage = () => {
         // Log the position of the user from the context
         console.log('Logged in as:', loginInfo.name);
         console.log('User Position:', loginInfo.position); // Log staff position
-        console.log('Class of the User', loginInfo.classAssigned)
+        console.log('Class of the User', loginInfo.classAssigned);
+        console.log('Branch Assigned:', loginInfo.branchAssigned);
       } else {
         throw new Error('Failed to fetch outpasses');
       }
@@ -47,31 +48,30 @@ const OutpassPage = () => {
       setError('No position information found. Please log in again.');
       return;
     }
-  
+
     // Extract the class level (e.g., FE, SE, TE, BE) from the className string
     const extractClassLevel = (className) => {
       const match = className.match(/(FE|SE|TE|BE)/);
       return match ? match[0] : null;
     };
-  
+
     const assignedClassLevel = extractClassLevel(loginInfo.classAssigned);
-  
-    if (!assignedClassLevel) {
-      setError('Invalid class assigned in your login info. Please log in again.');
-      return;
-    }
-  
+    const assignedBranch = loginInfo.branchAssigned;
+
     let filtered;
-  
+
     if (loginInfo.position.toLowerCase() === 'warden') {
-      // Warden-specific logic
       filtered = outpasses.filter(outpass => {
         const outpassClassLevel = extractClassLevel(outpass.className);
         return outpassClassLevel === assignedClassLevel &&
                JSON.stringify(outpass.extraDataArray) === JSON.stringify([1, 1, 0, 0]);
       });
+    } else if (loginInfo.position.toLowerCase() === 'hod') {
+      filtered = outpasses.filter(outpass => {
+        return outpass.branchAssigned === assignedBranch &&
+               JSON.stringify(outpass.extraDataArray) === JSON.stringify([1, 0, 0, 0]);
+      });
     } else {
-      // Normal logic for HOD or other roles
       filtered = outpasses.filter(outpass => {
         const outpassClassLevel = extractClassLevel(outpass.className);
         return outpassClassLevel === assignedClassLevel &&
@@ -79,16 +79,13 @@ const OutpassPage = () => {
                outpass.extraDataArray && outpass.extraDataArray[0] === 1;
       });
     }
-  
-    // Log the filtered result
+
     console.log('Filtered Outpasses:', filtered);
-  
-    // Sort the outpasses by date
+
     const sorted = filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
-  
+
     setFilteredOutpasses(sorted);
   };
-  
 
   useEffect(() => {
     fetchOutpasses();
