@@ -1,28 +1,21 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Spinner } from '@chakra-ui/react'; // Assuming you're using Chakra UI
-import { LoginContext } from '../../../context/LoginContext'; // Assuming you have a login context
-import HodNavbar from './navbar';
-import OutpassCard from '../../cards/outpassCard'; // Import OutpassCard
-import LeaveCard from '../../cards/LeaveCard'; // Import LeaveCard
+import HodNavbar from './navbar'; // Adjust the path to HodNavbar
+import SeenOutpassCard from '../../seenCard/seenOutpassCard'; // Adjust the path to SeenOutpassCard
+import SeenLeaveCard from '../../seenCard/seenLeaveCard'; // Import the SeenLeaveCard
+import { LoginContext } from '../../../context/LoginContext'; // Adjust the path to LoginContext
+import styles from './navbar.module.css'; // Import CSS Module for DonePage
 
 const DonePage = () => {
   const [outpasses, setOutpasses] = useState([]);
-  const [leaves, setLeaves] = useState([]);
-  const [filteredOutpasses, setFilteredOutpasses] = useState([]);
-  const [filteredLeaves, setFilteredLeaves] = useState([]);
+  const [leaves, setLeaves] = useState([]); // State for leaves
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const { loginInfo } = useContext(LoginContext); // Fetch login info from context
+  const { loginInfo } = useContext(LoginContext);
 
   useEffect(() => {
     fetchOutpasses();
-    fetchLeaves();
+    fetchLeaves(); // Fetch leaves when the component mounts
   }, []);
-
-  const extractClassLevel = (className) => {
-    const match = className.match(/(FE|SE|TE|BE)/);
-    return match ? match[0] : null;
-  };
 
   const fetchOutpasses = async () => {
     try {
@@ -31,15 +24,19 @@ const DonePage = () => {
       const result = await response.json();
 
       if (result.success) {
-        setOutpasses(result.data);
-        filterAndSortOutpasses(result.data);
+        const filteredOutpasses = filterAndSortOutpasses(result.data);
+        setOutpasses(filteredOutpasses);
+        console.log('Filtered Outpasses:', filteredOutpasses);
+
+        // Log the position of the user from the context
+        console.log('Logged in as:', loginInfo.name);
+        console.log('User Position:', loginInfo.position);
+        console.log('Class of the User', loginInfo.classAssigned);
       } else {
         throw new Error('Failed to fetch outpasses');
       }
     } catch (error) {
       setError(error.message || 'An unexpected error occurred');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -50,8 +47,9 @@ const DonePage = () => {
       const result = await response.json();
 
       if (result.success) {
-        setLeaves(result.data);
-        filterAndSortLeaves(result.data);
+        const filteredLeaves = filterAndSortLeaves(result.data);
+        setLeaves(filteredLeaves);
+        console.log('All Leaves:', result.data);
       } else {
         throw new Error('Failed to fetch leaves');
       }
@@ -62,89 +60,93 @@ const DonePage = () => {
     }
   };
 
-  const filterAndSortOutpasses = (outpasses) => {
+  const filterAndSortOutpasses = (data) => {
     const assignedClassLevel = extractClassLevel(loginInfo.classAssigned);
-    if (!assignedClassLevel) {
-      setError('Invalid class assigned in your login info. Please log in again.');
-      return;
-    }
+    let approvedStatus, declinedStatus;
 
-    let filtered;
-    if (loginInfo.position.toLowerCase() === 'warden') {
-      filtered = outpasses.filter(outpass => {
-        const outpassClassLevel = extractClassLevel(outpass.className);
-        return (
-          outpassClassLevel === assignedClassLevel &&
-          JSON.stringify(outpass.extraDataArray) === JSON.stringify([1, 1, 0, 0])
-        );
-      });
+    if (loginInfo.position === 'Warden') {
+      approvedStatus = [1, 1, 1, 0];
+      declinedStatus = [1, 1, -1, 0];
+    } else if (loginInfo.position === 'HOD') {
+      approvedStatus = [1, 1, 0, 0];
+      declinedStatus = [1, -1, 0, 0];
     } else {
-      filtered = outpasses.filter(outpass => {
-        const outpassClassLevel = extractClassLevel(outpass.className);
-        return (
-          outpassClassLevel === assignedClassLevel &&
-          !outpass.className.toLowerCase().includes('fe') &&
-          outpass.extraDataArray && outpass.extraDataArray[0] === 1
-        );
-      });
+      return [];
     }
 
-    const sorted = filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
-    setFilteredOutpasses(sorted);
+    return data
+      .filter(item => {
+        const itemClassLevel = extractClassLevel(item.className);
+        return itemClassLevel === assignedClassLevel &&
+          (arraysEqual(item.extraDataArray, approvedStatus) || arraysEqual(item.extraDataArray, declinedStatus));
+      })
+      .sort((a, b) => new Date(b.date) - new Date(a.date));
   };
 
-  const filterAndSortLeaves = (leaves) => {
+  const filterAndSortLeaves = (data) => {
     const assignedClassLevel = extractClassLevel(loginInfo.classAssigned);
-    if (!assignedClassLevel) {
-      setError('Invalid class assigned in your login info. Please log in again.');
-      return;
-    }
+    let approvedStatus, declinedStatus;
 
-    let filtered;
-    if (loginInfo.position.toLowerCase() === 'warden') {
-      filtered = leaves.filter(leave => {
-        const leaveClassLevel = extractClassLevel(leave.className);
-        return (
-          leaveClassLevel === assignedClassLevel &&
-          JSON.stringify(leave.extraDataArray) === JSON.stringify([1, 1, 0, 0])
-        );
-      });
+    if (loginInfo.position === 'Warden') {
+      approvedStatus = [1, 1, 1, 0];
+      declinedStatus = [1, 1, -1, 0];
+    } else if (loginInfo.position === 'HOD') {
+      approvedStatus = [1, 1, 0, 0];
+      declinedStatus = [1, -1, 0, 0];
     } else {
-      filtered = leaves.filter(leave => {
-        const leaveClassLevel = extractClassLevel(leave.className);
-        return (
-          leaveClassLevel === assignedClassLevel &&
-          !leave.className.toLowerCase().includes('fe') &&
-          leave.extraDataArray && leave.extraDataArray[0] === 1
-        );
-      });
+      return [];
     }
 
-    const sorted = filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
-    setFilteredLeaves(sorted);
+    return data
+      .filter(item => {
+        const itemClassLevel = extractClassLevel(item.className);
+        return itemClassLevel === assignedClassLevel &&
+          (arraysEqual(item.extraDataArray, approvedStatus) || arraysEqual(item.extraDataArray, declinedStatus));
+      })
+      .sort((a, b) => new Date(b.date) - new Date(a.date));
   };
 
-  const handleStatusChange = (id, status) => {
-    // Handle status change logic here
-    console.log(`Outpass/Leave with ID ${id} status changed to ${status}`);
+  const extractClassLevel = (className) => {
+    return className.split('-')[0];
   };
 
-  if (loading) return <Spinner />;
+  const arraysEqual = (arr1, arr2) => {
+    return arr1.length === arr2.length && arr1.every((val, index) => val === arr2[index]);
+  };
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div className={styles.error}>{error}</div>;
+
+  const approvedOutpasses = outpasses.filter(outpass => outpass.extraDataArray[2] === 1);
+  const declinedOutpasses = outpasses.filter(outpass => outpass.extraDataArray[2] === -1);
 
   return (
-    <div>
+    <div className={styles.container}>
       <HodNavbar />
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      
-      <h2>Outpasses</h2>
-      {filteredOutpasses.map(outpass => (
-        <OutpassCard key={outpass._id} data={outpass} onStatusChange={handleStatusChange} />
-      ))}
+      <div className={styles.main}>
+        <h2 className={styles.title}>Seen Outpasses</h2>
+        <div className={styles.grid}>
+          <div className={styles.column}>
+            <h3 className={styles.columnTitle}>Approved Outpasses</h3>
+            {approvedOutpasses.map(outpass => (
+              <SeenOutpassCard key={outpass._id} data={outpass} />
+            ))}
+          </div>
+          <div className={styles.column}>
+            <h3 className={styles.columnTitle}>Declined Outpasses</h3>
+            {declinedOutpasses.map(outpass => (
+              <SeenOutpassCard key={outpass._id} data={outpass} />
+            ))}
+          </div>
+        </div>
 
-      <h2>Leaves</h2>
-      {filteredLeaves.map(leave => (
-        <LeaveCard key={leave._id} data={leave} onStatusChange={handleStatusChange} />
-      ))}
+        <h2 className={styles.title}>Seen Leaves</h2>
+        <div className={styles.grid}>
+          {leaves.map(leave => (
+            <SeenLeaveCard key={leave._id} data={leave} />
+          ))}
+        </div>
+      </div>
     </div>
   );
 };

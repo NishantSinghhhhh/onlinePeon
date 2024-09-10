@@ -1,0 +1,35 @@
+/* DonePage.module.css */
+*{
+    margin: 0px;
+    
+    padding: 0px;
+}
+.container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%; /* Full viewport height */
+    box-sizing: border-box;
+  }
+  
+  .error {
+    color: #ef4444; /* Red 500 */
+    margin-bottom: 16px;
+  }
+  
+  .title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+  
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 16px;
+    flex: 1; /* Allows the grid to take up remaining space */
+  }
+  
+  .main{
+    width: 80%;
+    margin: auto;
+  }
