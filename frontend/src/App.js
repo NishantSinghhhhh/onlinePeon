@@ -24,11 +24,12 @@ import HODLeavePage from './components/HOD/pages/LeavePage'
 import HODOutpassPage from './components/HOD/pages/OutpassPage'
 import HODPLpage from './components/HOD/pages/PLpage'
 import HODdonepage from './components/HOD/pages/DonePage'
-
+import { LoginProvider } from './context/LoginContext';
 
 function App() {
   return (
     <div className="App">
+<LoginProvider>
    <Router>
       <Routes>
         <Route path="/" element={<SignInCard />} />
@@ -55,6 +56,7 @@ function App() {
         <Route path='/HODdonepage' element={<HODdonepage/>}/>
       </Routes>
     </Router>
+</LoginProvider>
     </div>
   );
 }

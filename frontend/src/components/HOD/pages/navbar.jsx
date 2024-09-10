@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -10,13 +10,15 @@ import {
 } from '@chakra-ui/react';
 import { Link, useLocation } from 'react-router-dom';
 import styles from './navbar.module.css';
+import { LoginContext } from '../../../context/LoginContext'; // Import the context
 
 const StaffNavbar = () => {
   const location = useLocation(); // Get the current location
-//   <Route path='/HODLeavePage' element={<HODLeavePage/>}/>
-//   <Route path='/HODOutpassPage' element={<HODOutpassPage/>}/>
-//   <Route path='/HODPLpage' element={<HODPLpage/>}/>
-// HODdonepage
+  const { loginInfo } = useContext(LoginContext); // Access loginInfo from LoginContext
+
+  // Determine if the user is a Warden
+  const isWarden = loginInfo.position.toLowerCase() === 'warden';
+
   return (
     <Box
       as='nav'
@@ -61,18 +63,20 @@ const StaffNavbar = () => {
               </BreadcrumbLink>
             </BreadcrumbItem>
 
-            <BreadcrumbItem>
-              <BreadcrumbLink
-                as={Link}
-                to='/HODPLpage'
-                className={styles['breadcrumb-link']}
-                bg={location.pathname === '/HODPLpage' ? 'gray.600' : 'transparent'}
-                color={location.pathname === '/HODPLpage' ? 'white' : 'gray.300'}
-                fontWeight={location.pathname === '/HODPLpage' ? 'bold' : 'normal'}
-              >
-                PL
-              </BreadcrumbLink>
-            </BreadcrumbItem>
+            {!isWarden && ( // Conditionally render the PL section
+              <BreadcrumbItem>
+                <BreadcrumbLink
+                  as={Link}
+                  to='/HODPLpage'
+                  className={styles['breadcrumb-link']}
+                  bg={location.pathname === '/HODPLpage' ? 'gray.600' : 'transparent'}
+                  color={location.pathname === '/HODPLpage' ? 'white' : 'gray.300'}
+                  fontWeight={location.pathname === '/HODPLpage' ? 'bold' : 'normal'}
+                >
+                  PL
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+            )}
 
             <BreadcrumbItem>
               <BreadcrumbLink

@@ -1,75 +1,115 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
+import { Box, Stack, Heading, Text, Flex, Alert, AlertIcon, Button } from '@chakra-ui/react';
 import HodNavbar from './navbar';
 import LeaveCard from '../../cards/LeaveCard';
-import { Box, Flex, Spinner, Text, Button } from '@chakra-ui/react';
+import { HashLoader } from 'react-spinners';
 import axios from 'axios';
+import { LoginContext } from '../../../context/LoginContext'; // Import the context
 
 const LeavePage = () => {
   const [leaves, setLeaves] = useState([]);
   const [filteredLeaves, setFilteredLeaves] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState('');
+  const [showLoader, setShowLoader] = useState(true);
 
-  useEffect(() => {
-    const fetchLeaves = async () => {
-      try {
-        const response = await axios.get('http://localhost:8000/fetchAll/fetchAllLeaves');
-        console.log('Fetched leaves data:', response.data);
+  // Access loginInfo from LoginContext
+  const { loginInfo } = useContext(LoginContext);
 
-        if (response.data && response.data.success) {
-          setLeaves(response.data.data || []);
-          filterAndSortLeaves(response.data.data || []);
-        } else {
-          setError('Failed to fetch leaves.');
-        }
-      } catch (error) {
-        console.error('Error fetching leaves:', error);
-        setError('An error occurred while fetching leaves.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchLeaves();
-  }, []);
-
-  const filterAndSortLeaves = (leaves) => {
+  const fetchLeaves = async () => {
     try {
-      const loginInfo = JSON.parse(localStorage.getItem('loginInfo') || '{}');
+      const response = await fetch('http://localhost:8000/fetchAll/fetchAllLeaves');
+      if (!response.ok) throw new Error('Failed to fetch leaves');
+      const result = await response.json();
 
-      if (!loginInfo || !loginInfo.branchAssigned) {
-        setError('Login information or branch assignment is missing.');
-        return;
+      if (result.success) {
+        setLeaves(result.data);
+        console.log('All Leaves:', result.data);
+        filterAndSortLeaves(result.data);
+
+        // Log the position of the user from the context
+        console.log('Logged in as:', loginInfo.name);
+        console.log('User Position:', loginInfo.position); // Log staff position
+        console.log('Class of the User', loginInfo.classAssigned);
+      } else {
+        throw new Error('Failed to fetch leaves');
       }
-
-      const { branchAssigned } = loginInfo;
-
-      const filtered = leaves.filter(leave => 
-        leave.className && 
-        leave.className.toLowerCase().includes(branchAssigned.toLowerCase()) &&
-        leave.extraDataArray && 
-        leave.extraDataArray[0] === 1 &&  // Existing condition: extraDataArray[0] === 1
-        !(leave.extraDataArray[0] === 1 && leave.extraDataArray[1] === 1 && leave.extraDataArray[2] === 0 && leave.extraDataArray[3] === 0) // Exclude leaves with [1,1,0,0]
-      );
-
-      const sorted = filtered.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
-
-      setFilteredLeaves(sorted);
     } catch (error) {
-      console.error('Error in filterAndSortLeaves:', error);
-      setError('An error occurred while processing leaves.');
+      setError(error.message || 'An unexpected error occurred');
+    } finally {
+      setLoading(false);
+      setShowLoader(false);
     }
   };
 
-  const onStatusChange = async (leaveId, status) => {
-    try {
-      const position = 1; // This can be modified as necessary
+  const filterAndSortLeaves = (leaves) => {
+    if (!loginInfo.position) {
+      setError('No position information found. Please log in again.');
+      return;
+    }
 
+    // Extract the class level (e.g., FE, SE, TE, BE) from the className string
+    const extractClassLevel = (className) => {
+      const match = className.match(/(FE|SE|TE|BE)/);
+      return match ? match[0] : null;
+    };
+
+    const assignedClassLevel = extractClassLevel(loginInfo.classAssigned);
+
+    if (!assignedClassLevel) {
+      setError('Invalid class assigned in your login info. Please log in again.');
+      return;
+    }
+
+    let filtered;
+
+    if (loginInfo.position.toLowerCase() === 'warden') {
+      // Warden-specific logic
+      filtered = leaves.filter(leave => {
+        const leaveClassLevel = extractClassLevel(leave.className);
+        return leaveClassLevel === assignedClassLevel &&
+               JSON.stringify(leave.extraDataArray) === JSON.stringify([1, 1, 0, 0]);
+      });
+    } else {
+      // Normal logic for HOD or other roles
+      filtered = leaves.filter(leave => {
+        const leaveClassLevel = extractClassLevel(leave.className);
+        return leaveClassLevel === assignedClassLevel &&
+               !leave.className.toLowerCase().includes('fe') &&
+               leave.extraDataArray && leave.extraDataArray[0] === 1;
+      });
+    }
+
+    // Log the filtered result
+    console.log('Filtered Leaves:', filtered);
+
+    // Sort the leaves by date
+    const sorted = filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    setFilteredLeaves(sorted);
+  };
+
+  useEffect(() => {
+    fetchLeaves();
+
+    const timer = setTimeout(() => {
+      setShowLoader(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+  
+  const handleStatusChange = async (leaveId, status) => {
+    try {
+      // Determine position based on the user's role
+      const position = loginInfo.position.toLowerCase() === 'warden' ? 2 : 1;
+  
       const response = await axios.put(`http://localhost:8000/update/updateLeave/${leaveId}`, {
         status,
         position,
       });
-
+  
+      // Check the response structure and handle accordingly
       if (response.data && response.data.success) {
         console.log('Leave updated successfully:', response.data);
         setFilteredLeaves(prevLeaves =>
@@ -78,44 +118,57 @@ const LeavePage = () => {
           )
         );
       } else {
-        console.error('Failed to update:', response.data ? response.data.message : 'Unknown error');
+        // Log the entire response data for debugging
+        console.error('Failed to update:', response.data ? response.data.message : 'No message');
       }
     } catch (error) {
-      console.error('Error updating leave:', error.message);
+      // Log detailed error information
+      console.error('Error updating leave:', error.response ? error.response.data : error.message);
     }
   };
+  
+
+  if (loading || showLoader) {
+    return (
+      <Flex direction="column" align="center" justify="center" p={5} minH="100vh">
+        <HashLoader color="#000000" loading={loading || showLoader} size={50} />
+        <Text mt={4}>Loading...</Text>
+      </Flex>
+    );
+  }
+
+  if (error) {
+    return (
+      <Flex direction="column" align="center" justify="center" p={5} minH="100vh">
+        <Alert status="error" variant="left-accent" borderRadius="md" boxShadow="lg" mb={4}>
+          <AlertIcon />
+          {error}
+        </Alert>
+        <Button colorScheme="teal" onClick={() => window.location.reload()}>Try Again</Button>
+      </Flex>
+    );
+  }
 
   return (
-    <div>
+    <>
       <HodNavbar />
-      <Box p={4}>
-        <Text fontSize="2xl" mb={4}>Leave Page</Text>
-        {loading ? (
-          <Flex justify="center" align="center" height="100vh">
-            <Spinner size="lg" />
-          </Flex>
-        ) : error ? (
-          <Flex direction="column" align="center" justify="center" height="100vh">
-            <Text color="red.500">{error}</Text>
-            <Button colorScheme="teal" onClick={() => window.location.reload()}>Try Again</Button>
-          </Flex>
+      <Flex direction="column" align="center" justify="center" p={5}>
+        <Heading as="h2" size="lg" mb={4}>Leave Requests</Heading>
+        {filteredLeaves.length > 0 ? (
+          <Stack spacing={4} maxW="md" w="full">
+            {filteredLeaves.map((leave) => (
+              <LeaveCard 
+                key={leave._id} 
+                data={leave} 
+                onStatusChange={handleStatusChange} 
+              />
+            ))}
+          </Stack>
         ) : (
-          <Box>
-            {filteredLeaves.length > 0 ? (
-              filteredLeaves.map((leave) => (
-                <LeaveCard
-                  key={leave._id}
-                  data={leave}
-                  onStatusChange={onStatusChange}
-                />
-              ))
-            ) : (
-              <Text>No leaves found.</Text>
-            )}
-          </Box>
+          <Text fontSize="xl" color="gray.600">No leaves found.</Text>
         )}
-      </Box>
-    </div>
+      </Flex>
+    </>
   );
 };
 

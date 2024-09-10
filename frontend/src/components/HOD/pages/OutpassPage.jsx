@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Box, Stack, Heading, Text, Flex, Alert, AlertIcon, Button } from '@chakra-ui/react';
 import HodNavbar from './navbar';
 import OutpassCard from '../../cards/outpassCard';
 import { HashLoader } from 'react-spinners';
 import axios from 'axios';
+import { LoginContext } from '../../../context/LoginContext'; // Import the context
 
 const OutpassPage = () => {
   const [outpasses, setOutpasses] = useState([]);
@@ -11,6 +12,9 @@ const OutpassPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showLoader, setShowLoader] = useState(true);
+
+  // Access loginInfo from LoginContext
+  const { loginInfo } = useContext(LoginContext);
 
   const fetchOutpasses = async () => {
     try {
@@ -23,13 +27,10 @@ const OutpassPage = () => {
         console.log('All Outpasses:', result.data);
         filterAndSortOutpasses(result.data);
 
-        // Log the position of the user
-        const loginInfo = JSON.parse(localStorage.getItem('loginInfo'));
-        if (loginInfo) {
-          const { branchAssigned, classAssigned } = loginInfo;
-          console.log('User Branch Assigned:', branchAssigned);
-          console.log('User Class Assigned:', classAssigned); // Log classAssigned
-        }
+        // Log the position of the user from the context
+        console.log('Logged in as:', loginInfo.name);
+        console.log('User Position:', loginInfo.position); // Log staff position
+        console.log('Class of the User', loginInfo.classAssigned)
       } else {
         throw new Error('Failed to fetch outpasses');
       }
@@ -42,34 +43,52 @@ const OutpassPage = () => {
   };
 
   const filterAndSortOutpasses = (outpasses) => {
-    const loginInfo = JSON.parse(localStorage.getItem('loginInfo'));
-
-    if (!loginInfo) {
-      setError('No login information found. Please log in again.');
+    if (!loginInfo.position) {
+      setError('No position information found. Please log in again.');
       return;
     }
-
-    const { branchAssigned, classAssigned } = loginInfo;
-
-    if (!branchAssigned || !classAssigned) {
-      setError('Branch or class assigned information is missing.');
+  
+    // Extract the class level (e.g., FE, SE, TE, BE) from the className string
+    const extractClassLevel = (className) => {
+      const match = className.match(/(FE|SE|TE|BE)/);
+      return match ? match[0] : null;
+    };
+  
+    const assignedClassLevel = extractClassLevel(loginInfo.classAssigned);
+  
+    if (!assignedClassLevel) {
+      setError('Invalid class assigned in your login info. Please log in again.');
       return;
     }
-
-    // Example filter logic using classAssigned
-    const filtered = outpasses.filter(outpass =>
-      outpass.className.toLowerCase().includes(branchAssigned.toLowerCase()) &&
-      !outpass.className.toLowerCase().includes('fe') &&
-      outpass.extraDataArray && outpass.extraDataArray[0] === 1
-    );
-
+  
+    let filtered;
+  
+    if (loginInfo.position.toLowerCase() === 'warden') {
+      // Warden-specific logic
+      filtered = outpasses.filter(outpass => {
+        const outpassClassLevel = extractClassLevel(outpass.className);
+        return outpassClassLevel === assignedClassLevel &&
+               JSON.stringify(outpass.extraDataArray) === JSON.stringify([1, 1, 0, 0]);
+      });
+    } else {
+      // Normal logic for HOD or other roles
+      filtered = outpasses.filter(outpass => {
+        const outpassClassLevel = extractClassLevel(outpass.className);
+        return outpassClassLevel === assignedClassLevel &&
+               !outpass.className.toLowerCase().includes('fe') &&
+               outpass.extraDataArray && outpass.extraDataArray[0] === 1;
+      });
+    }
+  
     // Log the filtered result
     console.log('Filtered Outpasses:', filtered);
-
+  
+    // Sort the outpasses by date
     const sorted = filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
-
+  
     setFilteredOutpasses(sorted);
   };
+  
 
   useEffect(() => {
     fetchOutpasses();
