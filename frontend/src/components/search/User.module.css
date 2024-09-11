@@ -1,0 +1,110 @@
+.cardContainer {
+  display: flex;
+  background-color: #ffffff;
+  border-radius: 12px;
+  /* box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); */
+  padding: 24px;
+  /* margin: 16px; */
+  width: 80%;
+  max-width: 900px;
+  margin: auto;
+  height: auto;
+  align-items: center;
+  justify-content: space-evenly;
+  width: 100%;
+  /* Center card content inside container */
+}
+
+.infoContainer {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  text-align: left;
+  flex: 1;
+  width: 50%;
+}
+
+.name {
+  font-size: 28px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+.info {
+  font-size: 16px;
+  margin-bottom: 8px;
+  color: #555;
+}
+
+.label {
+  font-weight: 600;
+  margin-right: 8px;
+}
+
+.activeYes {
+  color: #22c55e;
+  font-weight: bold;
+}
+
+.activeNo {
+  color: #ef4444;
+  font-weight: bold;
+}
+
+.imageContainer {
+  margin-right: 24px;
+  /* background-color: #ef4444; */
+  height: 100%;
+  display: flex;
+  align-items: center;
+  /* justify-content: center; */
+  width: 50%;
+  margin-left: 10%;
+}
+
+.userImage {
+  width:50%;
+  height:50%;
+  /* border-radius: 50%; */
+  object-fit: cover;
+  border: 4px solid #e5e7eb;
+}
+
+.placeholderImage {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background-color: #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 60px;
+  font-weight: bold;
+  color: #9ca3af;
+}
+
+.main{
+    display: flex;
+    align-items: center;
+    margin: auto;
+    flex-direction: column;
+}
+
+.outpass{
+    display: flex;
+    flex-direction: row;
+    gap: 50px;
+}
+
+.Leaves{
+    display: flex;
+    flex-direction: row;
+    gap: 50px;
+}
+
+.Pls{
+    display: flex;
+    flex-direction: row;
+    gap: 50px;
+}

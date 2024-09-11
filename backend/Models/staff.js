@@ -39,7 +39,7 @@ const StaffSchema = new Schema({
       'SE-IT-A', 'SE-IT-B', 'SE-MECH', 'TE-COMP-A', 'TE-COMP-B', 'TE-ENTC-A',
       'TE-ENTC-B', 'TE-IT-A', 'TE-IT-B', 'TE-MECH', 'BE-COMP-A', 'BE-COMP-B',
       'BE-ENTC-A', 'BE-ENTC-B', 'BE-IT-A', 'BE-IT-B', 'BE-MECH',
-      'FE-WARDEN', 'SE-WARDEN', 'TE-WARDEN', 'BE-WARDEN' // Added Warden options
+      'FE-WARDEN', 'SE-WARDEN', 'TE-WARDEN', 'BE-WARDEN' 
     ],
     required: function() {
       return this.position === 'Class Teacher' || this.position === 'Warden';

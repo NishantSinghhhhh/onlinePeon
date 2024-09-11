@@ -33,6 +33,7 @@ import Admin from './components/Admin/Admin'
 import AdminOutpass from './components/Admin/pages/AdminOutpassPage'
 import AdminLeavePage from './components/Admin/pages/AdminLeavePage';
 import AdminPLpage from './components/Admin/pages/AdminPLpage';
+import Search from './components/search/search';
 
 import { LoginProvider } from './context/LoginContext';
 
@@ -72,6 +73,7 @@ function App() {
         <Route path='/AdminOutpass' element={<AdminOutpass/>}/>
         <Route path='/AdminLeavePage' element={<AdminLeavePage/>}/>
         <Route path='/AdminPLpage' element={<AdminPLpage/>}/>
+        <Route path='/Search' element={<Search/>}/>
       </Routes>
     </Router>
 </LoginProvider>

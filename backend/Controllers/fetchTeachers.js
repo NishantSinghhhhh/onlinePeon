@@ -1,7 +1,157 @@
 const { Outpass } = require('../Models/Outpass');
 const { PL } = require('../Models/PL');
 const { Leave } = require('../Models/Leave');
-const {Staff} = require('../Models/staff')
+const {User} = require('../Models/User')
+
+const fetchUserByRegistration = async (req, res) => {
+  try {
+    const { registrationNumber } = req.params;
+    const user = await User.findOne({ registrationNumber });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json({ data: user });
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+
+const fetchOutpassByRegistration = async (req, res) => {
+  try {
+    const { registrationNumber } = req.params;
+
+    console.log('Registration number received from front-end:', registrationNumber);
+
+    if (!registrationNumber) {
+      return res.status(400).json({
+        message: 'Registration number is required',
+        success: false
+      });
+    }
+
+    const regexPattern = new RegExp(registrationNumber, 'i');
+    
+    const outpasses = await Outpass.find({
+      registrationNumber: { $regex: regexPattern }
+    }).exec();
+
+    if (outpasses.length === 0) {
+      return res.status(404).json({
+        message: 'No outpasses found for the specified registration number',
+        success: false
+      });
+    }
+
+    res.status(200).json({
+      message: 'Outpasses fetched successfully',
+      success: true,
+      data: outpasses
+    });
+  } catch (err) {
+    console.error('Error fetching outpasses by registration number:', {
+      message: err.message,
+      stack: err.stack
+    });
+
+    res.status(500).json({
+      message: 'Internal server error',
+      success: false,
+      error: err.message
+    });
+  }
+};
+
+const fetchLeaveByRegistration = async (req, res) => {
+  try {
+    const { registrationNumber } = req.params;
+
+    console.log('Registration number received from front-end:', registrationNumber);
+
+    if (!registrationNumber) {
+      return res.status(400).json({
+        message: 'Registration number is required',
+        success: false
+      });
+    }
+
+    const regexPattern = new RegExp(registrationNumber, 'i');
+    
+    const leaves = await Leave.find({
+      registrationNumber: { $regex: regexPattern }
+    }).exec();
+
+    if (leaves.length === 0) {
+      return res.status(404).json({
+        message: 'No leaves found for the specified registration number',
+        success: false
+      });
+    }
+
+    res.status(200).json({
+      message: 'Leaves fetched successfully',
+      success: true,
+      data: leaves
+    });
+  } catch (err) {
+    console.error('Error fetching leaves by registration number:', {
+      message: err.message,
+      stack: err.stack
+    });
+
+    res.status(500).json({
+      message: 'Internal server error',
+      success: false,
+      error: err.message
+    });
+  }
+};
+const fetchPLByRegistration = async (req, res) => {
+  try {
+    const { registrationNumber } = req.params;
+
+    if (!registrationNumber) {
+      return res.status(400).json({
+        message: 'Registration number is required',
+        success: false
+      });
+    }
+
+    const regexPattern = new RegExp(registrationNumber, 'i');
+
+    const personalLeaves = await PL.find({
+      registrationNumber: { $regex: regexPattern }
+    }).exec();
+
+    if (personalLeaves.length === 0) {
+      return res.status(404).json({
+        message: 'No personal leaves found for the specified registration number',
+        success: false
+      });
+    }
+
+    res.status(200).json({
+      message: 'Personal leaves fetched successfully',
+      success: true,
+      data: personalLeaves
+    });
+  } catch (err) {
+    console.error('Error fetching personal leaves by registration number:', {
+      message: err.message,
+      stack: err.stack
+    });
+
+    res.status(500).json({
+      message: 'Internal server error',
+      success: false,
+      error: err.message
+    });
+  }
+};
+
 
 const fetchOutpassByClass = async (req, res) => {
   try {
@@ -165,4 +315,11 @@ const fetchLeaveByClass = async (req, res) => {
   }
 };
 
-module.exports = { fetchOutpassByClass, fetchPLByClass, fetchLeaveByClass};
+module.exports = { fetchOutpassByClass,
+   fetchPLByClass,
+    fetchLeaveByClass,
+    fetchOutpassByRegistration,
+    fetchLeaveByRegistration,
+    fetchPLByRegistration,
+    fetchUserByRegistration
+  };

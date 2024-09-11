@@ -1,0 +1,59 @@
+.card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 16px;
+    margin-bottom: 16px;
+    transition: all 0.3s ease;
+  }
+  
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .name {
+    font-size: 18px;
+    font-weight: bold;
+    color: #1f2937;
+    margin: 0;
+  }
+  
+  .regNumber {
+    font-size: 14px;
+    color: #6b7280;
+    background-color: #f3f4f6;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  
+  .content {
+    display: grid;
+    gap: 8px;
+  }
+  
+  .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #4b5563;
+  }
+  
+  .value {
+    font-size: 14px;
+    color: #1f2937;
+  }
