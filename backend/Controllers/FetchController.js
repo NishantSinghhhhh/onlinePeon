@@ -2,64 +2,131 @@ const { Outpass } = require('../Models/Outpass');
 const { PL } = require('../Models/PL');
 const { Leave } = require('../Models/Leave');
 const {Staff} = require('../Models/staff')
-
 const fetchPendingByRegNo = async (req, res) => {
-    try {
-        const { regNo } = req.params;
+  try {
+      const { regNo } = req.params;
 
-        const [outpasses, pls, leaves] = await Promise.all([
-            Outpass.find({ registrationNumber: regNo, 'extraDataArray.0': 0 }).exec(),
-            PL.find({ registrationNumber: regNo, 'extraDataArray.0': 0 }).exec(),
-            Leave.find({ registrationNumber: regNo, 'extraDataArray.0': 0 }).exec()
-        ]);
+      // Criteria for matching at least one zero in the array for Outpass and Leave
+      const atLeastOneZero = {
+          registrationNumber: regNo,
+          extraDataArray: { $in: [0] } // Check if there's at least one zero in the array
+      };
 
-        res.status(200).json({
-            outpasses,
-            pls,
-            leaves
-        });
-    } catch (err) {
-        res.status(500).json({
-            message: 'Internal server error',
-            success: false,
-            error: err.message
-        });
-    }
+      // Criteria for matching zero in either the first or second position for PL
+      const plWithZeroInFirstOrSecond = [
+          {
+              $match: {
+                  registrationNumber: regNo
+              }
+          },
+          {
+              $addFields: {
+                  firstElement: { $arrayElemAt: ["$extraDataArray", 0] },
+                  secondElement: { $arrayElemAt: ["$extraDataArray", 1] }
+              }
+          },
+          {
+              $match: {
+                  $or: [
+                      { firstElement: 0 }, // Zero in the first position
+                      { secondElement: 0 } // Zero in the second position
+                  ]
+              }
+          }
+      ];
+
+      // Execute the queries
+      const [outpasses, pls, leaves] = await Promise.all([
+          Outpass.find(atLeastOneZero).exec(),
+          PL.aggregate(plWithZeroInFirstOrSecond).exec(),
+          Leave.find(atLeastOneZero).exec()
+      ]);
+
+      res.status(200).json({
+          outpasses,
+          pls,
+          leaves
+      });
+  } catch (err) {
+      console.error('Error in fetchPendingByRegNo:', err.message);
+      res.status(500).json({
+          message: 'Internal server error',
+          success: false,
+          error: err.message
+      });
+  }
 };
 
-
 const fetchApprovedByRegNo = async (req, res) => {
-    try {
-        const { regNo } = req.params;
+  try {
+      const { regNo } = req.params;
 
-        const [outpasses, pls, leaves] = await Promise.all([
-            Outpass.find({ registrationNumber: regNo, 'extraDataArray.0': 1 }).exec(),
-            PL.find({ registrationNumber: regNo, 'extraDataArray.0': 1 }).exec(),
-            Leave.find({ registrationNumber: regNo, 'extraDataArray.0': 1 }).exec()
-        ]);
+      // Criteria for approved Outpass and Leave (all elements in extraDataArray must be 1)
+      const allOnes = {
+          registrationNumber: regNo,
+          extraDataArray: { $not: { $elemMatch: { $ne: 1 } } } // Ensure all elements are 1
+      };
 
-        res.status(200).json({
-            outpasses,
-            pls,
-            leaves
-        });
-    } catch (err) {
-        res.status(500).json({
-            message: 'Internal server error',
-            success: false,
-            error: err.message
-        });
-    }
+      // Criteria for approved PL (1 in either the first or second position)
+      const plWithOneInFirstOrSecond = [
+          {
+              $match: {
+                  registrationNumber: regNo
+              }
+          },
+          {
+              $addFields: {
+                  firstElement: { $arrayElemAt: ["$extraDataArray", 0] },
+                  secondElement: { $arrayElemAt: ["$extraDataArray", 1] }
+              }
+          },
+          {
+              $match: {
+                  $or: [
+                      { firstElement: 1 }, // 1 in the first position
+                      { secondElement: 1 } // 1 in the second position
+                  ]
+              }
+          }
+      ];
+
+      // Execute the queries
+      const [outpasses, pls, leaves] = await Promise.all([
+          Outpass.find(allOnes).exec(),
+          PL.aggregate(plWithOneInFirstOrSecond).exec(),
+          Leave.find(allOnes).exec()
+      ]);
+
+      res.status(200).json({
+          outpasses,
+          pls,
+          leaves
+      });
+  } catch (err) {
+      console.error('Error in fetchApprovedByRegNo:', err.message);
+      res.status(500).json({
+          message: 'Internal server error',
+          success: false,
+          error: err.message
+      });
+  }
 };
 
 const fetchDeclinedByRegNo = async (req, res) => {
   try {
       const { regNo } = req.params;
 
+      // Criteria for declined Outpass, PL, and Leave (contains -1 in any position of extraDataArray)
+      const hasNegativeOne = {
+          registrationNumber: regNo,
+          extraDataArray: { $elemMatch: { $eq: -1 } } // Check if there's -1 in the array
+      };
+
+      // Execute the queries
       const [outpasses, pls, leaves] = await Promise.all([
-          Outpass.find({ registrationNumber: regNo, 'extraDataArray.0': 2 }).exec(),
-          PL.find({ registrationNumber: regNo, 'extraDataArray.0': 2 }).exec(),
-          Leave.find({ registrationNumber: regNo, 'extraDataArray.0': 2 }).exec()
+          Outpass.find(hasNegativeOne).exec(),
+          PL.find(hasNegativeOne).exec(),
+          Leave.find(hasNegativeOne).exec()
       ]);
 
       res.status(200).json({
