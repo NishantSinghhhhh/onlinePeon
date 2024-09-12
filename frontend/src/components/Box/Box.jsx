@@ -11,8 +11,12 @@ const BoxComponent = () => {
   const { loginInfo } = useContext(LoginContext);
   const [selectedClass, setSelectedClass] = useState('FE-COMP-A');
   const [studentMap, setStudentMap] = useState(new Map());  // Store fetched students in a Map
+  const [leavesMap, setLeavesMap] = useState(new Map());  // Store fetched leaves in a Map
+  const [outpassesMap, setOutpassesMap] = useState(new Map());  // Store fetched outpasses in a Map
   const [loading, setLoading] = useState(false); // Loading state
   const [error, setError] = useState(null);      // Error state
+  const [modalContent, setModalContent] = useState(null);  // State to manage modal content
+  const [showModal, setShowModal] = useState(false); // State to manage modal visibility
 
   // List of class options
   const classOptions = [
@@ -40,21 +44,28 @@ const BoxComponent = () => {
     }
   };
 
-  // Fetch students by class name when selected class changes
+  // Function to check if a leave is active
+  const isActiveLeave = (leave) => {
+    const now = new Date();
+    const startDate = new Date(leave.startDate);
+    const endDate = new Date(leave.endDate);
+
+    return now >= startDate && now <= endDate;
+  };
+
+  // Fetch students, leaves, and outpasses when selected class changes
   useEffect(() => {
     const fetchStudents = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        // Make an API request to the backend
+        // Make an API request to fetch students
         const response = await axios.get(`http://localhost:8000/fetchUser/users/${selectedClass}`);
-
-        // Store students in a map for easy access and processing
         const studentMap = new Map();
 
         response.data.data.forEach(student => {
-          studentMap.set(student.rollNumber, student);
+          studentMap.set(student.rollNumber, { ...student, leaves: 0, outpasses: 0 });
         });
 
         // Update the state with the fetched students
@@ -67,7 +78,49 @@ const BoxComponent = () => {
       }
     };
 
+    const fetchLeaves = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/fetchAll/fetchAllLeaves');
+        if (!response.ok) throw new Error('Failed to fetch leaves');
+        const result = await response.json();
+        
+        const leavesMap = new Map();
+        result.data.forEach(leave => {
+          if (!leavesMap.has(leave.rollNumber)) {
+            leavesMap.set(leave.rollNumber, []);
+          }
+          leavesMap.get(leave.rollNumber).push(leave);
+        });
+
+        setLeavesMap(leavesMap);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    const fetchOutpasses = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/fetchAll/fetchAllOutpasses');
+        if (!response.ok) throw new Error('Failed to fetch outpasses');
+        const result = await response.json();
+        
+        const outpassesMap = new Map();
+        result.data.forEach(outpass => {
+          if (!outpassesMap.has(outpass.rollNumber)) {
+            outpassesMap.set(outpass.rollNumber, []);
+          }
+          outpassesMap.get(outpass.rollNumber).push(outpass);
+        });
+
+        setOutpassesMap(outpassesMap);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
     fetchStudents();
+    fetchLeaves();
+    fetchOutpasses();
   }, [selectedClass]);
 
   // Handle class change
@@ -76,9 +129,22 @@ const BoxComponent = () => {
     console.log(`Selected class: ${e.target.value}`);
   };
 
-  // Sort students by rollNumber before rendering
+  const handleBoxClick = (student) => {
+    const studentLeaves = leavesMap.get(student.rollNumber) || [];
+    const activeLeaves = studentLeaves.filter(isActiveLeave);
+    const totalLeaves = studentLeaves.length;
+    const totalOutpasses = (outpassesMap.get(student.rollNumber) || []).length;
+
+    setModalContent({ student, totalLeaves, totalOutpasses, activeLeaves });
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setModalContent(null);
+  };
+
   const sortedStudents = Array.from(studentMap.values()).sort((a, b) => {
-    // Ensure rollNumber comparison is numeric
     return parseInt(a.rollNumber, 10) - parseInt(b.rollNumber, 10);
   });
 
@@ -92,7 +158,7 @@ const BoxComponent = () => {
             id="classDropdown"
             className={styles.dropdown}
             value={selectedClass}
-            onChange={handleSelectChange} 
+            onChange={handleSelectChange}
           >
             {classOptions.map((classOption) => (
               <option key={classOption} value={classOption}>
@@ -111,15 +177,53 @@ const BoxComponent = () => {
       ) : (
         <div className={styles.boxes}>
           {sortedStudents.length > 0 ? (
-            sortedStudents.map((student) => (
-              <div key={student.rollNumber} className={styles.studentBox}>
-                <p> {student.rollNumber}</p>
-                <p> {student.name}</p>
-              </div>
-            ))
+            sortedStudents.map((student) => {
+              const studentLeaves = leavesMap.get(student.rollNumber) || [];
+              const hasActiveLeave = studentLeaves.some(isActiveLeave);
+
+              return (
+                <div
+                  key={student.rollNumber}
+                  className={`${styles.studentBox} ${hasActiveLeave ? styles.activeLeave : ''}`}
+                  onClick={() => handleBoxClick(student)}
+                >
+                  <p>{student.rollNumber}</p>
+                  <p>{student.name}</p>
+                </div>
+              );
+            })
           ) : (
             <p>No students found for this class</p>
           )}
+        </div>
+      )}
+
+      {showModal && modalContent && (
+        <div className={styles.modal}>
+          <div className={styles.modalContent}>
+            <h2>{modalContent.student.name}</h2>
+            <p>Roll Number: {modalContent.student.rollNumber}</p>
+            <p>Total Leaves: {modalContent.totalLeaves}</p>
+            <p>Total Outpasses: {modalContent.totalOutpasses}</p>
+            {modalContent.activeLeaves.length > 0 && (
+              <>
+                <h3>Active Leaves:</h3>
+                <ul>
+                  {modalContent.activeLeaves.map((leave, index) => (
+                    <li key={index}>
+                      <p>Reason: {leave.reasonForLeave}</p>
+                      <p>Start Date: {new Date(leave.startDate).toLocaleDateString()}</p>
+                      <p>End Date: {new Date(leave.endDate).toLocaleDateString()}</p>
+                      <p>Place of Residence: {leave.placeOfResidence}</p>
+                      <p>Attendance Percentage: {leave.attendancePercentage}</p>
+                      <p>Contact Number: {leave.contactNumber}</p>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+            <button onClick={closeModal}>Close</button>
+          </div>
         </div>
       )}
     </>
