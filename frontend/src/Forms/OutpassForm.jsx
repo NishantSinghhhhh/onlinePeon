@@ -19,6 +19,7 @@ const OutpassForm = () => {
     firstName: '',
     lastName: '',
     registrationNumber: '',
+    rollNumber: '', // Added roll number field
     reason: '',
     date: new Date(),
     startHour: '',
@@ -49,13 +50,14 @@ const OutpassForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const { firstName, lastName, registrationNumber, reason, date, startHour, endHour, contactNumber, className, extraDataArray } = formData;
+    const { firstName, lastName, registrationNumber, rollNumber, reason, date, startHour, endHour, contactNumber, className, extraDataArray } = formData;
     const isoDate = date.toISOString();
 
     const emptyFields = [];
     if (!firstName) emptyFields.push('firstName');
     if (!lastName) emptyFields.push('lastName');
     if (!registrationNumber) emptyFields.push('registrationNumber');
+    if (!rollNumber) emptyFields.push('rollNumber'); // Check for roll number
     if (!reason) emptyFields.push('reason');
     if (!date) emptyFields.push('date');
     if (!startHour) emptyFields.push('startHour');
@@ -69,6 +71,10 @@ const OutpassForm = () => {
 
     if (!/^\d{5,6}$/.test(registrationNumber)) {
       return handleError('Registration number must be 5 or 6 digits long.');
+    }
+
+    if (!/^\d{4}$/.test(rollNumber)) {
+      return handleError('Roll number must be exactly 4 digits.');
     }
 
     if (!/^\d{10}$/.test(contactNumber)) {
@@ -86,6 +92,7 @@ const OutpassForm = () => {
           firstName,
           lastName,
           registrationNumber,
+          rollNumber, // Include roll number in request body
           reason,
           date: isoDate,
           startHour,
@@ -178,6 +185,17 @@ const OutpassForm = () => {
                 </FormControl>
 
                 <FormControl isRequired>
+                  <FormLabel>Roll Number</FormLabel>
+                  <Input 
+                    placeholder='Roll Number' 
+                    name='rollNumber'
+                    value={formData.rollNumber}
+                    onChange={handleChange}
+                    className={styles['chakra-input']}
+                  />
+                </FormControl>
+
+                <FormControl isRequired>
                   <FormLabel>Reason for Outpass</FormLabel>
                   <Input 
                     placeholder='Reason for Outpass' 
@@ -249,22 +267,23 @@ const OutpassForm = () => {
                     onChange={handleChange}
                     className={styles['chakra-input']}
                   >
-                    {classOptions.map((option, index) => (
-                      <option key={index} value={option}>
-                        {option}
-                      </option>
+                    {classOptions.map(option => (
+                      <option key={option} value={option}>{option}</option>
                     ))}
                   </Select>
                 </FormControl>
-
-                <Button type='submit' colorScheme='blue' size='lg'>
-                  Submit
-                </Button>
               </Stack>
+              <Button
+                mt={4}
+                colorScheme='blue'
+                type='submit'
+              >
+                Submit
+              </Button>
             </form>
           </CardBody>
           <CardFooter>
-            <Button variant='ghost' onClick={() => navigate('/Home')}>Back to Home</Button>
+            <Button variant='ghost' onClick={() => navigate('/Home')}>Back</Button>
           </CardFooter>
         </ChakraCard>
       </div>

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const { db3 } = require('./db'); // Import your existing database connection
+const { db3 } = require('./db');
 
 const LeaveSchema = new Schema({
     firstName: {
@@ -15,7 +15,12 @@ const LeaveSchema = new Schema({
     registrationNumber: {
         type: String,
         required: true,
-        match: /^\d{5,6}$/ // 5 or 6 digits
+        match: /^\d{5,6}$/ 
+    },
+    rollNumber: {
+        type: String,
+        required: true,
+        match: /^\d{4}$/ 
     },
     reasonForLeave: {
         type: String,
@@ -42,7 +47,7 @@ const LeaveSchema = new Schema({
     contactNumber: {
         type: String,
         required: true,
-        match: /^\d{10}$/ // Exactly 10 digits
+        match: /^\d{10}$/
     },
     className: {
         type: String,
@@ -60,13 +65,13 @@ const LeaveSchema = new Schema({
         required: true,
         validate: {
             validator: function(array) {
-                return array.length === 4; // Ensure the array has exactly 4 elements
+                return array.length === 4; 
             },
             message: 'extraDataArray must contain exactly 4 numbers'
         }
     }
 }, {
-    timestamps: true // Automatically adds createdAt and updatedAt fields
+    timestamps: true 
 });
 
 const Leave = db3.model('Leave', LeaveSchema);

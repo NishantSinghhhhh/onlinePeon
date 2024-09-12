@@ -95,6 +95,20 @@ const StaffNavbar = () => {
               </BreadcrumbItem>
            
 
+              <BreadcrumbItem>
+                <BreadcrumbLink
+                  as={Link}
+                  to='/Box'
+                  className={styles['breadcrumb-link']}
+                  bg={location.pathname === '/Box' ? 'gray.600' : 'transparent'}
+                  color={location.pathname === '/Box' ? 'white' : 'gray.300'}
+                  fontWeight={location.pathname === '/Box' ? 'bold' : 'normal'}
+                >
+                    Box
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+           
+
             {/* <BreadcrumbItem>
               <BreadcrumbLink
                 as={Link}

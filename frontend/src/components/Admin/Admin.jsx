@@ -4,6 +4,7 @@ const Admin = () => {
   return (
     <div>
         <AdminNavbar/>
+        
     </div>
   )
 }

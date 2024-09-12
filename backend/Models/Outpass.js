@@ -16,6 +16,11 @@ const OutpassSchema = new Schema({
         required: true,
         match: /^\d{5,6}$/ // 5 or 6 digits
     },
+    rollNumber: {
+        type: String,
+        required: true,
+        match: /^\d{4}$/ // Exactly 4 digits
+    },
     reason: {
         type: String,
         required: true,
@@ -63,8 +68,7 @@ const OutpassSchema = new Schema({
 },
 {
     timestamps: true
-}
-);
+});
 
 const Outpass = db2.model('Outpass', OutpassSchema);
 

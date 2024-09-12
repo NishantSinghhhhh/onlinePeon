@@ -68,55 +68,56 @@ const loginValidation = (req, res, next) => {
   
 
   const outpassValidation = (req, res, next) => {
-      console.log('Received request body:', JSON.stringify(req.body, null, 2));
-  
-      const schema = Joi.object({
-          firstName: Joi.string().min(2).max(50).required(),
-          lastName: Joi.string().min(2).max(50).required(),
-          registrationNumber: Joi.string().length(5).length(6).pattern(/^\d{5,6}$/).required(),
-          reason: Joi.string().min(10).required(),
-          date: Joi.date().iso().required(),
-          startHour: Joi.string().pattern(/^([01]\d|2[0-3]):([0-5]\d)$/).required(),
-          endHour: Joi.string().pattern(/^([01]\d|2[0-3]):([0-5]\d)$/).required(),
-          contactNumber: Joi.string().length(10).pattern(/^\d{10}$/).required(),
-          className: Joi.string().valid(
+    console.log('Received request body:', JSON.stringify(req.body, null, 2));
+
+    const schema = Joi.object({
+        firstName: Joi.string().min(2).max(50).required(),
+        lastName: Joi.string().min(2).max(50).required(),
+        registrationNumber: Joi.string().length(5).length(6).pattern(/^\d{5,6}$/).required(),
+        rollNumber: Joi.string().length(4).pattern(/^\d{4}$/).required(), // New rollNumber validation
+        reason: Joi.string().min(10).required(),
+        date: Joi.date().iso().required(),
+        startHour: Joi.string().pattern(/^([01]\d|2[0-3]):([0-5]\d)$/).required(),
+        endHour: Joi.string().pattern(/^([01]\d|2[0-3]):([0-5]\d)$/).required(),
+        contactNumber: Joi.string().length(10).pattern(/^\d{10}$/).required(),
+        className: Joi.string().valid(
             'FE-COMP-A', 'FE-COMP-B', 'FE-ENTC-A', 'FE-ENTC-B', 'FE-IT-A', 'FE-IT-B',
             'FE-MECH', 'FE-ARE', 'SE-COMP-A', 'SE-COMP-B', 'SE-ENTC-A', 'SE-ENTC-B',
             'SE-IT-A', 'SE-IT-B', 'SE-MECH', 'TE-COMP-A', 'TE-COMP-B', 'TE-ENTC-A',
             'TE-ENTC-B', 'TE-IT-A', 'TE-IT-B', 'TE-MECH', 'BE-COMP-A', 'BE-COMP-B',
             'BE-ENTC-A', 'BE-ENTC-B', 'BE-IT-A', 'BE-IT-B', 'BE-MECH'
-          ).required(),
-          extraDataArray: Joi.array().items(Joi.number()).length(4).required() // Ensures the array has exactly 4 numbers
-      });
-  
-      const { error, value } = schema.validate(req.body, { abortEarly: false });
-  
-      if (error) {
-          console.error('Validation error:', JSON.stringify(error.details, null, 2));
-          return res.status(400).json({
-              message: "Bad Request",
-              error: error.details.map(detail => ({
-                  field: detail.path.join('.'),
-                  message: detail.message
-              }))
-          });
-      }
-  
-      console.log('Validation passed. Validated data:', JSON.stringify(value, null, 2));
-      next();
-  };
+        ).required(),
+        extraDataArray: Joi.array().items(Joi.number()).length(4).required() // Ensures the array has exactly 4 numbers
+    });
 
-  const leaveValidation = (req, res, next) => {
+    const { error, value } = schema.validate(req.body, { abortEarly: false });
+
+    if (error) {
+        console.error('Validation error:', JSON.stringify(error.details, null, 2));
+        return res.status(400).json({
+            message: "Bad Request",
+            error: error.details.map(detail => ({
+                field: detail.path.join('.'),
+                message: detail.message
+            }))
+        });
+    }
+
+    console.log('Validation passed. Validated data:', JSON.stringify(value, null, 2));
+    next();
+};
+const leaveValidation = (req, res, next) => {
     console.log('Received request body:', JSON.stringify(req.body, null, 2));
 
     // Define the Joi schema
     const schema = Joi.object({
         firstName: Joi.string().min(2).max(50).required(),
         lastName: Joi.string().min(2).max(50).required(),
-        registrationNumber: Joi.string().min(5).max(6).pattern(/^\d+$/).required(), // Updated for 5 or 6 digits
+        registrationNumber: Joi.string().min(5).max(6).pattern(/^\d+$/).required(), // 5 or 6 digits
+        rollNumber: Joi.string().length(4).pattern(/^\d{4}$/).required(), // Exactly 4 digits
         reasonForLeave: Joi.string().min(10).required(),
         startDate: Joi.date().iso().required(),
-        endDate: Joi.date().iso().required(),
+        endDate: Joi.date().iso().greater(Joi.ref('startDate')).required(), // Ensure endDate is after startDate
         placeOfResidence: Joi.string().min(2).max(100).required(),
         attendancePercentage: Joi.number().min(0).max(100).required(),
         contactNumber: Joi.string().length(10).pattern(/^\d{10}$/).required(),
@@ -127,7 +128,7 @@ const loginValidation = (req, res, next) => {
             'TE-ENTC-B', 'TE-IT-A', 'TE-IT-B', 'TE-MECH', 'BE-COMP-A', 'BE-COMP-B',
             'BE-ENTC-A', 'BE-ENTC-B', 'BE-IT-A', 'BE-IT-B', 'BE-MECH'
         ).required(),
-        extraDataArray: Joi.array().items(Joi.number()).optional() // Optional array of numbers
+        extraDataArray: Joi.array().items(Joi.number()).length(4).required() // Ensure array has exactly 4 numbers
     });
 
     // Validate the request body against the schema

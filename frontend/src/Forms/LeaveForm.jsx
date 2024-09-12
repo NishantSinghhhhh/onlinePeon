@@ -22,6 +22,7 @@ const LeaveForm = () => {
     firstName: '',
     lastName: '',
     registrationNumber: '',
+    rollNumber: '',
     reasonForLeave: '',
     startDate: new Date(),
     endDate: new Date(),
@@ -58,7 +59,7 @@ const LeaveForm = () => {
     // Debug: Log the form data before submission
     console.log('Full formData state:', formData);
   
-    const { firstName, lastName, registrationNumber, reasonForLeave, startDate, endDate, placeOfResidence, attendancePercentage, contactNumber, className, extraDataArray } = formData;
+    const { firstName, lastName, registrationNumber, rollNumber, reasonForLeave, startDate, endDate, placeOfResidence, attendancePercentage, contactNumber, className, extraDataArray } = formData;
   
     // Check if startDate and endDate are valid
     let isoStartDate = '';
@@ -82,6 +83,7 @@ const LeaveForm = () => {
       lastName: `"${lastName}"`,
       registrationNumber: `"${registrationNumber}"`,
       reasonForLeave: `"${reasonForLeave}"`,
+      rollNumber : `"${rollNumber}`,
       startDate: `"${isoStartDate}"`,
       endDate: `"${isoEndDate}"`,
       placeOfResidence: `"${placeOfResidence}"`,
@@ -96,6 +98,7 @@ const LeaveForm = () => {
     if (!firstName) emptyFields.push('firstName');
     if (!lastName) emptyFields.push('lastName');
     if (!registrationNumber) emptyFields.push('registrationNumber');
+    if (!rollNumber) emptyFields.push('rollNumber');
     if (!reasonForLeave) emptyFields.push('reasonForLeave');
     if (!startDate) emptyFields.push('startDate');
     if (!endDate) emptyFields.push('endDate');
@@ -113,7 +116,12 @@ const LeaveForm = () => {
     if (!/^\d{5,6}$/.test(registrationNumber)) { // Updated regex
       return handleError('Registration number must be exactly 5 or 6 digits.');
     }
-  
+    
+    if (!/^\d{4}$/.test(rollNumber)) {
+      return handleError('Roll number must be exactly 4 digits.');
+    }
+
+
     if (!/^\d{10}$/.test(contactNumber)) {
       return handleError('Contact number must be exactly 10 digits.');
     }
@@ -129,6 +137,7 @@ const LeaveForm = () => {
           firstName,
           lastName,
           registrationNumber,
+          rollNumber,
           reasonForLeave,
           startDate: isoStartDate,
           endDate: isoEndDate,
@@ -225,6 +234,17 @@ const LeaveForm = () => {
                     placeholder='Registration Number' 
                     name='registrationNumber'
                     value={formData.registrationNumber}
+                    onChange={handleChange}
+                    className={styles['chakra-input']}
+                  />
+                </FormControl>
+
+                <FormControl isRequired>
+                  <FormLabel>Roll Number</FormLabel>
+                  <Input 
+                    placeholder='Roll Number' 
+                    name='rollNumber'
+                    value={formData.rollNumber}
                     onChange={handleChange}
                     className={styles['chakra-input']}
                   />
