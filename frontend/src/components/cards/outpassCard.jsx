@@ -48,7 +48,7 @@ const OutpassCard = ({ data, onStatusChange }) => {
             <Button
               mt={4}
               variant="solid"
-              onClick={onOpen} // Opens the modal
+              onClick={onOpen}
               size="md"
               width="full"
             >
