@@ -8,6 +8,7 @@ const fetchRoutesTeachers = require('./Routes/fetchRoutesTeachers')
 const fetchAll = require('./Routes/fetchAll')
 const { func } = require('joi');
 const updateRoutes = require('./Routes/updateRoutes');
+const fetchUser = require('./Routes/fetchUserRoute')
 require('./Models/db');
 
 const PORT = process.env.PORT || 8080;
@@ -30,6 +31,7 @@ app.use('/fetch', fetchRoutesTeachers)
 app.use('/update', updateRoutes);
 app.use('/products', authRoutes);
 app.use('/fetchAll',fetchAll )
+app.use("/fetchUser",fetchUser)
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });

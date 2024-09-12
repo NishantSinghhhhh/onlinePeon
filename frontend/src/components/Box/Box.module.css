@@ -1,52 +1,76 @@
-/* Box.module.css */
 .container {
-    height: 100%;
-    width: 100%;
-    /* padding: 20px; */
-    font-family: Arial, sans-serif;
-  }
-  
-  .dropdown {
-    width: 300px;
-    padding: 10px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-    transition: border-color 0.2s ease-in-out;
-  }
-  
-  .dropdown:hover {
-    border-color: #007bff;
-  }
-  
-  .dropdown:focus {
-    outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-  }
-  
-  .boxContent {
-    margin-top: 20px;
-    padding: 10px;
-    font-size: 18px;
-    background-color: #e8e8e8;
-    border-radius: 8px;
-  }
-  
-  .label {
-    /* margin-bottom: 10px; */
-    display: block;
-    font-size: 18px;
-    font-weight: bold;
-  }
-  
-  .page{
-    width: 90%;
-    margin: auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 30px;
-    /* flex-direction: column; */
-  }
+  height: 100%;
+  width: 100%;
+  font-family: Arial, sans-serif;
+}
+
+.dropdown {
+  width: 300px;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  transition: border-color 0.2s ease-in-out;
+}
+
+.dropdown:hover {
+  border-color: #007bff;
+}
+
+.dropdown:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.boxContent {
+  margin-top: 20px;
+  padding: 10px;
+  font-size: 18px;
+  background-color: #e8e8e8;
+  border-radius: 8px;
+}
+
+.label {
+  display: block;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.page {
+  width: 90%;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+}
+
+/* Add student boxes styles */
+.boxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 10px;
+  margin: auto;
+  margin-top: 20px;
+  width: 90%;
+  justify-content: center;
+ 
+}
+
+.studentBox {
+  border: 1px solid #ccc;
+  padding: 15px;
+  width: 200px;
+  height: 100px;
+  text-align: center;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.studentBox p {
+  margin: 5px 0;
+  font-size: 16px;
+}
