@@ -7,8 +7,8 @@ import WardenNavbar from '../HOD/pages/navbar';
 import StaffNavbar from '../StaffNavbar/StaffNavbar';
 import { LoginContext } from '../../context/LoginContext';
 import OutpassCard from './searchCards/Outpass';
-import LeaveCard from './searchCards/Leave'; // Import LeaveCard component
-import PLCard from './searchCards/Pls'; // Import PLCard component
+import LeaveCard from './searchCards/Leave';
+import PLCard from './searchCards/Pls';
 import styles from './User.module.css';
 import UserCard from './UserCard';
 
@@ -73,6 +73,56 @@ const Search = ({ selectedClass }) => {
 
   const activeLeaves = leaves.some((leave) => isLeaveActive(leave.startDate, leave.endDate));
 
+  const handleStatusChange = async (id, status, type) => {
+    try {
+      const positionMapping = {
+        'Class Teacher': 0,
+        'HOD': 1,
+        'Warden': 2,
+        'Joint Director': 3,
+        'Director': 3,
+        'Principal': 3,
+      };
+
+      const position = positionMapping[loginInfo.position] || 3;
+
+      console.log(`Sending update request for ${type} ${id} with status ${status} and position ${position}`);
+
+      const endpoint = type === 'outpass' 
+        ? `http://localhost:8000/update/updateOutpass/${id}`
+        : type === 'leave'
+        ? `http://localhost:8000/update/updateLeave/${id}`
+        : `http://localhost:8000/update/updatePL/${id}`;
+
+      const response = await axios.put(endpoint, {
+        status,
+        position,
+      });
+
+      if (response.data.success) {
+        console.log(`${type.charAt(0).toUpperCase() + type.slice(1)} updated successfully:`, response.data);
+
+        switch (type) {
+          case 'outpass':
+            setOutpasses((prevOutpasses) => prevOutpasses.filter((outpass) => outpass._id !== id));
+            break;
+          case 'leave':
+            setLeaves((prevLeaves) => prevLeaves.filter((leave) => leave._id !== id));
+            break;
+          case 'pl':
+            setPls((prevPls) => prevPls.filter((pl) => pl._id !== id));
+            break;
+          default:
+            break;
+        }
+      } else {
+        console.error('Failed to update:', response.data.message);
+      }
+    } catch (error) {
+      console.error('Error updating:', error.message);
+    }
+  };
+
   return (
     <Box>
       {renderNavbar()}
@@ -107,7 +157,11 @@ const Search = ({ selectedClass }) => {
         {outpasses.length > 0 && (
           <Box className={styles.outpass} mt="20px">
             {outpasses.map((outpass) => (
-              <OutpassCard key={outpass.id} outpass={outpass} />
+              <OutpassCard 
+                key={outpass._id}
+                outpass={outpass}
+                onStatusChange={(status) => handleStatusChange(outpass._id, status, 'outpass')}
+              />
             ))}
           </Box>
         )}
@@ -116,8 +170,9 @@ const Search = ({ selectedClass }) => {
           <Box className={styles.Leaves} mt="20px">
             {leaves.map((leave) => (
               <LeaveCard
-                key={leave.id}
-                leave={{ ...leave, isActive: isLeaveActive(leave.startDate, leave.endDate) }}
+                key={leave._id}
+                leave={leave}
+                onStatusChange={(status) => handleStatusChange(leave._id, status, 'leave')}
               />
             ))}
           </Box>
@@ -126,7 +181,11 @@ const Search = ({ selectedClass }) => {
         {pls.length > 0 && (
           <Box className={styles.Pls} mt="20px">
             {pls.map((pl) => (
-              <PLCard key={pl.id} pl={pl} />
+              <PLCard
+                key={pl._id}
+                pl={pl}
+                onStatusChange={(status) => handleStatusChange(pl._id, status, 'pl')}
+              />
             ))}
           </Box>
         )}

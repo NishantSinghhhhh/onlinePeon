@@ -13,7 +13,6 @@ const OutpassPage = () => {
   const [error, setError] = useState('');
   const [showLoader, setShowLoader] = useState(true);
 
-  // Access loginInfo from LoginContext
   const { loginInfo } = useContext(LoginContext);
 
   const fetchOutpasses = async () => {
