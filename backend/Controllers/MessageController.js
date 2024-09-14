@@ -26,7 +26,7 @@ const sendSMS = async (req, res) => {
         const message = await client.messages.create({
             body: `Dear Parent,\n\nWe would like to inform you that your child, ${studentName}, has applied for an outpass. Below are the details of the request:\n\n- Class: ${className}\n- Reason for Outpass: ${reason}\n- Leave Time: From ${startHour} to ${endHour}\n\nPlease discuss this request with your child if you were not aware of it. If you have any questions or concerns, feel free to contact us.\n\nThank you.`,
             from: process.env.TWILIO_PHONE_NUMBER,
-            to: contactNumber
+            to: '+919649959730'
         });
 
         console.log('Message sent successfully with SID:', message.sid);
@@ -58,7 +58,7 @@ const sendWhatsAppMessage = async (req, res) => {
         const message = await client.messages.create({
             body: `Dear Parent,\n\nWe would like to inform you that your child, ${studentName}, has applied for an outpass. Below are the details of the request:\n\n- Class: ${className}\n- Reason for Outpass: ${reason}\n- Leave Time: From ${startHour} to ${endHour}\n\nPlease discuss this request with your child if you were not aware of it. If you have any questions or concerns, feel free to contact us.\n\nThank you.`,
             from: process.env.TWILIO_WHATSAPP_NUMBER,
-            to: `whatsapp:${contactNumber}`
+            to: `whatsapp:+919649959730`
         });
 
         console.log('WhatsApp message sent successfully with SID:', message.sid);
@@ -108,7 +108,7 @@ const sendLeaveMessageToParents = async (req, res) => {
         const message = await client.messages.create({
             body: `Dear Parent,\n\nWe would like to inform you that your child, ${studentName} (Registration Number: ${registrationNumber}, Roll Number: ${rollNumber}), has applied for a leave. Below are the details of the request:\n\n- Class: ${className}\n- Reason for Leave: ${reason}\n- Leave Time: From ${startHour} to ${endHour}\n- Place of Residence during the Leave: ${placeOfResidence}\n- Attendance Percentage: ${attendancePercentage}\n\nPlease discuss this request with your child if you were not aware of it. If you have any questions or concerns, feel free to contact us.\n\nThank you.`,
             from: process.env.TWILIO_PHONE_NUMBER,
-            to: contactNumber
+            to: `+919649959730`
         });
 
         console.log('Message sent successfully with SID:', message.sid);
@@ -154,7 +154,7 @@ const sendLeaveMessageToTeachers = async (req, res) => {
         const message = await client.messages.create({
             body: `Dear Teacher,\n\nThis is to inform you that your student, ${studentName}, has applied for a leave. Below are the details of the request:\n\n- Class: ${className}\n- Reason for Leave: ${reasonForLeave}\n- Leave Time: From ${startDate} to ${endDate}\n- Place of Residence during the leave: ${placeOfResidence}\n- Attendance Percentage: ${attendancePercentage}\n\nPlease take note of this leave request.\n\nThank you.`,
             from: process.env.TWILIO_WHATSAPP_NUMBER,
-            to: `whatsapp:${contactNumber}`
+           to: `whatsapp:+919649959730`
         });
 
         console.log('WhatsApp message sent successfully with SID:', message.sid);
@@ -165,9 +165,108 @@ const sendLeaveMessageToTeachers = async (req, res) => {
     }
 };
 
+const sendPLMessageToParents = async (req, res) => {
+    console.log('Received Body:', req.body);
+
+    const {
+        contactNumber,
+        studentName,
+        registrationNumber,
+        rollNumber,
+        reason,
+        startDate,
+        endDate,
+        classesMissed,
+        className
+    } = req.body;
+
+    console.log('Form Data:', {
+        contactNumber,
+        studentName,
+        registrationNumber,
+        rollNumber,
+        reason,
+        startDate,
+        endDate,
+        classesMissed,
+        className
+    });
+
+    const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+
+    if (!contactNumber) {
+        return res.status(400).json({ error: 'Contact number is required' });
+    }
+
+    try {
+        const message = await client.messages.create({
+            body: `Dear Parent,\n\nWe would like to inform you that your child, ${studentName} (Registration Number: ${registrationNumber}, Roll Number: ${rollNumber}), has requested for Permitted Leave (PL). Here are the details:\n\n- Class: ${className}\n- Reason: ${reason}\n- Leave Duration: From ${startDate} to ${endDate}\n- Classes Missed: ${classesMissed}\n\nPlease discuss this request with your child if you were not aware of it. If you have any questions, feel free to contact us.\n\nThank you.`,
+            from: process.env.TWILIO_PHONE_NUMBER,
+             to: `+919649959730`
+        });
+
+        console.log('Message sent successfully with SID:', message.sid);
+        return res.status(200).json({ message: 'Message sent successfully', sid: message.sid });
+    } catch (error) {
+        console.error('Error sending message:', error);
+        return res.status(500).json({ error: 'Failed to send message', details: error.message });
+    }
+};
+
+const sendPLMessageToTeachers = async (req, res) => {
+    console.log('Received Body:', req.body);
+
+    const {
+        contactNumber,
+        studentName,
+        registrationNumber,
+        rollNumber,
+        reason,
+        startDate,
+        endDate,
+        classesMissed,
+        className
+    } = req.body;
+
+    console.log('Form Data:', {
+        contactNumber,
+        studentName,
+        registrationNumber,
+        rollNumber,
+        reason,
+        startDate,
+        endDate,
+        classesMissed,
+        className
+    });
+
+    const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+
+    if (!contactNumber) {
+        return res.status(400).json({ error: 'Teacher contact number is required' });
+    }
+
+    try {
+        const message = await client.messages.create({
+            body: `Dear Teacher,\n\nThis is to inform you that your student, ${studentName} (Registration Number: ${registrationNumber}, Roll Number: ${rollNumber}), has requested Permitted Leave (PL). Here are the details:\n\n- Class: ${className}\n- Reason: ${reason}\n- Leave Duration: From ${startDate} to ${endDate}\n- Classes Missed: ${classesMissed}\n\nPlease take note of this leave request.\n\nThank you.`,
+            from: process.env.TWILIO_PHONE_NUMBER, // Using Twilio's phone number for SMS
+            to: `whatsapp:+919649959730` // Assuming contactNumber is a phone number for SMS
+        });
+
+        console.log('Message sent successfully with SID:', message.sid);
+        return res.status(200).json({ message: 'Message sent successfully', sid: message.sid });
+    } catch (error) {
+        console.error('Error sending message:', error);
+        return res.status(500).json({ error: 'Failed to send message', details: error.message });
+    }
+};
+
+
 module.exports = {
     sendSMS,
     sendWhatsAppMessage,
     sendLeaveMessageToParents,
-    sendLeaveMessageToTeachers
+    sendLeaveMessageToTeachers,
+    sendPLMessageToTeachers,
+    sendPLMessageToParents
 };

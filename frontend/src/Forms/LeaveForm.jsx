@@ -211,7 +211,7 @@ const LeaveForm = () => {
     }
   };
   
-  const sendLeaveMessageToTeachers = async () => {
+const sendLeaveMessageToTeachers = async () => {
     try {
         const response = await fetch('http://localhost:8000/Message/sendLeaveMessageToTeachers', {
             method: 'POST',
