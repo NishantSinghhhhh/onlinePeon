@@ -93,7 +93,7 @@ const LeaveForm = () => {
       extraDataArray // Include hidden array in request
     });
   
-    // Check for empty fields
+
     const emptyFields = [];
     if (!firstName) emptyFields.push('firstName');
     if (!lastName) emptyFields.push('lastName');
@@ -159,6 +159,9 @@ const LeaveForm = () => {
       console.log('Server response:', result); // Debug log
   
       if (result.success) {
+        await sendLeaveMessageToParents();
+        await sendLeaveMessageToTeachers();
+
         handleSuccess(result.message);
         setTimeout(() => navigate('/Home'), 1000);
       } else if (result.error) {
@@ -172,7 +175,77 @@ const LeaveForm = () => {
     }
   };
   
+  const sendLeaveMessageToParents = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/Message/sendLeaveMessageToParents', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contactNumber: formData.contactNumber,
+          studentName: `${formData.firstName} ${formData.lastName}`,
+          registrationNumber: formData.registrationNumber,
+          rollNumber: formData.rollNumber,
+          reason: formData.reasonForLeave,
+          startHour: formData.startDate.toISOString(), // Convert to ISO string if necessary
+          endHour: formData.endDate.toISOString(), // Convert to ISO string if necessary
+          placeOfResidence: formData.placeOfResidence,
+          attendancePercentage: formData.attendancePercentage,
+          className: formData.className
+        }),
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Server response error:', errorData);
+        handleError(errorData.message || 'An error occurred while sending message to parents');
+        return;
+      }
+  
+      const result = await response.json();
+      handleSuccess(result.message);
+    } catch (err) {
+      console.error('Fetch error:', err);
+      handleError('An unexpected error occurred while sending message to parents.');
+    }
+  };
+  
+  const sendLeaveMessageToTeachers = async () => {
+    try {
+        const response = await fetch('http://localhost:8000/Message/sendLeaveMessageToTeachers', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                contactNumber: formData.contactNumber,
+                studentName: `${formData.firstName} ${formData.lastName}`,
+                reasonForLeave: formData.reasonForLeave,
+                startDate: formData.startDate.toISOString(), // Convert to ISO string if necessary
+                endDate: formData.endDate.toISOString(), // Convert to ISO string if necessary
+                placeOfResidence: formData.placeOfResidence,
+                attendancePercentage: formData.attendancePercentage,
+                className: formData.className
+            }),
+        });
 
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Server response error:', errorData);
+            handleError(errorData.message || 'An error occurred while sending message to teachers');
+            return;
+        }
+
+        const result = await response.json();
+        handleSuccess(result.message);
+    } catch (err) {
+        console.error('Fetch error:', err);
+        handleError('An unexpected error occurred while sending message to teachers.');
+    }
+};
+
+  
   const handleError = (message) => {
     console.error('Error:', message); // Debug log
     toast({

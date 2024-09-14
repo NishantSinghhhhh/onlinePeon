@@ -1,10 +1,17 @@
-// file://%20routes/messageRouter.jsconst%20express%20=%20require('express');const%20router%20=%20express.Router();const%20%7B%20sendWhatsAppMessage%20%7D%20=%20require('../Controllers/messageController');//%20Route%20to%20send%20a%20WhatsApp%20messagerouter.post('/send',%20sendWhatsAppMessage);module.exports%20=%20router;// Routes/messageRouter.js
 const express = require('express');
 const router = express.Router();
-const { sendSMS, sendWhatsAppMessage } = require('../Controllers/MessageController');
+const { sendSMS, sendWhatsAppMessage, sendLeaveMessageToParents, sendLeaveMessageToTeachers } = require('../Controllers/MessageController');
 
-// Route to send a WhatsApp message
+// Route to send a standard SMS message
 router.post('/send', sendSMS);
+
+// Route to send a WhatsApp message to the teacher
 router.post('/sendTeacher', sendWhatsAppMessage);
+
+// Route to send a leave message to parents
+router.post('/sendLeaveMessageToParents', sendLeaveMessageToParents);
+
+// Route to send a leave message to teachers
+router.post('/sendLeaveMessageToTeachers', sendLeaveMessageToTeachers);
 
 module.exports = router;
