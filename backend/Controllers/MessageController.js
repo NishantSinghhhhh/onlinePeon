@@ -1,39 +1,21 @@
-// Controllers/messageController.js
-require('dotenv').config();
-const twilio = require('twilio');
-
-// Use environment variables for Twilio credentials
-const accountSid = process.env.TWILIO_ACCOUNT_SID;
-const authToken = process.env.TWILIO_AUTH_TOKEN;
-const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
-
-// Initialize Twilio client
-const client = twilio(accountSid, authToken);
-
-// Function to send an SMS message
 const sendSMS = async (req, res) => {
-    const { contactNumber } = req.body;  // Get contact number from request body
+    console.log('Received Body:', req.body);   
+    
+    const { contactNumber, studentName, reason, returnDate, startHour, endHour, className } = req.body;
 
+    console.log('Form Data:', {
+        contactNumber,
+        studentName,
+        reason,
+        returnDate,
+        startHour,
+        endHour,
+        className
+    });
 
-
-    try {
-        // Send the SMS using Twilio
-        const message = await client.messages.create({
-            body: "Dear Parent, We would like to inform you that your son/daughter has applied for an outpass. If you were not aware of this request, please discuss it with your child. We will notify you once the request is processed. Thank you.",
-            from: twilioPhoneNumber,
-            to: contactNumber
-        });
-
-        console.log(`Message sent successfully. SID: ${message.sid}`);
-        res.status(200).json({ message: 'Message sent successfully', messageId: message.sid });
-    } catch (error) {
-        console.error('Error sending SMS message:', error);
-        res.status(500).json({ error: 'Failed to send message', details: error.message });
-    }
-};
-
-const sendWhatsAppMessage = async (req, res) => {
-    const { contactNumber } = req.body;
+    const accountSid = 'ACbe6f170fc617ce0a2d33f112e4cb7a58';
+    const authToken = '9d589fdd64071b961f57a5ffdf627f0d';
+    const client = require('twilio')(accountSid, authToken);
 
     if (!contactNumber) {
         return res.status(400).json({ error: 'Contact number is required' });
@@ -41,16 +23,51 @@ const sendWhatsAppMessage = async (req, res) => {
 
     try {
         const message = await client.messages.create({
-            body: "Dear Parent, We would like to inform you that your son/daughter has applied for an outpass. If you were not aware of this request, please discuss it with your child. We will notify you once the request is processed. Thank you.",
-            from: `whatsapp:${twilioPhoneNumber}`,
-            to: `whatsapp:${contactNumber}`
+            body: `Dear Parent,\n\nWe would like to inform you that your child, ${studentName}, has applied for an outpass. Below are the details of the request:\n\n- Class: ${className}\n- Reason for Outpass: ${reason}\n- Leave Time: From ${startHour} to ${endHour}\n\nPlease discuss this request with your child if you were not aware of it. If you have any questions or concerns, feel free to contact us.\n\nThank you.`,
+            from: '+13304605528',
+            to: '+919649959730'
         });
 
-        console.log(`WhatsApp message sent successfully. SID: ${message.sid}`);
-        res.status(200).json({ message: 'WhatsApp message sent successfully', messageId: message.sid });
+        console.log('Message sent successfully with SID:', message.sid);
+        return res.status(200).json({ message: 'Message sent successfully', sid: message.sid });
+    } catch (error) {
+        console.error('Error sending message:', error);
+        return res.status(500).json({ error: 'Failed to send message', details: error.message });
+    }
+};
+
+const sendWhatsAppMessage = async (req, res) => {
+    console.log('Received Body:', req.body);   
+    
+    const { contactNumber, studentName, reason, returnDate, startHour, endHour, className } = req.body;
+
+    console.log('Form Data:', {
+        contactNumber,
+        studentName,
+        reason,
+        returnDate,
+        startHour,
+        endHour,
+        className
+    });
+
+    const accountSid = 'ACbe6f170fc617ce0a2d33f112e4cb7a58';  
+    const authToken = '9d589fdd64071b961f57a5ffdf627f0d';     
+    const client = require('twilio')(accountSid, authToken);
+
+
+    try {
+        const message = await client.messages.create({
+            body: `Dear Parent,\n\nWe would like to inform you that your child, ${studentName}, has applied for an outpass. Below are the details of the request:\n\n- Class: ${className}\n- Reason for Outpass: ${reason}\n- Leave Time: From ${startHour} to ${endHour}\n\nPlease discuss this request with your child if you were not aware of it. If you have any questions or concerns, feel free to contact us.\n\nThank you.`,
+            from: 'whatsapp:+14155238886',
+            to: 'whatsapp:+919649959730'
+        });
+
+        console.log('WhatsApp message sent successfully with SID:', message.sid);
+        return res.status(200).json({ message: 'WhatsApp message sent successfully', sid: message.sid });
     } catch (error) {
         console.error('Error sending WhatsApp message:', error);
-        res.status(500).json({ error: 'Failed to send WhatsApp message', details: error.message });
+        return res.status(500).json({ error: 'Failed to send WhatsApp message', details: error.message });
     }
 };
 

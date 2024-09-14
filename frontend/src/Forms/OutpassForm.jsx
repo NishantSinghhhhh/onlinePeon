@@ -131,31 +131,94 @@ const OutpassForm = () => {
 
   const handleOutpassMessage = async () => {
     try {
-        const messageUrl = 'http://localhost:8000/Message/send';
-        const messageResponse = await fetch(messageUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                contactNumber: formData.contactNumber
-            }),
-        });
-
-        if (!messageResponse.ok) {
-            const messageData = await messageResponse.json();
-            handleError(messageData.error || 'Failed to send message.');
-        } else {
-            const messageResult = await messageResponse.json();
-            handleSuccess(messageResult.message || 'Message sent successfully.');
-        }
+      const outpassUrl = 'http://localhost:8000/Message/send';
+      const teacherUrl = 'http://localhost:8000/Message/sendTeacher';
+      
+      // Extract all fields from formData
+      const {
+        firstName,
+        lastName,
+        registrationNumber,
+        rollNumber,
+        reason,
+        date,
+        startHour,
+        endHour,
+        contactNumber,
+        className,
+        // Assume you have this in formData
+      } = formData;
+  
+      // Construct the message body for the outpass
+      const outpassMessageBody = {
+        contactNumber: contactNumber,
+        studentName: `${firstName} ${lastName}`,  // Combining first and last name
+        registrationNumber: registrationNumber,
+        rollNumber: rollNumber,
+        reason: reason,
+        leaveDate: date.toISOString(), // Ensure correct date format
+        startHour: startHour,
+        endHour: endHour,
+        className: className,
+      };
+  
+      // Construct the message body for the teacher
+      const teacherMessageBody = {
+        contactNumber: contactNumber,
+        studentName: `${firstName} ${lastName}`,
+        reason: reason,
+        returnDate: '', // Assume you don't have a return date for the teacher message
+        startHour: startHour,
+        endHour: endHour,
+        className: className,
+      };
+  
+      // Send outpass message
+      const outpassResponse = await fetch(outpassUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(outpassMessageBody),
+      });
+  
+      if (!outpassResponse.ok) {
+        const outpassData = await outpassResponse.json();
+        handleError(outpassData.error || 'Failed to send outpass message.');
+        console.error('Error sending outpass message:', outpassData);
+        return; // Exit early if there's an error with the outpass message
+      } else {
+        const outpassResult = await outpassResponse.json();
+        handleSuccess(outpassResult.message || 'Outpass message sent successfully.');
+        console.log('Outpass message sent successfully:', outpassResult);
+      }
+  
+      // Send teacher message
+      const teacherResponse = await fetch(teacherUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(teacherMessageBody),
+      });
+  
+      if (!teacherResponse.ok) {
+        const teacherData = await teacherResponse.json();
+        handleError(teacherData.error || 'Failed to send teacher message.');
+        console.error('Error sending teacher message:', teacherData);
+      } else {
+        const teacherResult = await teacherResponse.json();
+        handleSuccess(teacherResult.message || 'Teacher message sent successfully.');
+        console.log('Teacher message sent successfully:', teacherResult);
+      }
+  
     } catch (err) {
-        handleError('Failed to send the message.');
+      handleError('Failed to send the message.');
+      console.error('Exception in sending message:', err);
     }
-};
-
-
-
+  };
+  
+  
   const handleError = (message) => {
     toast({
       title: 'Error',
