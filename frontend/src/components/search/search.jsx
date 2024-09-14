@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { Input, Box, Button, Text } from '@chakra-ui/react';
+import { Input, Box, Button } from '@chakra-ui/react';
 import axios from 'axios';
 import AdminNavbar from '../Admin/pages/AdminNavbar';
 import HODNavbar from '../MainHod/pages/navbar';
@@ -144,14 +144,21 @@ const Search = ({ selectedClass }) => {
       </Box>
 
       <div className={styles.main}>
-        {userData && (
-          <UserCard
-            userData={userData}
-            outpassesCount={outpasses.length}
-            leavesCount={leaves.length}
-            plsCount={pls.length}
-            activeLeaves={activeLeaves}
-          />
+      {userData && (
+  <UserCard
+    userData={userData}
+    outpassesCount={outpasses.length || 0}
+    leavesCount={leaves.length || 0}
+    plsCount={pls.length || 0}
+    activeLeaves={activeLeaves || false}
+  />
+)}
+
+
+        {outpasses.length === 0 && leaves.length === 0 && pls.length === 0 && userData && (
+          <Box mt="20px" textAlign="center">
+            <p>No record of outpasses, leaves, or PLs found.</p>
+          </Box>
         )}
 
         {outpasses.length > 0 && (

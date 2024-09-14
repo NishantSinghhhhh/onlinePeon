@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
-import { Card as ChakraCard, useToast, CardHeader, CardBody, CardFooter, Heading, FormControl, FormLabel, Input, Button, Stack, InputGroup, InputLeftAddon, Select } from '@chakra-ui/react';
+import {
+  Card as ChakraCard, useToast, CardHeader, CardBody, CardFooter, Heading,
+  FormControl, FormLabel, Input, Button, Stack, InputGroup, InputLeftAddon, Select
+} from '@chakra-ui/react';
 import Navbar from '../components/navbar/navbar';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -50,7 +53,10 @@ const OutpassForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const { firstName, lastName, registrationNumber, rollNumber, reason, date, startHour, endHour, contactNumber, className, extraDataArray } = formData;
+    const {
+      firstName, lastName, registrationNumber, rollNumber, reason, date,
+      startHour, endHour, contactNumber, className, extraDataArray
+    } = formData;
     const isoDate = date.toISOString();
 
     const emptyFields = [];
@@ -82,8 +88,9 @@ const OutpassForm = () => {
     }
 
     try {
-      const url = 'http://localhost:8000/auth/outpass';
-      const response = await fetch(url, {
+      // First request to submit the outpass form data
+      const outpassUrl = 'http://localhost:8000/auth/outpass';
+      const response = await fetch(outpassUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -110,6 +117,8 @@ const OutpassForm = () => {
 
       const result = await response.json();
       if (result.success) {
+        // If the form submission was successful, trigger the message sending
+        await handleOutpassMessage();
         handleSuccess(result.message);
         setTimeout(() => navigate('/Home'), 1000);
       } else {
@@ -119,6 +128,33 @@ const OutpassForm = () => {
       handleError('An unexpected error occurred.');
     }
   };
+
+  const handleOutpassMessage = async () => {
+    try {
+        const messageUrl = 'http://localhost:8000/Message/send';
+        const messageResponse = await fetch(messageUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                contactNumber: formData.contactNumber
+            }),
+        });
+
+        if (!messageResponse.ok) {
+            const messageData = await messageResponse.json();
+            handleError(messageData.error || 'Failed to send message.');
+        } else {
+            const messageResult = await messageResponse.json();
+            handleSuccess(messageResult.message || 'Message sent successfully.');
+        }
+    } catch (err) {
+        handleError('Failed to send the message.');
+    }
+};
+
+
 
   const handleError = (message) => {
     toast({
@@ -246,22 +282,18 @@ const OutpassForm = () => {
 
                 <FormControl isRequired>
                   <FormLabel>Contact Number</FormLabel>
-                  <InputGroup>
-                    <InputLeftAddon children='+91' />
-                    <Input 
-                      placeholder='Contact Number' 
-                      name='contactNumber'
-                      value={formData.contactNumber}
-                      onChange={handleChange}
-                      className={styles['chakra-input']}
-                    />
-                  </InputGroup>
+                  <Input 
+                    placeholder='Contact Number' 
+                    name='contactNumber'
+                    value={formData.contactNumber}
+                    onChange={handleChange}
+                    className={styles['chakra-input']}
+                  />
                 </FormControl>
 
                 <FormControl isRequired>
-                  <FormLabel>Class Name</FormLabel>
+                  <FormLabel>Class</FormLabel>
                   <Select
-                    placeholder='Select Class'
                     name='className'
                     value={formData.className}
                     onChange={handleChange}
@@ -272,19 +304,11 @@ const OutpassForm = () => {
                     ))}
                   </Select>
                 </FormControl>
+
+                <Button type='submit' colorScheme='teal' size='lg'>Submit</Button>
               </Stack>
-              <Button
-                mt={4}
-                colorScheme='blue'
-                type='submit'
-              >
-                Submit
-              </Button>
             </form>
           </CardBody>
-          <CardFooter>
-            <Button variant='ghost' onClick={() => navigate('/Home')}>Back</Button>
-          </CardFooter>
         </ChakraCard>
       </div>
     </>

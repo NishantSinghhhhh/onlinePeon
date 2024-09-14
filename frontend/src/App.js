@@ -37,10 +37,13 @@ import Search from './components/search/search';
 import Box from './components/Box/Box';
 
 import { LoginProvider } from './context/LoginContext';
+import { RollNumberProvider } from './context/RollNumberContext';
 
 function App() {
   return (
     <div className="App">
+<RollNumberProvider>
+
 <LoginProvider>
    <Router>
       <Routes>
@@ -79,6 +82,7 @@ function App() {
       </Routes>
     </Router>
 </LoginProvider>
+</RollNumberProvider>
     </div>
   );
 }

@@ -2,6 +2,10 @@ import React, { createContext, useContext, useState } from 'react';
 
 const RollNumberContext = createContext();
 
+export const useRollNumber = () => {
+  return useContext(RollNumberContext);
+};
+
 export const RollNumberProvider = ({ children }) => {
   const [rollNumber, setRollNumber] = useState('');
 
@@ -11,5 +15,3 @@ export const RollNumberProvider = ({ children }) => {
     </RollNumberContext.Provider>
   );
 };
-
-export const useRollNumber = () => useContext(RollNumberContext);

@@ -6,19 +6,28 @@ const {User} = require('../Models/User')
 const fetchUserByRegistration = async (req, res) => {
   try {
     const { registrationNumber } = req.params;
+    console.log('Received request for registration number:', registrationNumber);
+
+    if (!registrationNumber) {
+      console.error('No registration number provided');
+      return res.status(400).json({ error: 'Registration number is required' });
+    }
+
     const user = await User.findOne({ registrationNumber });
+    console.log('User search query completed');
 
     if (!user) {
+      console.warn('User not found for registration number:', registrationNumber);
       return res.status(404).json({ error: 'User not found' });
     }
 
+    console.log('User found:', user);
     res.json({ data: user });
   } catch (error) {
-    console.error('Error fetching user:', error);
+    console.error('Error fetching user:', error.message);
     res.status(500).json({ error: 'Server error' });
   }
 };
-
 
 const fetchOutpassByRegistration = async (req, res) => {
   try {
