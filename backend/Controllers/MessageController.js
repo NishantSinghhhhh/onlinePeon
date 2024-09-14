@@ -1,3 +1,6 @@
+require('dotenv').config();
+const twilio = require('twilio');
+
 const sendSMS = async (req, res) => {
     console.log('Received Body:', req.body);   
     
@@ -13,9 +16,7 @@ const sendSMS = async (req, res) => {
         className
     });
 
-    const accountSid = 'ACbe6f170fc617ce0a2d33f112e4cb7a58';
-    const authToken = '9d589fdd64071b961f57a5ffdf627f0d';
-    const client = require('twilio')(accountSid, authToken);
+    const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
     if (!contactNumber) {
         return res.status(400).json({ error: 'Contact number is required' });
@@ -24,8 +25,8 @@ const sendSMS = async (req, res) => {
     try {
         const message = await client.messages.create({
             body: `Dear Parent,\n\nWe would like to inform you that your child, ${studentName}, has applied for an outpass. Below are the details of the request:\n\n- Class: ${className}\n- Reason for Outpass: ${reason}\n- Leave Time: From ${startHour} to ${endHour}\n\nPlease discuss this request with your child if you were not aware of it. If you have any questions or concerns, feel free to contact us.\n\nThank you.`,
-            from: '+13304605528',
-            to: '+919649959730'
+            from: process.env.TWILIO_PHONE_NUMBER,
+            to: contactNumber
         });
 
         console.log('Message sent successfully with SID:', message.sid);
@@ -51,16 +52,13 @@ const sendWhatsAppMessage = async (req, res) => {
         className
     });
 
-    const accountSid = 'ACbe6f170fc617ce0a2d33f112e4cb7a58';  
-    const authToken = '9d589fdd64071b961f57a5ffdf627f0d';     
-    const client = require('twilio')(accountSid, authToken);
-
+    const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
     try {
         const message = await client.messages.create({
             body: `Dear Parent,\n\nWe would like to inform you that your child, ${studentName}, has applied for an outpass. Below are the details of the request:\n\n- Class: ${className}\n- Reason for Outpass: ${reason}\n- Leave Time: From ${startHour} to ${endHour}\n\nPlease discuss this request with your child if you were not aware of it. If you have any questions or concerns, feel free to contact us.\n\nThank you.`,
-            from: 'whatsapp:+14155238886',
-            to: 'whatsapp:+919649959730'
+            from: process.env.TWILIO_WHATSAPP_NUMBER,
+            to: `whatsapp:${contactNumber}`
         });
 
         console.log('WhatsApp message sent successfully with SID:', message.sid);
@@ -70,6 +68,7 @@ const sendWhatsAppMessage = async (req, res) => {
         return res.status(500).json({ error: 'Failed to send WhatsApp message', details: error.message });
     }
 };
+
 const sendLeaveMessageToParents = async (req, res) => {
     console.log('Received Body:', req.body);
 
@@ -99,9 +98,7 @@ const sendLeaveMessageToParents = async (req, res) => {
         className
     });
 
-    const accountSid = 'ACbe6f170fc617ce0a2d33f112e4cb7a58'; // Your Twilio Account SID
-    const authToken = '9d589fdd64071b961f57a5ffdf627f0d'; // Your Twilio Auth Token
-    const client = require('twilio')(accountSid, authToken);
+    const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
     if (!contactNumber) {
         return res.status(400).json({ error: 'Contact number is required' });
@@ -110,8 +107,8 @@ const sendLeaveMessageToParents = async (req, res) => {
     try {
         const message = await client.messages.create({
             body: `Dear Parent,\n\nWe would like to inform you that your child, ${studentName} (Registration Number: ${registrationNumber}, Roll Number: ${rollNumber}), has applied for a leave. Below are the details of the request:\n\n- Class: ${className}\n- Reason for Leave: ${reason}\n- Leave Time: From ${startHour} to ${endHour}\n- Place of Residence during the Leave: ${placeOfResidence}\n- Attendance Percentage: ${attendancePercentage}\n\nPlease discuss this request with your child if you were not aware of it. If you have any questions or concerns, feel free to contact us.\n\nThank you.`,
-            from: '+13304605528', // Your Twilio phone number
-            to: `+919649959730` // Use the contact number from the request body
+            from: process.env.TWILIO_PHONE_NUMBER,
+            to: contactNumber
         });
 
         console.log('Message sent successfully with SID:', message.sid);
@@ -121,6 +118,7 @@ const sendLeaveMessageToParents = async (req, res) => {
         return res.status(500).json({ error: 'Failed to send message', details: error.message });
     }
 };
+
 const sendLeaveMessageToTeachers = async (req, res) => {
     console.log('Received Body:', req.body);
 
@@ -146,11 +144,8 @@ const sendLeaveMessageToTeachers = async (req, res) => {
         className
     });
 
-    const accountSid = 'ACbe6f170fc617ce0a2d33f112e4cb7a58'; // Your Twilio Account SID
-    const authToken = '9d589fdd64071b961f57a5ffdf627f0d'; // Your Twilio Auth Token
-    const client = require('twilio')(accountSid, authToken);
+    const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
-    // Ensure contactNumber is provided
     if (!contactNumber) {
         return res.status(400).json({ error: 'Teacher contact number is required' });
     }
@@ -158,8 +153,8 @@ const sendLeaveMessageToTeachers = async (req, res) => {
     try {
         const message = await client.messages.create({
             body: `Dear Teacher,\n\nThis is to inform you that your student, ${studentName}, has applied for a leave. Below are the details of the request:\n\n- Class: ${className}\n- Reason for Leave: ${reasonForLeave}\n- Leave Time: From ${startDate} to ${endDate}\n- Place of Residence during the leave: ${placeOfResidence}\n- Attendance Percentage: ${attendancePercentage}\n\nPlease take note of this leave request.\n\nThank you.`,
-            from: 'whatsapp:+14155238886', // Your Twilio WhatsApp number
-            to: `whatsapp:+919649959730` // Use the contact number from the request body
+            from: process.env.TWILIO_WHATSAPP_NUMBER,
+            to: `whatsapp:${contactNumber}`
         });
 
         console.log('WhatsApp message sent successfully with SID:', message.sid);
