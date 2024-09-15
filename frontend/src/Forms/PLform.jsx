@@ -99,75 +99,81 @@ const PLForm = () => {
   };
   
   const sendPLMessageToParents = async (formData) => {
+    console.log("Sending PL message to parents with the following data:", formData); // Debugging log
+  
     try {
-        const response = await fetch('http://localhost:8000/Message/sendPLMessageToParents', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                contactNumber: formData.contactNumber,
-                studentName: `${formData.firstName} ${formData.lastName}`,
-                registrationNumber: formData.registrationNumber,
-                rollNumber: formData.rollNumber,
-                reason: formData.reason,
-                startDate: formData.startDate.toISOString(), // Convert to ISO string
-                endDate: formData.endDate.toISOString(), // Convert to ISO string
-                classesMissed: formData.classesMissed, // Include classesMissed field
-                className: formData.className
-            }),
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            console.error('Server response error:', errorData);
-            handleError(errorData.message || 'An error occurred while sending the message to parents');
-            return;
-        }
-
-        const result = await response.json();
-        handleSuccess(result.message);
-    } catch (err) {
-        console.error('Fetch error:', err);
-        handleError('An unexpected error occurred while sending the message to parents.');
-    }
-};
-
-const sendPLMessageToTeachers = async (formData) => {
-  try {
-      const response = await fetch('http://localhost:8000/Message/sendPLMessageToTeachers', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-              contactNumber: formData.contactNumber,
-              studentName: `${formData.firstName} ${formData.lastName}`,
-              registrationNumber: formData.registrationNumber,
-              rollNumber: formData.rollNumber,
-              reason: formData.reason,
-              startDate: formData.startDate.toISOString(), // Convert to ISO string
-              endDate: formData.endDate.toISOString(), // Convert to ISO string
-              classesMissed: formData.classesMissed, // Include classesMissed field
-              className: formData.className
-          }),
+      const response = await fetch('http://localhost:8000/message/sendPLMessageToParents', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contactNumber: formData.contactNumber,
+          studentName: `${formData.firstName} ${formData.lastName}`,
+          registrationNumber: formData.registrationNumber,
+          rollNumber: formData.rollNumber,
+          reason: formData.reason,
+          startDate: formData.startDate.toISOString(), // Convert to ISO string
+          endDate: formData.endDate.toISOString(), // Convert to ISO string
+          classesMissed: formData.classesMissed, // Include classesMissed field
+          className: formData.className
+        }),
       });
-
+  
       if (!response.ok) {
-          const errorData = await response.json();
-          console.error('Server response error:', errorData);
-          handleError(errorData.message || 'An error occurred while sending the message to teachers');
-          return;
+        const errorData = await response.json();
+        console.error('Error response from server:', errorData); // Detailed error logging
+        handleError(errorData.message || 'An error occurred while sending the message to parents');
+        return;
       }
-
+  
       const result = await response.json();
+      console.log("Response from server (parents):", result); // Log server response for debugging
       handleSuccess(result.message);
-  } catch (err) {
-      console.error('Fetch error:', err);
+    } catch (err) {
+      console.error('Fetch error:', err); // Detailed fetch error log
+      handleError('An unexpected error occurred while sending the message to parents.');
+    }
+  };
+  
+  const sendPLMessageToTeachers = async (formData) => {
+    console.log("Sending PL message to teachers with the following data:", formData); // Debugging log
+  
+    try {
+      const response = await fetch('http://localhost:8000/message/sendPLMessageToTeachers', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contactNumber: formData.contactNumber,
+          studentName: `${formData.firstName} ${formData.lastName}`,
+          registrationNumber: formData.registrationNumber,
+          rollNumber: formData.rollNumber,
+          reason: formData.reason,
+          startDate: formData.startDate.toISOString(), // Convert to ISO string
+          endDate: formData.endDate.toISOString(), // Convert to ISO string
+          classesMissed: formData.classesMissed, // Include classesMissed field
+          className: formData.className
+        }),
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Error response from server:', errorData); // Detailed error logging
+        handleError(errorData.message || 'An error occurred while sending the message to teachers');
+        return;
+      }
+  
+      const result = await response.json();
+      console.log("Response from server (teachers):", result); // Log server response for debugging
+      handleSuccess(result.message);
+    } catch (err) {
+      console.error('Fetch error:', err); // Detailed fetch error log
       handleError('An unexpected error occurred while sending the message to teachers.');
-  }
-};
-
+    }
+  };
+  
   
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
