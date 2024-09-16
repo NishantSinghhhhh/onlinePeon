@@ -37,8 +37,8 @@ app.use('/message', messageRoutes); // Ensure this is correct
 app.use('/check', check); // Ensure this is correct
 
 // Test route
-app.get('/ping', (req, res) => {
-    res.send("PONG");
+app.get('/', (req, res) => {
+    res.json("PONG");
 });
 
 // Error handling middleware
