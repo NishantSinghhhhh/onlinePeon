@@ -19,7 +19,7 @@ const app = express();
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 app.use(cors({
-    origin: ["https://online-peon-frontend.vercel.app/"],
+    origin: ["https://online-peon-frontend.vercel.app"],
     methods : ["POST", "GET", "PUT", "DELETE"],
     credentials : true
 }));
