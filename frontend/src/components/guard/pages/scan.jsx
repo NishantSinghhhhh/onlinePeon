@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
-import Navbar from './navbar';
-import { Box, Flex, Text, useToast, Button } from '@chakra-ui/react';
+import { Box, Flex, Text, useToast } from '@chakra-ui/react';
 import { Html5Qrcode } from 'html5-qrcode';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
-const Scan = () => {
+const Scan = ({ setSuccessLeaves, setFailureLeaves, setSuccessOutpasses, setFailureOutpasses }) => {
   const toast = useToast();
   const readerRef = useRef(null);
   const [objectId, setObjectId] = useState(null);
@@ -12,6 +12,7 @@ const Scan = () => {
   const [scannedOnce, setScannedOnce] = useState(false);
   const [animation, setAnimation] = useState(null); // New state for animation
   const html5QrCodeRef = useRef(null);
+  const navigate = useNavigate(); // Initialize navigate
 
   useEffect(() => {
     html5QrCodeRef.current = new Html5Qrcode("reader");
@@ -20,7 +21,7 @@ const Scan = () => {
 
     const config = {
       fps: 10,
-      qrbox: { width: 250, height: 250 },
+      qrbox: { width: 600, height: 600 }, // Increased QR code scanning area size
     };
 
     const onScanSuccess = (decodedText, decodedResult) => {
@@ -105,9 +106,14 @@ const Scan = () => {
       const response = await axios.post('http://localhost:8000/check/checkOutpass', { objectId: id });
       if (response.data.success) {
         setAnimation('success'); // Trigger success animation
-        setTimeout(() => setAnimation(null), 2000); // Hide animation after 2 seconds
+        setSuccessOutpasses(prev => prev + 1); // Increment success outpass count
+        setTimeout(() => {
+          setAnimation(null);
+          navigate('/guard'); // Redirect to /guard
+        }, 2000); // Hide animation after 2 seconds
       } else {
         setAnimation('failure'); // Trigger failure animation
+        setFailureOutpasses(prev => prev + 1); // Increment failure outpass count
         setTimeout(() => setAnimation(null), 2000); // Hide animation after 2 seconds
         toast({
           title: 'Failure',
@@ -120,6 +126,7 @@ const Scan = () => {
     } catch (err) {
       console.error('Error sending object ID to backend:', err);
       setAnimation('failure'); // Trigger failure animation
+      setFailureOutpasses(prev => prev + 1); // Increment failure outpass count
       setTimeout(() => setAnimation(null), 2000); // Hide animation after 2 seconds
       toast({
         title: 'Server Error',
@@ -133,11 +140,8 @@ const Scan = () => {
 
   return (
     <div>
-      <Navbar />
+      {/* Render your scanner here */}
       <Box display="flex" flexDirection="column" alignItems="center" mt="50px">
-        {objectId === null && !error && (
-          <Text fontSize="lg" mb="20px" color="gray.500">Please scan a QR code</Text>
-        )}
         <Text fontSize="2xl" mb="20px">QR Code Scanner</Text>
         <Flex
           border="2px solid #333"
@@ -145,18 +149,12 @@ const Scan = () => {
           p="20px"
           boxShadow="0 4px 10px rgba(0, 0, 0, 0.1)"
           bg="#f9f9f9"
-          width="300px"
-          height="300px"
+          width="600px" // Increased width
+          height="600px" // Increased height
           position="relative"
         >
           <div id="reader" style={{ width: '100%', height: '100%' }} ref={readerRef}></div>
         </Flex>
-        {objectId && (
-          <Text fontSize="lg" mt="20px" color="green.500">Object ID: {objectId}</Text>
-        )}
-        {error && (
-          <Text fontSize="lg" mt="20px" color="red.500">Error: {error}</Text>
-        )}
       </Box>
 
       {/* Full-screen overlay for animations */}

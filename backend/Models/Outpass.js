@@ -14,12 +14,12 @@ const OutpassSchema = new Schema({
     registrationNumber: {
         type: String,
         required: true,
-        match: /^\d{5,6}$/ // 5 or 6 digits
+        match: /^\d{5,6}$/ 
     },
     rollNumber: {
         type: String,
         required: true,
-        match: /^\d{4}$/ // Exactly 4 digits
+        match: /^\d{4}$/
     },
     reason: {
         type: String,
@@ -32,17 +32,17 @@ const OutpassSchema = new Schema({
     startHour: {
         type: String,
         required: true,
-        match: /^([01]\d|2[0-3]):([0-5]\d)$/ // Valid time format (HH:mm)
+        match: /^([01]\d|2[0-3]):([0-5]\d)$/ 
     },
     endHour: {
         type: String,
         required: true,
-        match: /^([01]\d|2[0-3]):([0-5]\d)$/ // Valid time format (HH:mm)
+        match: /^([01]\d|2[0-3]):([0-5]\d)$/
     },
     contactNumber: {
         type: String,
         required: true,
-        match: /^\d{10}$/ // Exactly 10 digits
+        match: /^\d{10}$/
     },
     className: {
         type: String,
@@ -53,7 +53,7 @@ const OutpassSchema = new Schema({
             'SE-IT-A', 'SE-IT-B', 'SE-MECH', 'TE-COMP-A', 'TE-COMP-B', 'TE-ENTC-A',
             'TE-ENTC-B', 'TE-IT-A', 'TE-IT-B', 'TE-MECH', 'BE-COMP-A', 'BE-COMP-B',
             'BE-ENTC-A', 'BE-ENTC-B', 'BE-IT-A', 'BE-IT-B', 'BE-MECH'
-        ] // Validate against predefined class names
+        ] 
     },
     extraDataArray: {
         type: [Number],

@@ -37,7 +37,7 @@ const Navbar = () => {
             <BreadcrumbItem>
               <BreadcrumbLink
                 as={Link}
-                to='/Scan'
+                // to='/Scan'
                 className={styles['breadcrumb-link']}
                 bg={location.pathname === '/Scan' ? 'gray.600' : 'transparent'}
                 color={location.pathname === '/Scan' ? 'white' : 'gray.300'}
