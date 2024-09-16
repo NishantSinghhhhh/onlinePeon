@@ -13,9 +13,9 @@ const SeenLeaveCard = ({ data, role }) => {
     extraDataArray
   } = data;
 
-  // Check approval or decline based on role
+
   const isApproved = role === 'Warden'
-    ? extraDataArray[2] === 1 // Warden approval check
+    ? extraDataArray[2] === 1
     : extraDataArray[1] === 1; // HOD approval check
 
   const isDeclined = role === 'Warden'
