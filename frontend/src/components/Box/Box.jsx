@@ -10,15 +10,14 @@ import styles from './Box.module.css'; // Import the CSS module
 const BoxComponent = () => {
   const { loginInfo } = useContext(LoginContext);
   const [selectedClass, setSelectedClass] = useState('FE-COMP-A');
-  const [studentMap, setStudentMap] = useState(new Map());  // Store fetched students in a Map
-  const [leavesMap, setLeavesMap] = useState(new Map());  // Store fetched leaves in a Map
-  const [outpassesMap, setOutpassesMap] = useState(new Map());  // Store fetched outpasses in a Map
-  const [loading, setLoading] = useState(false); // Loading state
-  const [error, setError] = useState(null);      // Error state
-  const [modalContent, setModalContent] = useState(null);  // State to manage modal content
-  const [showModal, setShowModal] = useState(false); // State to manage modal visibility
+  const [studentMap, setStudentMap] = useState(new Map());  
+  const [leavesMap, setLeavesMap] = useState(new Map()); 
+  const [outpassesMap, setOutpassesMap] = useState(new Map()); 
+  const [loading, setLoading] = useState(false); 
+  const [error, setError] = useState(null);     
+  const [modalContent, setModalContent] = useState(null);  
+  const [showModal, setShowModal] = useState(false); 
 
-  // List of class options
   const classOptions = [
     'FE-COMP-A', 'FE-COMP-B', 'FE-ENTC-A', 'FE-ENTC-B', 'FE-IT-A', 'FE-IT-B',
     'FE-MECH', 'FE-ARE', 'SE-COMP-A', 'SE-COMP-B', 'SE-ENTC-A', 'SE-ENTC-B',
@@ -27,7 +26,6 @@ const BoxComponent = () => {
     'BE-ENTC-A', 'BE-ENTC-B', 'BE-IT-A', 'BE-IT-B', 'BE-MECH'
   ];
 
-  // Function to render navbar based on the login position
   const renderNavbar = () => {
     switch (loginInfo.position) {
       case 'HOD':
@@ -44,7 +42,6 @@ const BoxComponent = () => {
     }
   };
 
-  // Function to check if a leave is active
   const isActiveLeave = (leave) => {
     const now = new Date();
     const startDate = new Date(leave.startDate);
@@ -53,23 +50,22 @@ const BoxComponent = () => {
     return now >= startDate && now <= endDate;
   };
 
-  // Function to check if an outpass is active
   const isActiveOutpass = (outpass) => {
     const now = new Date();
     const outpassDate = new Date(outpass.dateIssued);
 
-    // Assuming outpasses are active for the current day
-    return now.toDateString() === outpassDate.toDateString();
+    // Ensure both dates are compared only based on the day, ignoring time.
+    const isActive = now.toDateString() === outpassDate.toDateString();
+    console.log(`Outpass Date: ${outpassDate}, Is Active: ${isActive}`);
+    return isActive;
   };
 
-  // Fetch students, leaves, and outpasses when selected class changes
   useEffect(() => {
     const fetchStudents = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        // Make an API request to fetch students
         const response = await axios.get(`https://online-peon.vercel.app/fetchUser/users/${selectedClass}`);
         const studentMap = new Map();
 
@@ -77,7 +73,6 @@ const BoxComponent = () => {
           studentMap.set(student.rollNumber, { ...student, leaves: 0, outpasses: 0 });
         });
 
-        // Update the state with the fetched students
         setStudentMap(studentMap);
       } catch (err) {
         setError('Failed to fetch students');
@@ -132,7 +127,6 @@ const BoxComponent = () => {
     fetchOutpasses();
   }, [selectedClass]);
 
-  // Handle class change
   const handleSelectChange = (e) => {
     setSelectedClass(e.target.value);
     console.log(`Selected class: ${e.target.value}`);
@@ -197,7 +191,7 @@ const BoxComponent = () => {
                   key={student.rollNumber}
                   className={`${styles.studentBox} 
                   ${hasActiveLeave ? styles.activeLeave : ''} 
-                  ${hasActiveOutpass ? styles.activeOutpass : ''}`}
+                  ${hasActiveOutpass ? styles.activeOutpass : ''}`}  // Correctly apply activeOutpass class
                   onClick={() => handleBoxClick(student)}
                 >
                   <p>{student.rollNumber}</p>
