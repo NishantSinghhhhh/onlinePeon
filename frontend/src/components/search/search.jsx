@@ -43,18 +43,22 @@ const Search = ({ selectedClass }) => {
 
   const handleSearch = async () => {
     try {
-      const userResponse = await axios.get(`https://online-peon.vercel.app/fetch/fetchUser/${registrationNumber}`);
+      const userResponse = await axios.get(`https://online-peon.vercel.app/fetch/teachers/fetchUser/${registrationNumber}`);
+      console.log('User data:', userResponse.data.data);
       setUserData(userResponse.data.data);
-
-      const outpassesResponse = await axios.get(`https://online-peon.vercel.app/fetch/fetchOutpasses/registration/${registrationNumber}`);
+  
+      const outpassesResponse = await axios.get(`https://online-peon.vercel.app/fetch/teachers/fetchOutpasses/registration/${registrationNumber}`);
+      console.log('Outpasses:', outpassesResponse.data.data);
       setOutpasses(outpassesResponse.data.data);
-
-      const leavesResponse = await axios.get(`https://online-peon.vercel.app/fetch/fetchLeaves/registration/${registrationNumber}`);
+  
+      const leavesResponse = await axios.get(`https://online-peon.vercel.app/fetch/teachers/fetchLeaves/registration/${registrationNumber}`);
+      console.log('Leaves:', leavesResponse.data.data);
       setLeaves(leavesResponse.data.data);
-
-      const plsResponse = await axios.get(`https://online-peon.vercel.app/fetch/fetchPLs/registration/${registrationNumber}`);
+  
+      const plsResponse = await axios.get(`https://online-peon.vercel.app/fetch/teachers/fetchPLs/registration/${registrationNumber}`);
+      console.log('PLs:', plsResponse.data.data);
       setPls(plsResponse.data.data);
-
+  
       setError('');
     } catch (err) {
       console.error('Error fetching data:', err);
@@ -65,6 +69,7 @@ const Search = ({ selectedClass }) => {
       setPls([]);
     }
   };
+  
 
   const isLeaveActive = (startDate, endDate) => {
     const currentDate = new Date();
