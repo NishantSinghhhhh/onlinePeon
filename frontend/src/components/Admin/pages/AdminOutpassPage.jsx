@@ -67,7 +67,7 @@ const AdminOutpassPage = () => {
       console.log('Position:', position);
       console.log('New extraDataArray:', newExtraDataArray);
   
-      const response = await axios.put(`http://localhost:8000/update/updateOutpass/${outpassId}`, {
+      const response = await axios.put(`https://online-peon.vercel.app/update/updateOutpass/${outpassId}`, {
         status,
         position,
         extraDataArray: newExtraDataArray

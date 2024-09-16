@@ -43,16 +43,16 @@ const Search = ({ selectedClass }) => {
 
   const handleSearch = async () => {
     try {
-      const userResponse = await axios.get(`http://localhost:8000/fetch/fetchUser/${registrationNumber}`);
+      const userResponse = await axios.get(`https://online-peon.vercel.app/fetch/fetchUser/${registrationNumber}`);
       setUserData(userResponse.data.data);
 
-      const outpassesResponse = await axios.get(`http://localhost:8000/fetch/fetchOutpasses/registration/${registrationNumber}`);
+      const outpassesResponse = await axios.get(`https://online-peon.vercel.app/fetch/fetchOutpasses/registration/${registrationNumber}`);
       setOutpasses(outpassesResponse.data.data);
 
-      const leavesResponse = await axios.get(`http://localhost:8000/fetch/fetchLeaves/registration/${registrationNumber}`);
+      const leavesResponse = await axios.get(`https://online-peon.vercel.app/fetch/fetchLeaves/registration/${registrationNumber}`);
       setLeaves(leavesResponse.data.data);
 
-      const plsResponse = await axios.get(`http://localhost:8000/fetch/fetchPLs/registration/${registrationNumber}`);
+      const plsResponse = await axios.get(`https://online-peon.vercel.app/fetch/fetchPLs/registration/${registrationNumber}`);
       setPls(plsResponse.data.data);
 
       setError('');
@@ -89,10 +89,10 @@ const Search = ({ selectedClass }) => {
       console.log(`Sending update request for ${type} ${id} with status ${status} and position ${position}`);
 
       const endpoint = type === 'outpass' 
-        ? `http://localhost:8000/update/updateOutpass/${id}`
+        ? `https://online-peon.vercel.app/update/updateOutpass/${id}`
         : type === 'leave'
-        ? `http://localhost:8000/update/updateLeave/${id}`
-        : `http://localhost:8000/update/updatePL/${id}`;
+        ? `https://online-peon.vercel.app/update/updateLeave/${id}`
+        : `https://online-peon.vercel.app/update/updatePL/${id}`;
 
       const response = await axios.put(endpoint, {
         status,

@@ -67,7 +67,7 @@ const PLForm = () => {
     };
 
     try {
-      const url = 'http://localhost:8000/auth/PL'; // Ensure this URL is correct
+      const url = 'https://online-peon.vercel.app/auth/PL'; // Ensure this URL is correct
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -102,7 +102,7 @@ const PLForm = () => {
     console.log("Sending PL message to parents with the following data:", formData); // Debugging log
   
     try {
-      const response = await fetch('http://localhost:8000/message/sendPLMessageToParents', {
+      const response = await fetch('https://online-peon.vercel.app/message/sendPLMessageToParents', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -140,7 +140,7 @@ const PLForm = () => {
     console.log("Sending PL message to teachers with the following data:", formData); // Debugging log
   
     try {
-      const response = await fetch('http://localhost:8000/message/sendPLMessageToTeachers', {
+      const response = await fetch('https://online-peon.vercel.app/message/sendPLMessageToTeachers', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

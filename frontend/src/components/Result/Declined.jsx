@@ -25,7 +25,7 @@ const Declined = () => {
       const { registrationNumber } = loginInfo;
 
       try {
-        const response = await fetch(`http://localhost:8000/fetch/fetchdeclined/${registrationNumber}`);
+        const response = await fetch(`https://online-peon.vercel.app/fetch/fetchdeclined/${registrationNumber}`);
         const data = await response.json();
 
         if (response.ok) {

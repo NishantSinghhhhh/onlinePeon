@@ -49,7 +49,7 @@ const Register = () => {
     // Fetch class teachers when the component mounts
     const fetchClassTeachers = async () => {
       try {
-        const response = await fetch('http://localhost:8000/fetch/fetchTeachers');
+        const response = await fetch('https://online-peon.vercel.app/fetch/fetchTeachers');
         if (!response.ok) {
           throw new Error('Failed to fetch class teachers');
         }
@@ -120,7 +120,7 @@ const Register = () => {
     });
 
     try {
-      const url = `http://localhost:8000/auth/signUp`;
+      const url = `https://online-peon.vercel.app/auth/signUp`;
       const response = await fetch(url, {
         method: "POST",
         headers: {

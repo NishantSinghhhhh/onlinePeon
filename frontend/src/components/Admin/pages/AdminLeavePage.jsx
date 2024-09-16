@@ -14,7 +14,7 @@ const AdminLeavePage = () => {
 
   const fetchLeaves = async () => {
     try {
-      const response = await fetch('http://localhost:8000/fetchAll/fetchAllLeaves');
+      const response = await fetch('https://online-peon.vercel.app/fetchAll/fetchAllLeaves');
       if (!response.ok) throw new Error('Failed to fetch leaves');
       const result = await response.json();
 
@@ -62,7 +62,7 @@ const AdminLeavePage = () => {
       const position = 2;  // Assuming 2 is for Warden
       const newExtraDataArray = [1, 1, status === 'approved' ? 1 : -1, 0];
 
-      const response = await axios.put(`http://localhost:8000/update/updateLeave/${leaveId}`, {
+      const response = await axios.put(`https://online-peon.vercel.app/update/updateLeave/${leaveId}`, {
         status,
         position,
         extraDataArray: newExtraDataArray

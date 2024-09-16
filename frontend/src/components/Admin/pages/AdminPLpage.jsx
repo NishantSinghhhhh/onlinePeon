@@ -52,7 +52,7 @@ const AdminPLpage = () => {
       const position = 3;  // Assuming 3 is for Admin
       const newExtraDataArray = [1, 1, status === 'approved' ? 1 : -1, 0];
 
-      const response = await axios.put(`http://localhost:8000/update/updatePL/${plId}`, {
+      const response = await axios.put(`https://online-peon.vercel.app/update/updatePL/${plId}`, {
         status,
         position,
         extraDataArray: newExtraDataArray

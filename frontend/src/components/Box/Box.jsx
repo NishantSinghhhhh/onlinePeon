@@ -61,7 +61,7 @@ const BoxComponent = () => {
         setError(null);
 
         // Make an API request to fetch students
-        const response = await axios.get(`http://localhost:8000/fetchUser/users/${selectedClass}`);
+        const response = await axios.get(`https://online-peon.vercel.app/fetchUser/users/${selectedClass}`);
         const studentMap = new Map();
 
         response.data.data.forEach(student => {
@@ -80,7 +80,7 @@ const BoxComponent = () => {
 
     const fetchLeaves = async () => {
       try {
-        const response = await fetch('http://localhost:8000/fetchAll/fetchAllLeaves');
+        const response = await fetch('https://online-peon.vercel.app/fetchAll/fetchAllLeaves');
         if (!response.ok) throw new Error('Failed to fetch leaves');
         const result = await response.json();
         
@@ -100,7 +100,7 @@ const BoxComponent = () => {
 
     const fetchOutpasses = async () => {
       try {
-        const response = await fetch('http://localhost:8000/fetchAll/fetchAllOutpasses');
+        const response = await fetch('https://online-peon.vercel.app/fetchAll/fetchAllOutpasses');
         if (!response.ok) throw new Error('Failed to fetch outpasses');
         const result = await response.json();
         

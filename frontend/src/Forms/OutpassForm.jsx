@@ -89,7 +89,7 @@ const OutpassForm = () => {
 
     try {
       // First request to submit the outpass form data
-      const outpassUrl = 'http://localhost:8000/auth/outpass';
+      const outpassUrl = 'https://online-peon.vercel.app/auth/outpass';
       const response = await fetch(outpassUrl, {
         method: 'POST',
         headers: {
@@ -131,8 +131,8 @@ const OutpassForm = () => {
 
   const handleOutpassMessage = async () => {
     try {
-      const outpassUrl = 'http://localhost:8000/Message/send';
-      const teacherUrl = 'http://localhost:8000/Message/sendTeacher';
+      const outpassUrl = 'https://online-peon.vercel.app/Message/send';
+      const teacherUrl = 'https://online-peon.vercel.app/Message/sendTeacher';
       
       // Extract all fields from formData
       const {

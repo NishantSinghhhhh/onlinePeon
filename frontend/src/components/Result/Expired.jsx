@@ -22,7 +22,7 @@ const Expired = () => {
       const { registrationNumber } = loginInfo;
 
       try {
-        const expiredResponse = await fetch(`http://localhost:8000/fetch/fetchexpired/${registrationNumber}`);
+        const expiredResponse = await fetch(`https://online-peon.vercel.app/fetch/fetchexpired/${registrationNumber}`);
         const expiredData = await expiredResponse.json();
 
         console.log('Expired data:', expiredData); // Log the data to verify structure

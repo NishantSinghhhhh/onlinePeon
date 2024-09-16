@@ -39,7 +39,7 @@ const StaffDone = () => {
 
   const fetchOutpass = async (classAssigned) => {
     try {
-      const response = await fetch(`http://localhost:8000/fetch/fetchOutpasses/${classAssigned}`);
+      const response = await fetch(`https://online-peon.vercel.app/fetch/fetchOutpasses/${classAssigned}`);
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(errorText);
@@ -53,7 +53,7 @@ const StaffDone = () => {
 
   const fetchLeaves = async (classAssigned) => {
     try {
-      const response = await fetch(`http://localhost:8000/fetch/fetchLeaves/${classAssigned}`);
+      const response = await fetch(`https://online-peon.vercel.app/fetch/fetchLeaves/${classAssigned}`);
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(errorText);
@@ -67,7 +67,7 @@ const StaffDone = () => {
 
   const fetchPLs = async (classAssigned) => {
     try {
-      const response = await fetch(`http://localhost:8000/fetch/fetchPLs/${classAssigned}`);
+      const response = await fetch(`https://online-peon.vercel.app/fetch/fetchPLs/${classAssigned}`);
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(errorText);
@@ -92,7 +92,7 @@ const StaffDone = () => {
       const { staffId } = loginInfo;
 
       try {
-        const teacherResponse = await fetch(`http://localhost:8000/fetch/fetchTeacher/${staffId}`);
+        const teacherResponse = await fetch(`https://online-peon.vercel.app/fetch/fetchTeacher/${staffId}`);
         if (!teacherResponse.ok) {
           const teacherError = await teacherResponse.json();
           throw new Error(teacherError.message || 'Failed to fetch teacher information');

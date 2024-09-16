@@ -14,7 +14,7 @@ const StaffLeave = () => {
   // Function to fetch leave data
   const fetchLeaveData = async (classAssigned) => {
     try {
-      const leaveResponse = await fetch(`http://localhost:8000/fetch/fetchLeaves/${classAssigned}`);
+      const leaveResponse = await fetch(`https://online-peon.vercel.app/fetch/fetchLeaves/${classAssigned}`);
       if (!leaveResponse.ok) {
         throw new Error('Failed to fetch leaves');
       }
@@ -38,7 +38,7 @@ const StaffLeave = () => {
       const { staffId } = loginInfo;
 
       try {
-        const teacherResponse = await fetch(`http://localhost:8000/fetch/fetchTeacher/${staffId}`);
+        const teacherResponse = await fetch(`https://online-peon.vercel.app/fetch/fetchTeacher/${staffId}`);
         const teacherData = await teacherResponse.json();
 
         if (!teacherResponse.ok) {
@@ -75,7 +75,7 @@ const StaffLeave = () => {
 
       const position = 0;
 
-      const response = await axios.put(`http://localhost:8000/update/updateLeave/${leaveId}`, {
+      const response = await axios.put(`https://online-peon.vercel.app/update/updateLeave/${leaveId}`, {
         status,
         position,
       });

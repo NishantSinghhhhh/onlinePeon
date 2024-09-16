@@ -50,7 +50,7 @@ const SignInCard = () => {
     }
 
     try {
-      const url = `http://localhost:8000/auth/login`;
+      const url = `https://online-peon.vercel.app/auth/login`;
       const response = await fetch(url, {
         method: "POST",
         headers: { 'Content-Type': 'application/json' },
@@ -103,7 +103,7 @@ const SignInCard = () => {
     }
   
     try {
-      const url = `http://localhost:8000/auth/loginStaff`;
+      const url = `https://online-peon.vercel.app/auth/loginStaff`;
       const response = await fetch(url, {
         method: "POST",
         headers: { 'Content-Type': 'application/json' },

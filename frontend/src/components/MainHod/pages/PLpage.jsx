@@ -18,7 +18,7 @@ const PLPage = () => {
   // Fetch PL requests from the API
   const fetchPLs = async () => {
     try {
-      const response = await fetch('http://localhost:8000/fetchAll/fetchAllPLs');
+      const response = await fetch('https://online-peon.vercel.app/fetchAll/fetchAllPLs');
       if (!response.ok) throw new Error('Failed to fetch PL requests');
       const result = await response.json();
 
@@ -82,7 +82,7 @@ const PLPage = () => {
 
       const position = 0; // Static value for HOD
 
-      const response = await axios.put(`http://localhost:8000/update/updatePL/${plId}`, {
+      const response = await axios.put(`https://online-peon.vercel.app/update/updatePL/${plId}`, {
         status,
         position,
       });
