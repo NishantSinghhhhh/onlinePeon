@@ -52,14 +52,22 @@ const BoxComponent = () => {
 
   const isActiveOutpass = (outpass) => {
     const now = new Date();
-    const outpassDate = new Date(outpass.dateIssued);
-
-    // Ensure both dates are compared only based on the day, ignoring time.
-    const isActive = now.toDateString() === outpassDate.toDateString();
-    console.log(`Outpass Date: ${outpassDate}, Is Active: ${isActive}`);
+  
+    // Extract the start and end hours from the outpass
+    const [startHour, startMinute] = outpass.startHour.split(':').map(Number);
+    const [endHour, endMinute] = outpass.endHour.split(':').map(Number);
+  
+    // Create Date objects for today with the start and end times
+    const startTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), startHour, startMinute);
+    const endTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), endHour, endMinute);
+  
+    // Check if the current time falls within the start and end times
+    const isActive = now >= startTime && now <= endTime;
+    
+    console.log(`Outpass Start Time: ${startTime}, End Time: ${endTime}, Is Active: ${isActive}`);
     return isActive;
   };
-
+  
   useEffect(() => {
     const fetchStudents = async () => {
       try {
