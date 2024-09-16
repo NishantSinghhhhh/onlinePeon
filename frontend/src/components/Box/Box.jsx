@@ -53,6 +53,15 @@ const BoxComponent = () => {
     return now >= startDate && now <= endDate;
   };
 
+  // Function to check if an outpass is active
+  const isActiveOutpass = (outpass) => {
+    const now = new Date();
+    const outpassDate = new Date(outpass.dateIssued);
+
+    // Assuming outpasses are active for the current day
+    return now.toDateString() === outpassDate.toDateString();
+  };
+
   // Fetch students, leaves, and outpasses when selected class changes
   useEffect(() => {
     const fetchStudents = async () => {
@@ -179,12 +188,16 @@ const BoxComponent = () => {
           {sortedStudents.length > 0 ? (
             sortedStudents.map((student) => {
               const studentLeaves = leavesMap.get(student.rollNumber) || [];
+              const studentOutpasses = outpassesMap.get(student.rollNumber) || [];
               const hasActiveLeave = studentLeaves.some(isActiveLeave);
+              const hasActiveOutpass = studentOutpasses.some(isActiveOutpass);
 
               return (
                 <div
                   key={student.rollNumber}
-                  className={`${styles.studentBox} ${hasActiveLeave ? styles.activeLeave : ''}`}
+                  className={`${styles.studentBox} 
+                  ${hasActiveLeave ? styles.activeLeave : ''} 
+                  ${hasActiveOutpass ? styles.activeOutpass : ''}`}
                   onClick={() => handleBoxClick(student)}
                 >
                   <p>{student.rollNumber}</p>

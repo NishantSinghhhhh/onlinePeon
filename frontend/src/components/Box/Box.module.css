@@ -52,7 +52,7 @@
 .boxes {
   display: flex;
   flex-wrap: wrap;
-  gap: 5px;
+  gap: 10px;
   padding: 10px;
   margin: auto;
   margin-top: 20px;
@@ -69,11 +69,12 @@
   border-radius: 8px;
   background-color: #f9f9f9;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .studentBox:hover {
   background-color: #e0e0e0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .studentBox p {
@@ -102,10 +103,12 @@
   width: 80%;
   max-width: 600px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 0.3s ease-in-out;
 }
 
 .modalContent h2 {
   margin-top: 0;
+  font-size: 24px;
 }
 
 .modalContent ul {
@@ -135,4 +138,43 @@
 .activeLeave {
   border: 2px solid #ff5722;
   background-color: #ffebee;
+  animation: shake 0.2s ease-in-out;
+}
+
+/* Active outpass styles */
+.activeOutpass {
+  border: 2px solid #4caf50;
+  background-color: #e8f5e9;
+}
+
+/* Animations */
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-5px); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Responsive styling */
+@media screen and (max-width: 600px) {
+  .studentBox {
+    width: 100%;
+    height: auto;
+    padding: 20px;
+  }
+
+  .dropdown {
+    width: 100%;
+  }
+
+  .modalContent {
+    width: 90%;
+    max-width: 400px;
+  }
 }
