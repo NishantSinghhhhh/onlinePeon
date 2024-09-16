@@ -104,13 +104,14 @@ const Scan = ({ setSuccessLeaves, setFailureLeaves, setSuccessOutpasses, setFail
   const sendObjectIdToBackend = async (id) => {
     try {
       const response = await axios.post('http://localhost:8000/check/checkOutpass', { objectId: id });
+      
       if (response.data.success) {
-        setAnimation('success'); // Trigger success animation
+        // Trigger success animation
+        setAnimation('success'); 
         setSuccessOutpasses(prev => prev + 1); // Increment success outpass count
-        setTimeout(() => {
-          setAnimation(null);
-          navigate('/guard'); // Redirect to /guard
-        }, 2000); // Hide animation after 2 seconds
+        
+        // Call function to update validation array
+        await updateValidationArray(id);
       } else {
         setAnimation('failure'); // Trigger failure animation
         setFailureOutpasses(prev => prev + 1); // Increment failure outpass count
@@ -137,6 +138,57 @@ const Scan = ({ setSuccessLeaves, setFailureLeaves, setSuccessOutpasses, setFail
       });
     }
   };
+  const updateValidationArray = async (id) => {
+    try {
+        // Debugging: Log the incoming request ID
+        console.log(`Attempting to update validation array for object ID: ${id}`);
+
+        // Make the PUT request to update the validation array
+        const response = await axios.put(`http://localhost:8000/update/updateOutpass/guard/${id}`);
+
+        // Debugging: Log the response from the server
+        console.log('Response from updateValidationArray request:', response);
+
+        if (response.status === 200 && response.data.success) {
+            // Debugging: Log success status
+            console.log('Validation array updated successfully.');
+
+            // Trigger success animation and handle navigation
+            setAnimation('success');
+            setTimeout(() => {
+                setAnimation(null);
+                navigate('/guard'); // Redirect to /guard
+            }, 2000); // Hide animation after 2 seconds
+        } else {
+            // Debugging: Log the failure message from the server
+            console.log('Failed to update validation array:', response.data.message);
+
+            toast({
+                title: 'Update Error',
+                description: response.data.message || 'Failed to update validation array.',
+                status: 'error',
+                duration: 5000,
+                isClosable: true,
+            });
+        }
+    } catch (err) {
+        // Enhanced error logging
+        console.error('Error updating validation array:', {
+            message: err.message,
+            stack: err.stack,
+            requestId: id, // Log the ID associated with the request
+            timestamp: new Date().toISOString() // Log the timestamp of the error
+        });
+
+        toast({
+            title: 'Update Error',
+            description: 'Failed to update validation array.',
+            status: 'error',
+            duration: 5000,
+            isClosable: true,
+        });
+    }
+};
 
   return (
     <div>
@@ -157,7 +209,6 @@ const Scan = ({ setSuccessLeaves, setFailureLeaves, setSuccessOutpasses, setFail
         </Flex>
       </Box>
 
-      {/* Full-screen overlay for animations */}
       {animation === 'success' && (
         <Box
           position="fixed"

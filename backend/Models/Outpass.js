@@ -37,7 +37,7 @@ const OutpassSchema = new Schema({
     endHour: {
         type: String,
         required: true,
-        match: /^([01]\d|2[0-3]):([0-5]\d)$/
+        match: /^([01]\d|2[0-3]):([0-5]\d)$/ 
     },
     contactNumber: {
         type: String,
@@ -57,13 +57,33 @@ const OutpassSchema = new Schema({
     },
     extraDataArray: {
         type: [Number],
-        required: true,
+        default: [0, 0, 0, 0], // Default value of [0, 0, 0, 0]
         validate: {
             validator: function(array) {
                 return array.length === 4; // Ensure the array has exactly 4 elements
             },
             message: 'extraDataArray must contain exactly 4 numbers'
         }
+    },
+    extraValidation: {
+        type: [Number],
+        default: [0, 0], // Default value of [0, 0]
+        validate: {
+            validator: function(array) {
+                return array.length === 2; // Ensure the array has exactly 2 elements
+            },
+            message: 'extraValidation must contain exactly 2 numbers'
+        }
+    },
+    outTime: {
+        type: String,
+        default: '', // Default to empty string if not provided
+        match: /^([01]\d|2[0-3]):([0-5]\d)$/ // Validates time in HH:MM format
+    },
+    inTime: {
+        type: String,
+        default: '', // Default to empty string if not provided
+        match: /^([01]\d|2[0-3]):([0-5]\d)$/ // Validates time in HH:MM format
     }
 },
 {

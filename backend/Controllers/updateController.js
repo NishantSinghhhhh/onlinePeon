@@ -2,6 +2,7 @@ const { Outpass } = require('../Models/Outpass');
 const { PL } = require('../Models/PL');
 const { Leave } = require('../Models/Leave');
 const mongoose = require('mongoose'); // Import mongoose
+const moment = require('moment'); // Using moment.js for time formatting (ensure to install it if not already)
 
 exports.updateLeaveStatus = async (req, res) => {
     try {
@@ -172,6 +173,90 @@ exports.updatePLStatus = async (req, res) => {
         });
     } catch (err) {
         console.error('Error updating PL:', { message: err.message, stack: err.stack });
+        res.status(500).json({
+            message: 'Internal server error',
+            success: false,
+            error: err.message
+        });
+    }
+};
+// const moment = require('moment'); // Ensure moment is imported for time formatting
+// const Outpass = require('../models/Outpass'); // Adjust the path as needed
+
+exports.updateOutpassGuard = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Debugging: Log the incoming request ID
+        console.log(`Received request to update outpass with ID: ${id}`);
+
+        // Validate input
+        if (!id) {
+            console.log('Validation failed: ID is missing');
+            return res.status(400).json({
+                message: 'ID is required',
+                success: false
+            });
+        }
+
+        // Fetch the Outpass document
+        const outpass = await Outpass.findById(id);
+        console.log('Fetched outpass document:', outpass);
+
+        if (!outpass) {
+            console.log(`Outpass with ID ${id} not found`);
+            return res.status(404).json({
+                message: 'Outpass not found',
+                success: false
+            });
+        }
+
+        // Ensure extraValidation array exists
+        if (!Array.isArray(outpass.extraValidation)) {
+            console.log('Outpass document does not have a valid extraValidation array');
+            return res.status(500).json({
+                message: 'Server error: extraValidation array is not properly defined',
+                success: false
+            });
+        }
+
+        // Update fields based on the state of extraValidation array
+        if (outpass.extraValidation[0] === 0) {
+            // Update outTime if extraValidation[0] is 0
+            outpass.extraValidation[0] = 1; // Update the validation state
+            outpass.outTime = moment().format('HH:mm'); // Set outTime to the current time
+        } else if (outpass.extraValidation[0] === 1) {
+            // Update inTime if extraValidation[0] is 1
+            outpass.inTime = moment().format('HH:mm'); // Set inTime to the current time
+        } else {
+            console.log('extraValidation array is in an unexpected state');
+            return res.status(500).json({
+                message: 'Server error: extraValidation array is in an unexpected state',
+                success: false
+            });
+        }
+
+        // Debugging: Log the updated outpass document before saving
+        console.log('Updated outpass document before saving:', outpass);
+
+        // Save the updated outpass
+        await outpass.save();
+
+        console.log(`Outpass with ID ${id} updated successfully`);
+        res.status(200).json({
+            message: 'Outpass updated successfully',
+            success: true,
+            data: outpass
+        });
+    } catch (err) {
+        // Enhanced error logging
+        console.error('Error updating outpass:', {
+            message: err.message,
+            stack: err.stack,
+            requestId: req.params.id, // Log the ID associated with the request
+            requestBody: req.body,   // Log the request body for additional context
+            timestamp: new Date().toISOString() // Log the timestamp of the error
+        });
         res.status(500).json({
             message: 'Internal server error',
             success: false,

@@ -13,7 +13,13 @@ const check = require('./Routes/check')
 require('./Models/db'); // Ensure this file sets up your DB connection
 
 const PORT = process.env.PORT || 8080;
-const app = express();
+const app = express(
+    {
+        origin: ["online-peon.vercel.app"],
+        methods : ["POST", "GET", "PUT", "DELETE"],
+        credentials : true
+    }
+);
 
 // Middleware configuration
 app.use(bodyParser.json({ limit: '10mb' }));

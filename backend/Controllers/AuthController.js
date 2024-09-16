@@ -56,17 +56,16 @@ const submitPL = async (req, res) => {
         });
     }
 };
-
 const submitLeave = async (req, res) => {
     try {
         console.log('Received request body:', JSON.stringify(req.body, null, 2));
 
-        // Extract fields from the request body, including rollNumber
+        // Extract fields from the request body with default values where applicable
         const {
             firstName,
             lastName,
             registrationNumber,
-            rollNumber, // Include rollNumber
+            rollNumber,
             reasonForLeave,
             startDate,
             endDate,
@@ -74,15 +73,40 @@ const submitLeave = async (req, res) => {
             attendancePercentage,
             contactNumber,
             className,
-            extraDataArray // Include extraDataArray
+            extraDataArray,
+            extraValidation = [0, 0], // Default value for extraValidation
+            outTime = '00:00',         // Default value for outTime
+            inTime = '00:00'           // Default value for inTime
         } = req.body;
+
+        // Validate required fields
+        const missingFields = [];
+        if (!firstName) missingFields.push('firstName');
+        if (!lastName) missingFields.push('lastName');
+        if (!registrationNumber) missingFields.push('registrationNumber');
+        if (!rollNumber) missingFields.push('rollNumber');
+        if (!reasonForLeave) missingFields.push('reasonForLeave');
+        if (!startDate) missingFields.push('startDate');
+        if (!endDate) missingFields.push('endDate');
+        if (!placeOfResidence) missingFields.push('placeOfResidence');
+        if (!attendancePercentage) missingFields.push('attendancePercentage');
+        if (!contactNumber) missingFields.push('contactNumber');
+        if (!className) missingFields.push('className');
+        if (!extraDataArray) missingFields.push('extraDataArray');
+
+        if (missingFields.length > 0) {
+            return res.status(400).json({
+                message: `The following fields are required: ${missingFields.join(', ')}`,
+                success: false
+            });
+        }
 
         // Create a new leave instance with all required fields
         const leave = new Leave({
             firstName,
             lastName,
             registrationNumber,
-            rollNumber, // Include rollNumber
+            rollNumber,
             reasonForLeave,
             startDate,
             endDate,
@@ -90,7 +114,10 @@ const submitLeave = async (req, res) => {
             attendancePercentage,
             contactNumber,
             className,
-            extraDataArray // Include extraDataArray
+            extraDataArray,
+            extraValidation, // Handle extraValidation with default value
+            outTime,         // Handle outTime with default value
+            inTime           // Handle inTime with default value
         });
 
         // Save the new leave request to the database
@@ -109,6 +136,7 @@ const submitLeave = async (req, res) => {
     }
 };
 
+
 const submitOutpass = async (req, res) => {
     try {
         console.log('Received request body:', JSON.stringify(req.body, null, 2));
@@ -117,14 +145,17 @@ const submitOutpass = async (req, res) => {
             firstName,
             lastName,
             registrationNumber,
-            rollNumber, // Added rollNumber
+            rollNumber,
             reason,
             date,
             startHour,
             endHour,
             contactNumber,
             className,
-            extraDataArray
+            extraDataArray,
+            extraValidation = [0, 0], // Default value for extraValidation
+            outTime = '00:00',         // Default value for outTime
+            inTime = '00:00'           // Default value for inTime
         } = req.body;
 
         // Validate required fields
@@ -132,7 +163,7 @@ const submitOutpass = async (req, res) => {
         if (!firstName) missingFields.push('firstName');
         if (!lastName) missingFields.push('lastName');
         if (!registrationNumber) missingFields.push('registrationNumber');
-        if (!rollNumber) missingFields.push('rollNumber'); // Check for rollNumber
+        if (!rollNumber) missingFields.push('rollNumber');
         if (!reason) missingFields.push('reason');
         if (!date) missingFields.push('date');
         if (!startHour) missingFields.push('startHour');
@@ -153,14 +184,17 @@ const submitOutpass = async (req, res) => {
             firstName,
             lastName,
             registrationNumber,
-            rollNumber, // Added rollNumber
+            rollNumber,
             reason,
             date,
             startHour,
             endHour,
             contactNumber,
             className,
-            extraDataArray
+            extraDataArray,
+            extraValidation, // Handle extraValidation with default value
+            outTime,         // Handle outTime with default value
+            inTime           // Handle inTime with default value
         });
 
         // Save the new outpass to the database
