@@ -147,6 +147,32 @@
   background-color: #e8f5e9;
 }
 
+/* Half green and half red for both active leave and outpass */
+.activeBoth {
+  position: relative;
+}
+
+.activeBoth::before,
+.activeBoth::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  border-radius: 8px;
+  z-index: -1;
+}
+
+.activeBoth::before {
+  background-color: #4caf50; /* Green */
+  left: 0;
+}
+
+.activeBoth::after {
+  background-color: #ff5722; /* Red */
+  right: 0;
+}
+
 /* Animations */
 @keyframes shake {
   0% { transform: translateX(0); }

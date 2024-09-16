@@ -46,26 +46,24 @@ const BoxComponent = () => {
     const now = new Date();
     const startDate = new Date(leave.startDate);
     const endDate = new Date(leave.endDate);
-
-    return now >= startDate && now <= endDate;
+    
+    const isApproved = leave.extraDataArray && leave.extraDataArray.every(value => value === 1);
+    
+    return now >= startDate && now <= endDate && isApproved;
   };
 
   const isActiveOutpass = (outpass) => {
     const now = new Date();
   
-    // Extract the start and end hours from the outpass
     const [startHour, startMinute] = outpass.startHour.split(':').map(Number);
     const [endHour, endMinute] = outpass.endHour.split(':').map(Number);
   
-    // Create Date objects for today with the start and end times
     const startTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), startHour, startMinute);
     const endTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), endHour, endMinute);
   
-    // Check if the current time falls within the start and end times
-    const isActive = now >= startTime && now <= endTime;
-    
-    console.log(`Outpass Start Time: ${startTime}, End Time: ${endTime}, Is Active: ${isActive}`);
-    return isActive;
+    const isApproved = outpass.extraDataArray && outpass.extraDataArray.every(value => value === 1);
+  
+    return now >= startTime && now <= endTime && isApproved;
   };
   
   useEffect(() => {
@@ -226,12 +224,7 @@ const BoxComponent = () => {
                 <ul>
                   {modalContent.activeLeaves.map((leave, index) => (
                     <li key={index}>
-                      <p>Reason: {leave.reasonForLeave}</p>
-                      <p>Start Date: {new Date(leave.startDate).toLocaleDateString()}</p>
-                      <p>End Date: {new Date(leave.endDate).toLocaleDateString()}</p>
-                      <p>Place of Residence: {leave.placeOfResidence}</p>
-                      <p>Attendance Percentage: {leave.attendancePercentage}</p>
-                      <p>Contact Number: {leave.contactNumber}</p>
+                      {leave.reason} (Start Date: {new Date(leave.startDate).toLocaleDateString()} - End Date: {new Date(leave.endDate).toLocaleDateString()})
                     </li>
                   ))}
                 </ul>
