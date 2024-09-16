@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
-  Card as ChakraCard, useToast, CardHeader, CardBody, CardFooter, Heading,
-  FormControl, FormLabel, Input, Button, Stack, InputGroup, InputLeftAddon, Select
+  Card as ChakraCard, useToast, CardHeader, CardBody,  Heading,
+  FormControl, FormLabel, Input, Button, Stack,  Select
 } from '@chakra-ui/react';
 import Navbar from '../components/navbar/navbar';
 import DatePicker from 'react-datepicker';
