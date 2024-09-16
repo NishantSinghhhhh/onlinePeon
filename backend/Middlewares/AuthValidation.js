@@ -220,7 +220,8 @@ const staffSignupValidation = (req, res, next) => {
             'Warden',
             'Joint Director',
             'Director',
-            'Principal'
+            'Principal',
+            'Security Guard'
         ).required(),
         classAssigned: Joi.string().valid(
             'FE-COMP-A', 'FE-COMP-B', 'FE-ENTC-A', 'FE-ENTC-B', 'FE-IT-A', 'FE-IT-B', 'FE-MECH', 'FE-ARE',

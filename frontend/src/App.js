@@ -35,6 +35,8 @@ import AdminLeavePage from './components/Admin/pages/AdminLeavePage';
 import AdminPLpage from './components/Admin/pages/AdminPLpage';
 import Search from './components/search/search';
 import Box from './components/Box/Box';
+import Guard from './components/guard/guard'
+import Scan from './components/guard/pages/scan'
 
 import { LoginProvider } from './context/LoginContext';
 import { RollNumberProvider } from './context/RollNumberContext';
@@ -79,6 +81,8 @@ function App() {
         <Route path='/AdminPLpage' element={<AdminPLpage/>}/>
         <Route path='/Search' element={<Search/>}/>
         <Route path='/Box' element={<Box/>}/>
+        <Route path='/Guard' element={<Guard/>}/>
+        <Route path='/Scan' element={<Scan/>}/>
       </Routes>
     </Router>
 </LoginProvider>

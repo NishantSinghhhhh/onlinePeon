@@ -97,11 +97,11 @@ const SignInCard = () => {
   const staffLogin = async (e) => {
     e.preventDefault();
     const { email, password, staffId } = loginInfo;
-
+  
     if (!email || !password || !staffId) {
       return handleError('All fields are required');
     }
-
+  
     try {
       const url = `http://localhost:8000/auth/loginStaff`;
       const response = await fetch(url, {
@@ -109,19 +109,19 @@ const SignInCard = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password, staffId, isStudent: false })
       });
-
+  
       const result = await response.json();
-
+  
       if (!response.ok) {
         throw new Error(result.message || 'An unexpected error occurred');
       }
-
+  
       const { success, message, jwtToken, staff } = result;
-
+  
       if (success && staff) {
         handleSuccess(message);
         localStorage.setItem('token', jwtToken);
-
+  
         updateLoginInfo({
           name: staff.name,
           position: staff.position,
@@ -131,7 +131,7 @@ const SignInCard = () => {
           classAssigned: staff.classAssigned,
           branchAssigned: staff.branchAssigned
         });
-
+  
         // Redirect based on position
         switch (staff.position) {
           case 'Class Teacher':
@@ -148,8 +148,12 @@ const SignInCard = () => {
           case 'Principal':
             setTimeout(() => navigate('/Admin'), 1000);
             break;
+          case 'Security Guard':
+            setTimeout(() => navigate('/Guard'), 1000); // Redirect to the security guard home page
+            break;
           default:
             setTimeout(() => navigate('/DefaultStaffHome'), 1000);
+            break;
         }
       } else if (success && !staff) {
         handleError('Login successful, but staff details are missing');
@@ -160,6 +164,7 @@ const SignInCard = () => {
       handleError(err.message || 'An unexpected error occurred');
     }
   };
+  
 
   const handleError = (message) => {
     console.error(message);

@@ -8,6 +8,8 @@ const fetchAll = require('./Routes/fetchAll');
 const updateRoutes = require('./Routes/updateRoutes');
 const fetchUser = require('./Routes/fetchUserRoute');
 const messageRoutes = require('./Routes/MessageRouter'); // Ensure this exports an Express router
+const check = require('./Routes/check')
+
 require('./Models/db'); // Ensure this file sets up your DB connection
 
 const PORT = process.env.PORT || 8080;
@@ -28,6 +30,7 @@ app.use('/products', authRoutes); // Verify if this is correct or needs to be di
 app.use('/fetchAll', fetchAll);
 app.use('/fetchUser', fetchUser);
 app.use('/message', messageRoutes); // Ensure this is correct
+app.use('/check', check); // Ensure this is correct
 
 // Test route
 app.get('/ping', (req, res) => {

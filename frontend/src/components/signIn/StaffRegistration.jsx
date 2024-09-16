@@ -233,6 +233,7 @@ const StaffRegistration = () => {
                       <option value="Joint Director">Joint Director</option>
                       <option value="Director">Director</option>
                       <option value="Principal">Principal</option> {/* Added Principal */}
+                      <option value="Security Guard">Security Guard</option> {/* Added Principal */}
                     </Select>
                   </FormControl>
 
