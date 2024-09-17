@@ -14,7 +14,7 @@ const AdminPLpage = () => {
 
   const fetchPlRequests = async () => {
     try {
-      const response = await fetch('http://localhost:8000/fetchAll/fetchAllPLs');
+      const response = await fetch('https://online-peon.vercel.app/fetchAll/fetchAllPLs');
       if (!response.ok) throw new Error('Failed to fetch PL requests');
       const result = await response.json();
 

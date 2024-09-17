@@ -14,7 +14,7 @@ const AdminOutpassPage = () => {
 
   const fetchOutpasses = async () => {
     try {
-      const response = await fetch('http://localhost:8000/fetchAll/fetchAllOutpasses');
+      const response = await fetch('https://online-peon.vercel.app/fetchAll/fetchAllOutpasses');
       if (!response.ok) throw new Error('Failed to fetch outpasses');
       const result = await response.json();
 
