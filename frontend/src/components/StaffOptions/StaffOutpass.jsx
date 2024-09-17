@@ -13,7 +13,7 @@ const StaffOutpass = () => {
 
   const fetchOutpass = async (classAssigned) => {
     try {
-      const outpassResponse = await fetch(`https://online-peon.vercel.app/fetch/fetchOutpasses/${classAssigned}`);
+      const outpassResponse = await fetch(`https://online-peon.vercel.app/fetch/teachers/fetchOutpasses/${classAssigned}`);
       if (!outpassResponse.ok) throw new Error('Failed to fetch outpasses');
       const outpassData = await outpassResponse.json();
       return outpassData;

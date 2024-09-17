@@ -39,7 +39,7 @@ const StaffDone = () => {
 
   const fetchOutpass = async (classAssigned) => {
     try {
-      const response = await fetch(`https://online-peon.vercel.app/fetch/fetchOutpasses/${classAssigned}`);
+      const response = await fetch(`https://online-peon.vercel.app/fetch/teachers/fetchOutpasses/${classAssigned}`);
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(errorText);
@@ -53,7 +53,7 @@ const StaffDone = () => {
 
   const fetchLeaves = async (classAssigned) => {
     try {
-      const response = await fetch(`https://online-peon.vercel.app/fetch/fetchLeaves/${classAssigned}`);
+      const response = await fetch(`https://online-peon.vercel.app/fetch/teachers/fetchLeaves/${classAssigned}`);
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(errorText);
@@ -67,7 +67,7 @@ const StaffDone = () => {
 
   const fetchPLs = async (classAssigned) => {
     try {
-      const response = await fetch(`https://online-peon.vercel.app/fetch/fetchPLs/${classAssigned}`);
+      const response = await fetch(`https://online-peon.vercel.app/fetch/teachers/fetchPLs/${classAssigned}`);
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(errorText);

@@ -14,7 +14,7 @@ const StaffPL = () => {
   // Function to fetch and filter PL data
   const fetchPL = async (classAssigned) => {
     try {
-      const response = await axios.get(`https://online-peon.vercel.app/fetch/fetchPLs/${classAssigned}`);
+      const response = await axios.get(`https://online-peon.vercel.app/fetch/teachers/fetchPLs/${classAssigned}`);
       return response.data;
     } catch (error) {
       throw new Error('Failed to fetch PL data');

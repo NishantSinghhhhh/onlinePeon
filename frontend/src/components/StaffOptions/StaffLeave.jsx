@@ -14,7 +14,7 @@ const StaffLeave = () => {
   // Function to fetch leave data
   const fetchLeaveData = async (classAssigned) => {
     try {
-      const leaveResponse = await fetch(`https://online-peon.vercel.app/fetch/fetchLeaves/${classAssigned}`);
+      const leaveResponse = await fetch(`https://online-peon.vercel.app/fetch/teachers/fetchLeaves/${classAssigned}`);
       if (!leaveResponse.ok) {
         throw new Error('Failed to fetch leaves');
       }
