@@ -1,6 +1,6 @@
 import React from 'react';
 import { Calendar, Clock } from 'lucide-react';
-import styles from './SeenOutpassCard.module.css'; // Import the CSS Module
+import styles from './SeenLeaveCard.module.css'; // Import the CSS Module
 
 const SeenLeaveCard = ({ data, role }) => {
   const {
@@ -13,7 +13,7 @@ const SeenLeaveCard = ({ data, role }) => {
     extraDataArray
   } = data;
 
-
+  // Role-based approval/decline logic
   const isApproved = role === 'Warden'
     ? extraDataArray[2] === 1
     : extraDataArray[1] === 1; // HOD approval check
@@ -21,6 +21,18 @@ const SeenLeaveCard = ({ data, role }) => {
   const isDeclined = role === 'Warden'
     ? extraDataArray[2] === -1 // Warden decline check
     : extraDataArray[1] === -1; // HOD decline check
+
+  // Determine status
+  let statusClass = styles.statusPending;
+  let statusText = 'Pending';
+
+  if (isDeclined) {
+    statusClass = styles.statusDeclined;
+    statusText = 'Declined';
+  } else if (isApproved) {
+    statusClass = styles.statusApproved;
+    statusText = 'Approved';
+  }
 
   return (
     <div className={styles.card}>
@@ -37,7 +49,6 @@ const SeenLeaveCard = ({ data, role }) => {
         <span className="text-sm mr-4">
           {new Date(startDate).toLocaleDateString()} - {new Date(endDate).toLocaleDateString()}
         </span>
-        {/* Assuming startDate and endDate are whole days, adjust if needed */}
         <Clock className={styles.icon} />
         <span className="text-sm">
           {`From ${new Date(startDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} to ${new Date(endDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}
@@ -47,12 +58,8 @@ const SeenLeaveCard = ({ data, role }) => {
         <div className="flex items-center text-gray-600">
           <span className="text-sm">Status:</span>
         </div>
-        <div className={`${styles.status} ${
-          isApproved ? styles.statusApproved :
-          isDeclined ? styles.statusDeclined :
-          styles.statusPending
-        }`}>
-          {isApproved ? 'Approved' : isDeclined ? 'Declined' : 'Pending'}
+        <div className={`${styles.status} ${statusClass}`}>
+          {statusText}
         </div>
       </div>
     </div>

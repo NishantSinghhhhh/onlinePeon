@@ -14,6 +14,18 @@ const SeenOutpassCard = ({ data, role }) => {
     ? extraDataArray[2] === -1 // Warden decline check
     : extraDataArray[1] === -1; // HOD decline check
 
+  // Determine status
+  let statusClass = styles.statusPending;
+  let statusText = 'Pending';
+
+  if (isDeclined) {
+    statusClass = styles.statusDeclined;
+    statusText = 'Declined';
+  } else if (isApproved) {
+    statusClass = styles.statusApproved;
+    statusText = 'Approved';
+  }
+
   return (
     <div className={styles.card}>
       <div className={styles.header}>
@@ -39,12 +51,8 @@ const SeenOutpassCard = ({ data, role }) => {
           <Eye className="w-4 h-4 mr-2" />
           <span className="text-sm">Seen</span>
         </div>
-        <div className={`${styles.status} ${
-          isApproved ? styles.statusApproved :
-          isDeclined ? styles.statusDeclined :
-          styles.statusPending
-        }`}>
-          {isApproved ? 'Approved' : isDeclined ? 'Declined' : 'Pending'}
+        <div className={`${styles.status} ${statusClass}`}>
+          {statusText}
         </div>
       </div>
     </div>
