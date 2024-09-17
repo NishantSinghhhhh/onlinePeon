@@ -5,7 +5,6 @@ import styles from './SeenOutpassCard.module.css'; // Import the CSS Module
 const SeenOutpassCard = ({ data, role }) => {
   const { firstName, lastName, className, reason, date, startHour, endHour, extraDataArray, type } = data;
 
-  // Role-based approval/decline logic
   const isApproved = role === 'Warden'
     ? extraDataArray[2] === 1 // Warden approval check
     : extraDataArray[1] === 1; // HOD approval check
@@ -38,18 +37,18 @@ const SeenOutpassCard = ({ data, role }) => {
           {type}
         </span>
       </div>
-      <p className="text-sm text-gray-600 mb-2">{className}</p>
-      <p className="text-sm text-gray-700 mb-4 line-clamp-2">{reason}</p>
+      <p className={styles.className}>{className}</p>
+      <p className={styles.reason}>{reason}</p>
       <div className={styles.details}>
         <Calendar className={styles.icon} />
-        <span className="text-sm mr-4">{new Date(date).toLocaleDateString()}</span>
+        <span className={styles.date}>{new Date(date).toLocaleDateString()}</span>
         <Clock className={styles.icon} />
-        <span className="text-sm">{`${startHour} - ${endHour}`}</span>
+        <span className={styles.time}>{`${startHour} - ${endHour}`}</span>
       </div>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center text-gray-600">
-          <Eye className="w-4 h-4 mr-2" />
-          <span className="text-sm">Seen</span>
+      <div className={styles.footer}>
+        <div className={styles.seenInfo}>
+          <Eye className={styles.iconSmall} />
+          <span>Seen</span>
         </div>
         <div className={`${styles.status} ${statusClass}`}>
           {statusText}

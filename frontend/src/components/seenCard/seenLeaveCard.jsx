@@ -13,7 +13,6 @@ const SeenLeaveCard = ({ data, role }) => {
     extraDataArray
   } = data;
 
-
   const isApproved = role === 'Warden'
     ? extraDataArray[2] === 1
     : extraDataArray[1] === 1; 
@@ -21,7 +20,6 @@ const SeenLeaveCard = ({ data, role }) => {
   const isDeclined = role === 'Warden'
     ? extraDataArray[2] === -1 
     : extraDataArray[1] === -1; 
-
 
   let statusClass = styles.statusPending;
   let statusText = 'Pending';
@@ -42,22 +40,20 @@ const SeenLeaveCard = ({ data, role }) => {
           Leave
         </span>
       </div>
-      <p className="text-sm text-gray-600 mb-2">{className}</p>
-      <p className="text-sm text-gray-700 mb-4 line-clamp-2">{reasonForLeave}</p>
+      <p className={styles.className}>{className}</p>
+      <p className={styles.reason}>{reasonForLeave}</p>
       <div className={styles.details}>
         <Calendar className={styles.icon} />
-        <span className="text-sm mr-4">
+        <span className={styles.dateRange}>
           {new Date(startDate).toLocaleDateString()} - {new Date(endDate).toLocaleDateString()}
         </span>
         <Clock className={styles.icon} />
-        <span className="text-sm">
+        <span className={styles.timeRange}>
           {`From ${new Date(startDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} to ${new Date(endDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}
         </span>
       </div>
-      <div className="flex items-center justify-between mt-4">
-        <div className="flex items-center text-gray-600">
-          <span className="text-sm">Status:</span>
-        </div>
+      <div className={styles.statusContainer}>
+        <span className={styles.statusLabel}>Status:</span>
         <div className={`${styles.status} ${statusClass}`}>
           {statusText}
         </div>

@@ -1,86 +1,103 @@
 /* SeenOutpassCard.module.css */
 
 .card {
-    background-color: white;
-    border-radius: 0.5rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: box-shadow 0.3s ease;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-  }
-  
-  .card:hover {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  }
-  
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-  }
-  
-  .title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #333;
-  }
-  
-  .typeBadge {
-    padding: 0.25rem 0.5rem;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 600;
-  }
-  
-  .outpass {
-    background-color: #dbeafe;
-    color: #1d4ed8;
-  }
-  
-  .leave {
-    background-color: #fef3c7;
-    color: #f59e0b;
-  }
-  
-  .pl {
-    background-color: #d1fae5;
-    color: #10b981;
-  }
-  
-  .details {
-    display: flex;
-    align-items: center;
-    color: #6b7280;
-    margin-bottom: 1rem;
-  }
-  
-  .icon {
-    width: 1rem;
-    height: 1rem;
-    margin-right: 0.5rem;
-  }
-  
-  .status {
-    padding: 0.5rem 1rem;
-    border-radius: 9999px;
-    font-size: 0.875rem;
-    font-weight: 600;
-  }
-  
-  .statusApproved {
-    background-color: #d1fae5;
-    color: #10b981;
-  }
-  
-  .statusDeclined {
-    background-color: #fee2e2;
-    color: #f87171;
-  }
-  
-  .statusPending {
-    background-color: #f3f4f6;
-    color: #6b7280;
-  }
-  
-  
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.leaveBadge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background-color: #fef3c7;
+  color: #f59e0b;
+}
+
+.className {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 0.5rem;
+}
+
+.reason {
+  font-size: 0.875rem;
+  color: #374151;
+  margin-bottom: 1rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.details {
+  display: flex;
+  align-items: center;
+  color: #6b7280;
+  margin-bottom: 1rem;
+}
+
+.icon {
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.5rem;
+}
+
+.dateRange, .timeRange {
+  font-size: 0.875rem;
+  margin-right: 1rem;
+}
+
+.statusContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+.statusLabel {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.status {
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.statusApproved {
+  background-color: #d1fae5;
+  color: #10b981;
+}
+
+.statusDeclined {
+  background-color: #fee2e2;
+  color: #f87171;
+}
+
+.statusPending {
+  background-color: #f3f4f6;
+  color: #6b7280;
+}
