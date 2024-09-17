@@ -1,6 +1,6 @@
 import React from 'react';
 import { Calendar, Clock } from 'lucide-react';
-import styles from './SeenLeaveCard.module.css'; // Import the CSS Module
+import styles from './SeenOutpassCard.module.css'; // Import the CSS Module
 
 const SeenLeaveCard = ({ data, role }) => {
   const {
@@ -13,16 +13,16 @@ const SeenLeaveCard = ({ data, role }) => {
     extraDataArray
   } = data;
 
-  // Role-based approval/decline logic
+
   const isApproved = role === 'Warden'
     ? extraDataArray[2] === 1
-    : extraDataArray[1] === 1; // HOD approval check
+    : extraDataArray[1] === 1; 
 
   const isDeclined = role === 'Warden'
-    ? extraDataArray[2] === -1 // Warden decline check
-    : extraDataArray[1] === -1; // HOD decline check
+    ? extraDataArray[2] === -1 
+    : extraDataArray[1] === -1; 
 
-  // Determine status
+
   let statusClass = styles.statusPending;
   let statusText = 'Pending';
 
