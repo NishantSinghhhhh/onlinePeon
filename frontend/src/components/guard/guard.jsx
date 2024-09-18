@@ -43,6 +43,30 @@ const Guard = () => {
     fetchAllOutpasses();
   }, []);
 
+  // Function to convert JSON to CSV
+  const convertToCSV = (obj) => {
+    const csvRows = [];
+    const headers = Object.keys(obj);
+    csvRows.push(headers.join(','));
+    csvRows.push(headers.map(header => JSON.stringify(obj[header], (key, value) => (value === null ? '' : value))).join(','));
+    return csvRows.join('\n');
+  };
+
+  // Function to handle CSV download
+  const handleDownloadCSV = () => {
+    if (filteredOutpass) {
+      const csv = convertToCSV(filteredOutpass);
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'filteredOutpass.csv');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
   return (
     <div>
       <Navbar />
@@ -114,6 +138,16 @@ const Guard = () => {
               <Text fontSize="md" color="blue.500">{JSON.stringify(filteredOutpass, null, 2)}</Text>
             </Box>
           )}
+
+          {/* Download CSV Button */}
+          <Button
+            mt="6"
+            colorScheme="blue"
+            onClick={handleDownloadCSV}
+            isDisabled={!filteredOutpass}
+          >
+            Download Filtered Outpass CSV
+          </Button>
         </Box>
       </Container>
     </div>
