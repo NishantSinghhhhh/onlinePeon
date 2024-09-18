@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from './pages/navbar';
 import { Box, Container, Flex, Heading, Text, Button, useColorModeValue } from '@chakra-ui/react';
 import Scan from './pages/scan';
@@ -10,26 +10,38 @@ const Guard = () => {
   const [successOutpasses, setSuccessOutpasses] = useState(0);
   const [failureOutpasses, setFailureOutpasses] = useState(0);
   const [scannedObjectId, setScannedObjectId] = useState(null); // State to store the scanned object ID
+  const [outpasses, setOutpasses] = useState([]); // State to store all outpasses
+  const [filteredOutpass, setFilteredOutpass] = useState(null); // State to store the filtered outpass
 
   // Color mode values for better contrast
   const backgroundColor = useColorModeValue('gray.50', 'gray.800');
   const textColor = useColorModeValue('gray.800', 'gray.200');
   const cardBgColor = useColorModeValue('white', 'gray.700');
 
-  // Function to handle download CSV
-  const handleDownload = async () => {
+  // Function to fetch all outpasses
+  const fetchAllOutpasses = async () => {
     try {
-      const response = await axios.get('/downloadOutpassesCsv', { responseType: 'blob' });
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'outpasses.csv'); // File name for the CSV
-      document.body.appendChild(link);
-      link.click();
+      const response = await axios.get('https://online-peon.vercel.app/fetchAll/fetchAllOutpasses');
+      setOutpasses(response.data.data);
+      console.log('Fetched Outpasses:', response.data.data); // Log the fetched outpasses
     } catch (error) {
-      console.error('Error downloading CSV:', error);
+      console.error('Error fetching outpasses:', error);
     }
   };
+
+  // Filter the outpass based on the scanned object ID
+  useEffect(() => {
+    if (scannedObjectId && outpasses.length > 0) {
+      const filtered = outpasses.find(outpass => outpass._id === scannedObjectId);
+      setFilteredOutpass(filtered);
+      console.log('Filtered Outpass:', filtered); // Log the filtered outpass
+    }
+  }, [scannedObjectId, outpasses]);
+
+  // Fetch all outpasses when the component mounts
+  useEffect(() => {
+    fetchAllOutpasses();
+  }, []);
 
   return (
     <div>
@@ -95,14 +107,13 @@ const Guard = () => {
             </Box>
           )}
 
-          {/* Download Button */}
-          <Button
-            mt="6"
-            colorScheme="blue"
-            onClick={handleDownload}
-          >
-            Download Outpasses CSV
-          </Button>
+          {/* Display Filtered Outpass */}
+          {filteredOutpass && (
+            <Box mt="6" p="4" bg={cardBgColor} borderRadius="md" boxShadow="md">
+              <Text fontSize="lg" fontWeight="bold">Filtered Outpass</Text>
+              <Text fontSize="md" color="blue.500">{JSON.stringify(filteredOutpass, null, 2)}</Text>
+            </Box>
+          )}
         </Box>
       </Container>
     </div>
