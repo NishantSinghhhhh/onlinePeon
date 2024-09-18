@@ -17,6 +17,7 @@ const BoxComponent = () => {
   const [error, setError] = useState(null);     
   const [modalContent, setModalContent] = useState(null);  
   const [showModal, setShowModal] = useState(false); 
+  const [activeStudents, setActiveStudents] = useState([]); // Add activeStudents state
 
   const classOptions = [
     'FE-COMP-A', 'FE-COMP-B', 'FE-ENTC-A', 'FE-ENTC-B', 'FE-IT-A', 'FE-IT-B',
@@ -133,6 +134,24 @@ const BoxComponent = () => {
     fetchOutpasses();
   }, [selectedClass]);
 
+  useEffect(() => {
+    const activeList = [];
+
+    studentMap.forEach(student => {
+      const studentLeaves = leavesMap.get(student.rollNumber) || [];
+      const studentOutpasses = outpassesMap.get(student.rollNumber) || [];
+
+      const hasActiveLeave = studentLeaves.some(isActiveLeave);
+      const hasActiveOutpass = studentOutpasses.some(isActiveOutpass);
+
+      if (hasActiveLeave || hasActiveOutpass) {
+        activeList.push(student);
+      }
+    });
+
+    setActiveStudents(activeList);
+  }, [studentMap, leavesMap, outpassesMap]);
+
   const handleSelectChange = (e) => {
     setSelectedClass(e.target.value);
     console.log(`Selected class: ${e.target.value}`);
@@ -151,6 +170,23 @@ const BoxComponent = () => {
   const closeModal = () => {
     setShowModal(false);
     setModalContent(null);
+  };
+
+  const downloadCSV = () => {
+    const csvHeader = ['Roll Number', 'Name'];
+    const csvRows = activeStudents.map((student) => [student.rollNumber, student.name]);
+
+    const csvContent = [
+      csvHeader.join(','), // CSV header
+      ...csvRows.map(row => row.join(',')) // CSV rows
+    ].join('\n'); // Join rows with newline
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.setAttribute('href', url);
+    a.setAttribute('download', 'active_students.csv');
+    a.click();
   };
 
   const sortedStudents = Array.from(studentMap.values()).sort((a, b) => {
@@ -197,40 +233,64 @@ const BoxComponent = () => {
                   key={student.rollNumber}
                   className={`${styles.studentBox} 
                   ${hasActiveLeave ? styles.activeLeave : ''} 
-                  ${hasActiveOutpass ? styles.activeOutpass : ''}`}  // Correctly apply activeOutpass class
+                  ${hasActiveOutpass ? styles.activeOutpass : ''}`}
                   onClick={() => handleBoxClick(student)}
                 >
-                  <p>{student.rollNumber}</p>
-                  <p>{student.name}</p>
+                  <p>{student.rollNumber} - {student.name}</p>
                 </div>
               );
             })
           ) : (
-            <p>No students found for this class</p>
+            <p>No students found for the selected class.</p>
           )}
         </div>
       )}
 
+      {/* Display active students */}
+      <div className={styles.boxes}>
+        <h3>Students on Active Leave or Outpass</h3>
+        {activeStudents.length > 0 ? (
+          <>
+            {activeStudents.map((student) => (
+              <div key={student.rollNumber} className={styles.studentBox}>
+                <p>{student.rollNumber} - {student.name}</p>
+              </div>
+            ))}
+
+            {/* Download Button */}
+            <button onClick={downloadCSV} className={styles.downloadButton}>
+              Download CSV
+            </button>
+          </>
+        ) : (
+          <p>No students are currently on active leave or outpass</p>
+        )}
+      </div>
+
+      {/* Modal for detailed view */}
       {showModal && modalContent && (
         <div className={styles.modal}>
           <div className={styles.modalContent}>
+            <button className={styles.closeButton} onClick={closeModal}>
+              &times;
+            </button>
             <h2>{modalContent.student.name}</h2>
             <p>Roll Number: {modalContent.student.rollNumber}</p>
             <p>Total Leaves: {modalContent.totalLeaves}</p>
             <p>Total Outpasses: {modalContent.totalOutpasses}</p>
+
             {modalContent.activeLeaves.length > 0 && (
               <>
-                <h3>Active Leaves:</h3>
+                <h3>Active Leaves</h3>
                 <ul>
                   {modalContent.activeLeaves.map((leave, index) => (
                     <li key={index}>
-                      {leave.reason} (Start Date: {new Date(leave.startDate).toLocaleDateString()} - End Date: {new Date(leave.endDate).toLocaleDateString()})
+                      {leave.startDate} - {leave.endDate}
                     </li>
                   ))}
                 </ul>
               </>
             )}
-            <button onClick={closeModal}>Close</button>
           </div>
         </div>
       )}
