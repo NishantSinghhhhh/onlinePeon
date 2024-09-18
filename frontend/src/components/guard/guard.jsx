@@ -9,6 +9,7 @@ const Guard = () => {
   const [failureLeaves, setFailureLeaves] = useState(0);
   const [successOutpasses, setSuccessOutpasses] = useState(0);
   const [failureOutpasses, setFailureOutpasses] = useState(0);
+  const [scannedObjectId, setScannedObjectId] = useState(null); // State to store the scanned object ID
 
   // Color mode values for better contrast
   const backgroundColor = useColorModeValue('gray.50', 'gray.800');
@@ -38,6 +39,7 @@ const Guard = () => {
         setFailureLeaves={setFailureLeaves}
         setSuccessOutpasses={setSuccessOutpasses}
         setFailureOutpasses={setFailureOutpasses}
+        setScannedObjectId={setScannedObjectId} // Pass the state setter function
       />
       <Container maxW="container.md" mt="6" mb="6">
         <Box p="6">
@@ -84,6 +86,14 @@ const Guard = () => {
               <Text fontSize="2xl" color="red.500">{failureOutpasses}</Text>
             </Box>
           </Flex>
+
+          {/* Display Scanned Object ID */}
+          {scannedObjectId && (
+            <Box mt="6" p="4" bg={cardBgColor} borderRadius="md" boxShadow="md">
+              <Text fontSize="lg" fontWeight="bold">Scanned Object ID</Text>
+              <Text fontSize="2xl" color="blue.500">{scannedObjectId}</Text>
+            </Box>
+          )}
 
           {/* Download Button */}
           <Button
