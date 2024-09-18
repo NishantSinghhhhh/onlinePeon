@@ -173,21 +173,59 @@ const BoxComponent = () => {
   };
 
   const downloadCSV = () => {
-    const csvHeader = ['Roll Number', 'Name'];
-    const csvRows = activeStudents.map((student) => [student.rollNumber, student.name]);
-
+    // CSV header
+    const csvHeader = ['Roll Number', 'Name', 'Leave Reason', 'Leave Dates', 'Outpass Reason', 'Outpass Dates'];
+    const csvRows = activeStudents.map((student) => {
+      const studentLeaves = leavesMap.get(student.rollNumber) || [];
+      const studentOutpasses = outpassesMap.get(student.rollNumber) || [];
+  
+      // Formatting leave and outpass data
+      const leaveDetails = studentLeaves
+        .filter(isActiveLeave)
+        .map((leave) => ({
+          reason: leave.reason || 'N/A',
+          dates: `${leave.startDate} to ${leave.endDate}`
+        }));
+  
+      const outpassDetails = studentOutpasses
+        .filter(isActiveOutpass)
+        .map((outpass) => ({
+          reason: outpass.reason || 'N/A',
+          dates: `${outpass.startHour} to ${outpass.endHour}`
+        }));
+  
+      // Convert to string for CSV
+      const leaveReasons = leaveDetails.map((leave) => leave.reason).join('; ');
+      const leaveDates = leaveDetails.map((leave) => leave.dates).join('; ');
+      const outpassReasons = outpassDetails.map((outpass) => outpass.reason).join('; ');
+      const outpassDates = outpassDetails.map((outpass) => outpass.dates).join('; ');
+  
+      // Return the CSV row for the student
+      return [
+        student.rollNumber,
+        student.name,
+        leaveReasons,
+        leaveDates,
+        outpassReasons,
+        outpassDates
+      ];
+    });
+  
+    // Convert to CSV string format
     const csvContent = [
       csvHeader.join(','), // CSV header
       ...csvRows.map(row => row.join(',')) // CSV rows
     ].join('\n'); // Join rows with newline
-
+  
+    // Create CSV file and download
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.setAttribute('href', url);
-    a.setAttribute('download', 'active_students.csv');
+    a.setAttribute('download', 'active_students_with_leave_outpass.csv');
     a.click();
   };
+  
 
   const sortedStudents = Array.from(studentMap.values()).sort((a, b) => {
     return parseInt(a.rollNumber, 10) - parseInt(b.rollNumber, 10);
