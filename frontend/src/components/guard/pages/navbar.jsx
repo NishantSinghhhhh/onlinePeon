@@ -25,8 +25,8 @@ const Navbar = () => {
       mb={4}
       border='1px solid rgba(255, 255, 255, 0.2)'
     >
-      <Flex className={styles.items} align='center' justify='space-between'>
-        <Flex flex='1' justify='center'>
+      <Flex className={styles.items} align='center' justify='space-between' >
+        <Flex flex='1' justify='center' gap={10}>
           <Breadcrumb
             spacing='16px'
             separator={null}
@@ -37,13 +37,34 @@ const Navbar = () => {
             <BreadcrumbItem>
               <BreadcrumbLink
                 as={Link}
-                // to='/Scan'
+                to='/Scan'
                 className={styles['breadcrumb-link']}
                 bg={location.pathname === '/Scan' ? 'gray.600' : 'transparent'}
                 color={location.pathname === '/Scan' ? 'white' : 'gray.300'}
                 fontWeight={location.pathname === '/Scan' ? 'bold' : 'normal'}
               >
-                Scan
+                Scan Outpass
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+          </Breadcrumb>
+
+          <Breadcrumb
+            spacing='16px'
+            separator={null}
+            fontSize='lg'
+            fontWeight='medium'
+            color='white'
+          >
+            <BreadcrumbItem>
+              <BreadcrumbLink
+                as={Link}
+                to='/ScanLeave'
+                className={styles['breadcrumb-link']}
+                bg={location.pathname === '/ScanLeave' ? 'gray.600' : 'transparent'}
+                color={location.pathname === '/ScanLeave' ? 'white' : 'gray.300'}
+                fontWeight={location.pathname === '/ScanLeave' ? 'bold' : 'normal'}
+              >
+                Scan Leave
               </BreadcrumbLink>
             </BreadcrumbItem>
           </Breadcrumb>

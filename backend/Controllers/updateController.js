@@ -180,8 +180,6 @@ exports.updatePLStatus = async (req, res) => {
         });
     }
 };
-// const moment = require('moment'); // Ensure moment is imported for time formatting
-// const Outpass = require('../models/Outpass'); // Adjust the path as needed
 
 exports.updateOutpassGuard = async (req, res) => {
     try {
@@ -257,6 +255,86 @@ exports.updateOutpassGuard = async (req, res) => {
             requestId: req.params.id, // Log the ID associated with the request
             requestBody: req.body,   // Log the request body for additional context
             timestamp: new Date().toISOString() // Log the timestamp of the error
+        });
+        res.status(500).json({
+            message: 'Internal server error',
+            success: false,
+            error: err.message
+        });
+    }
+};
+
+exports.updateLeaveGuard = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Check if the provided ID is a valid ObjectId
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            console.log('Invalid ID format:', id);
+            return res.status(400).json({
+                message: 'Invalid ID format',
+                success: false
+            });
+        }
+
+        // Debugging: Log the incoming request ID
+        console.log(`Received request to update leave with ID: ${id}`);
+
+        // Fetch the Leave document
+        const leave = await Leave.findById(id);
+        console.log('Fetched leave document:', leave);
+
+        if (!leave) {
+            console.log(`Leave with ID ${id} not found`);
+            return res.status(404).json({
+                message: 'Leave not found',
+                success: false
+            });
+        }
+
+        // Ensure extraValidation array exists
+        if (!Array.isArray(leave.extraValidation)) {
+            console.log('Leave document does not have a valid extraValidation array');
+            return res.status(500).json({
+                message: 'Server error: extraValidation array is not properly defined',
+                success: false
+            });
+        }
+
+        // Update fields based on the state of extraValidation array
+        if (leave.extraValidation[0] === 0) {
+            leave.extraValidation[0] = 1;
+            leave.outTime = moment().format('HH:mm');
+        } else if (leave.extraValidation[0] === 1) {
+            leave.extraValidation[1] = 1;
+            leave.inTime = moment().format('HH:mm');
+        } else {
+            console.log('extraValidation array is in an unexpected state');
+            return res.status(500).json({
+                message: 'Server error: extraValidation array is in an unexpected state',
+                success: false
+            });
+        }
+
+        // Debugging: Log the updated leave document before saving
+        console.log('Updated leave document before saving:', leave);
+
+        // Save the updated leave
+        await leave.save();
+
+        console.log(`Leave with ID ${id} updated successfully`);
+        res.status(200).json({
+            message: 'Leave updated successfully',
+            success: true,
+            data: leave
+        });
+    } catch (err) {
+        console.error('Error updating leave:', {
+            message: err.message,
+            stack: err.stack,
+            requestId: req.params.id,
+            requestBody: req.body,
+            timestamp: new Date().toISOString()
         });
         res.status(500).json({
             message: 'Internal server error',

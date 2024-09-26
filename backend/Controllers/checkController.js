@@ -45,7 +45,7 @@ const checkOutpass = async (req, res) => {
     }
 };
 
-// Check leave by objectId
+
 const checkLeave = async (req, res) => {
     const { objectId } = req.body;
 

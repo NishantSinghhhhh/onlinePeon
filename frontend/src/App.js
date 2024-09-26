@@ -38,8 +38,11 @@ import Search from './components/search/search';
 import Box from './components/Box/Box';
 import Guard from './components/guard/guard'
 import Scan from './components/guard/pages/scan'
+import ScanLeave from './components/guard/pages/scanLeave';
+
 import { LoginProvider } from './context/LoginContext';
 import { RollNumberProvider } from './context/RollNumberContext';
+import { LeaveProvider } from './context/LeaveNumContext';
 
 function App() {
   return (
@@ -47,6 +50,8 @@ function App() {
 <RollNumberProvider>
 
 <LoginProvider>
+  <LeaveProvider>
+
    <Router>
       <Routes>
         <Route path="/" element={<SignInCard />} />
@@ -84,8 +89,12 @@ function App() {
         <Route path='/Box' element={<Box/>}/>
         <Route path='/Guard' element={<Guard/>}/>
         <Route path='/Scan' element={<Scan/>}/>
+
+        <Route path='/ScanLeave' element={<ScanLeave/>}/>
       </Routes>
     </Router>
+        
+  </LeaveProvider>
 </LoginProvider>
 </RollNumberProvider>
     </div>
