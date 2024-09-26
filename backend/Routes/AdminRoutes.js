@@ -1,7 +1,6 @@
 const express = require('express');
 const {
-  fetchLeavesOutpasses,  // new controller
-  fetchLateComers        // new controller
+  fetchLeavesOutpasses,  // new controller       // new controller
 } = require('../Controllers/AdminInOut');
 
 const router = express.Router();

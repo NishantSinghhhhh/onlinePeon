@@ -1,6 +1,5 @@
 const Leave = require('../Models/Leave'); // Assuming Leave is a Mongoose model
 const Outpass = require('../Models/Outpass'); // Assuming Outpass is a Mongoose model
-const LateComer = require('../Models/LateComer'); // Assuming LateComer is a Mongoose model
 
 // Controller to fetch leaves and outpasses based on the provided date
 const fetchLeavesOutpasses = async (req, res) => {
