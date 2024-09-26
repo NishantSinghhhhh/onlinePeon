@@ -227,6 +227,7 @@ exports.updateOutpassGuard = async (req, res) => {
             outpass.outTime = moment().format('HH:mm'); // Set outTime to the current time
         } else if (outpass.extraValidation[0] === 1) {
             // Update inTime if extraValidation[0] is 1
+            outpass.extraValidation[1] = 1;
             outpass.inTime = moment().format('HH:mm'); // Set inTime to the current time
         } else {
             console.log('extraValidation array is in an unexpected state');
