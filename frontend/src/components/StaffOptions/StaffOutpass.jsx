@@ -13,7 +13,7 @@ const StaffOutpass = () => {
 
   const fetchOutpass = async (classAssigned) => {
     try {
-      const outpassResponse = await fetch(`https://online-peon.vercel.app/fetch/teachers/fetchOutpasses/${classAssigned}`);
+      const outpassResponse = await fetch(`${process.env.REACT_APP_BASE_URL}/fetch/teachers/fetchOutpasses/${classAssigned}`);
       if (!outpassResponse.ok) throw new Error('Failed to fetch outpasses');
       const outpassData = await outpassResponse.json();
       return outpassData;
@@ -35,7 +35,7 @@ const StaffOutpass = () => {
       const { staffId } = loginInfo;
 
       try {
-        const teacherResponse = await fetch(`https://online-peon.vercel.app/fetch/fetchTeacher/${staffId}`);
+        const teacherResponse = await fetch(`${process.env.REACT_APP_BASE_URL}/fetch/fetchTeacher/${staffId}`);
         const teacherData = await teacherResponse.json();
         if (!teacherResponse.ok) throw new Error(teacherData.message);
 
@@ -68,7 +68,7 @@ const StaffOutpass = () => {
 
       const position = 0;
 
-      const response = await axios.put(`https://online-peon.vercel.app/update/updateOutpass/${outpassId}`, {
+      const response = await axios.put(`${process.env.REACT_APP_BASE_URL}/update/updateOutpass/${outpassId}`, {
         status,
         position,
       });

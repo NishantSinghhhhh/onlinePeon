@@ -49,7 +49,7 @@ const Register = () => {
     // Fetch class teachers when the component mounts
     const fetchClassTeachers = async () => {
       try {
-        const response = await fetch('https://online-peon.vercel.app/fetch/fetchTeachers');
+        const response = await fetch(`${process.env.REACT_APP_BASE_URL}/fetch/fetchTeachers`);
         if (!response.ok) {
           throw new Error('Failed to fetch class teachers');
         }
@@ -120,7 +120,7 @@ const Register = () => {
     });
 
     try {
-      const url = `https://online-peon.vercel.app/auth/signUp`;
+      const url = `${process.env.REACT_APP_BASE_URL}/auth/signUp`;
       const response = await fetch(url, {
         method: "POST",
         headers: {

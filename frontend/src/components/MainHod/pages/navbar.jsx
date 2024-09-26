@@ -16,11 +16,6 @@ const HODNavbar = () => {
   const location = useLocation(); // Get the current location
   const { loginInfo } = useContext(LoginContext); // Access loginInfo from LoginContext
 
-//   import HODLeavePage from './components/MainHod/pages/LeavePage'
-//   import HODOutpassPage from './components/MainHod/pages/OutpassPage'
-//   import HOUPLpage from './components/MainHod/pages/PLpage'
-{/* <Route path='/HODPLpage' element={<HODPLpage/>}/>
-<Route path='/HODdonePage' element={<HODdonePage/>}/> */}
 
   return (
     <Box

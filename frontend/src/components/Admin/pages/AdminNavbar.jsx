@@ -115,19 +115,6 @@ const StaffNavbar = () => {
                 </BreadcrumbLink>
               </BreadcrumbItem>
            
-
-            {/* <BreadcrumbItem>
-              <BreadcrumbLink
-                as={Link}
-                to='/WARDENdonepage'
-                className={styles['breadcrumb-link']}
-                bg={location.pathname === '/WARDENdonepage' ? 'gray.600' : 'transparent'}
-                color={location.pathname === '/WARDENdonepage' ? 'white' : 'gray.300'}
-                fontWeight={location.pathname === '/WARDENdonepage' ? 'bold' : 'normal'}
-              >
-                Seen
-              </BreadcrumbLink>
-            </BreadcrumbItem> */}
           </Breadcrumb>
         </Flex>
 

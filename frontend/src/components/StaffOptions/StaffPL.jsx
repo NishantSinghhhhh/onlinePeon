@@ -14,7 +14,7 @@ const StaffPL = () => {
   // Function to fetch and filter PL data
   const fetchPL = async (classAssigned) => {
     try {
-      const response = await axios.get(`https://online-peon.vercel.app/fetch/teachers/fetchPLs/${classAssigned}`);
+      const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/fetch/teachers/fetchPLs/${classAssigned}`);
       return response.data;
     } catch (error) {
       throw new Error('Failed to fetch PL data');
@@ -34,7 +34,7 @@ const StaffPL = () => {
       const { staffId } = loginInfo;
 
       try {
-        const teacherResponse = await axios.get(`https://online-peon.vercel.app/fetch/fetchTeacher/${staffId}`);
+        const teacherResponse = await axios.get(`${process.env.REACT_APP_BASE_URL}/fetch/fetchTeacher/${staffId}`);
         const teacherData = teacherResponse.data;
 
         if (teacherResponse.status !== 200) {
@@ -71,7 +71,7 @@ const StaffPL = () => {
     try {
       const position = 0; // Adjust this as needed
 
-      const response = await axios.put(`https://online-peon.vercel.app/update/updatePL/${plId}`, {
+      const response = await axios.put(`${process.env.REACT_APP_BASE_URL}/update/updatePL/${plId}`, {
         status,
         position,
       });

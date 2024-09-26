@@ -73,7 +73,7 @@ const BoxComponent = () => {
         setLoading(true);
         setError(null);
 
-        const response = await axios.get(`https://online-peon.vercel.app/fetchUser/users/${selectedClass}`);
+        const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/fetchUser/users/${selectedClass}`);
         const studentMap = new Map();
 
         response.data.data.forEach(student => {
@@ -91,7 +91,7 @@ const BoxComponent = () => {
 
     const fetchLeaves = async () => {
       try {
-        const response = await fetch('https://online-peon.vercel.app/fetchAll/fetchAllLeaves');
+        const response = await fetch(`${process.env.REACT_APP_BASE_URL}/fetchAll/fetchAllLeaves`);
         if (!response.ok) throw new Error('Failed to fetch leaves');
         const result = await response.json();
         
@@ -111,7 +111,7 @@ const BoxComponent = () => {
 
     const fetchOutpasses = async () => {
       try {
-        const response = await fetch('https://online-peon.vercel.app/fetchAll/fetchAllOutpasses');
+        const response = await fetch(`${process.env.REACT_APP_BASE_URL}/fetchAll/fetchAllOutpasses`);
         if (!response.ok) throw new Error('Failed to fetch outpasses');
         const result = await response.json();
         

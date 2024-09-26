@@ -18,7 +18,7 @@ const PLpage = () => {
 
   const fetchPLs = async () => {
     try {
-      const response = await fetch('https://online-peon.vercel.app/fetchAll/fetchAllPLs');
+      const response = await fetch(`${process.env.REACT_APP_BASE_URL}/fetchAll/fetchAllPLs`);
       if (!response.ok) throw new Error('Failed to fetch permitted leaves');
       const result = await response.json();
 

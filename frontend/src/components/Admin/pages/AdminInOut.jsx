@@ -16,7 +16,7 @@ const AdminInOut = () => {
       const formattedDate = date || new Date().toISOString().split('T')[0]; // Format as YYYY-MM-DD
       console.log("Formatted date:", formattedDate); // Debugging line
 
-      const leaveResponse = await axios.get(`https://online-peon.vercel.app/adminInOut/leaves-outpasses?date=${formattedDate}`);
+      const leaveResponse = await axios.get(`${process.env.REACT_APP_BASE_URL}/adminInOut/leaves-outpasses?date=${formattedDate}`);
       console.log("Leave response data:", leaveResponse.data); // Debugging line
       setLeaveData(leaveResponse.data);
 

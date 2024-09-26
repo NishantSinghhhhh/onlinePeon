@@ -103,7 +103,7 @@ const Scan = ({ setSuccessLeaves, setFailureLeaves, setSuccessOutpasses, setFail
 
   const sendObjectIdToBackend = async (id) => {
     try {
-      const response = await axios.post('https://online-peon.vercel.app/check/checkOutpass', { objectId: id });
+      const response = await axios.post(`${process.env.REACT_APP_BASE_URL}/check/checkOutpass`, { objectId: id });
       
       if (response.data.success) {
         // Trigger success animation
@@ -144,7 +144,7 @@ const Scan = ({ setSuccessLeaves, setFailureLeaves, setSuccessOutpasses, setFail
         console.log(`Attempting to update validation array for object ID: ${id}`);
 
         // Make the PUT request to update the validation array
-        const response = await axios.put(`https://online-peon.vercel.app/update/updateOutpass/guard/${id}`);
+        const response = await axios.put(`${process.env.REACT_APP_BASE_URL}/update/updateOutpass/guard/${id}`);
 
         // Debugging: Log the response from the server
         console.log('Response from updateValidationArray request:', response);

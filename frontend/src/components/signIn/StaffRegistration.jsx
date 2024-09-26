@@ -72,7 +72,7 @@ const StaffRegistration = () => {
     }
 
     try {
-        const url = `https://online-peon.vercel.app/auth/signupStaff`;
+        const url = `${process.env.REACT_APP_BASE_URL}/auth/signupStaff`;
         const response = await fetch(url, {
             method: "POST",
             headers: {

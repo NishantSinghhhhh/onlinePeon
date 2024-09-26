@@ -127,7 +127,7 @@ const LeaveForm = () => {
     }
   
     try {
-      const url = 'https://online-peon.vercel.app/auth/leave'; // Ensure this URL is correct
+      const url = `${process.env.REACT_APP_BASE_URL}/auth/leave`; // Ensure this URL is correct
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -177,7 +177,7 @@ const LeaveForm = () => {
   
   const sendLeaveMessageToParents = async () => {
     try {
-      const response = await fetch('https://online-peon.vercel.app/Message/sendLeaveMessageToParents', {
+      const response = await fetch(`${process.env.REACT_APP_BASE_URL}/Message/sendLeaveMessageToParents`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -213,7 +213,7 @@ const LeaveForm = () => {
   
 const sendLeaveMessageToTeachers = async () => {
     try {
-        const response = await fetch('https://online-peon.vercel.app/Message/sendLeaveMessageToTeachers', {
+        const response = await fetch(`${process.env.REACT_APP_BASE_URL}/Message/sendLeaveMessageToTeachers`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

@@ -47,7 +47,7 @@ const Pending = () => {
       const { registrationNumber } = loginInfo;
 
       try {
-        const response = await fetch(`https://online-peon.vercel.app/fetch/fetchpending/${registrationNumber}`);
+        const response = await fetch(`${process.env.REACT_APP_BASE_URL}/fetch/fetchpending/${registrationNumber}`);
         const data = await response.json();
 
         if (response.ok) {

@@ -17,7 +17,7 @@ const LeaveRequestPage = () => {
 
   const fetchLeaves = async () => {
     try {
-      const response = await fetch('https://online-peon.vercel.app/fetchAll/fetchAllLeaves');
+      const response = await fetch(`${process.env.REACT_APP_BASE_URL}/fetchAll/fetchAllLeaves`);
       if (!response.ok) throw new Error('Failed to fetch leaves');
       const result = await response.json();
 

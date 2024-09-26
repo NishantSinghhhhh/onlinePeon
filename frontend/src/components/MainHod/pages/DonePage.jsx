@@ -27,7 +27,7 @@ const DonePage = () => {
 
   const fetchOutpasses = async () => {
     try {
-      const response = await fetch('https://online-peon.vercel.app/fetchAll/fetchAllOutpasses');
+      const response = await fetch(`${process.env.REACT_APP_BASE_URL}/fetchAll/fetchAllOutpasses`);
       if (!response.ok) throw new Error('Failed to fetch outpasses');
       const result = await response.json();
 
@@ -46,7 +46,7 @@ const DonePage = () => {
 
   const fetchLeaves = async () => {
     try {
-      const response = await fetch('https://online-peon.vercel.app/fetchAll/fetchAllLeaves');
+      const response = await fetch(`${process.env.REACT_APP_BASE_URL}/fetchAll/fetchAllLeaves`);
       if (!response.ok) throw new Error('Failed to fetch leaves');
       const result = await response.json();
 
@@ -65,7 +65,7 @@ const DonePage = () => {
 
   const fetchPLs = async () => {
     try {
-      const response = await fetch('https://online-peon.vercel.app/fetchAll/fetchAllPLs');
+      const response = await fetch(`${process.env.REACT_APP_BASE_URL}/fetchAll/fetchAllPLs`);
       if (!response.ok) throw new Error('Failed to fetch PL requests');
       const result = await response.json();
 

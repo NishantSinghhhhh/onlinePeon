@@ -27,7 +27,7 @@ const Approved = () => {
       const { registrationNumber } = loginInfo;
 
       try {
-        const response = await fetch(`https://online-peon.vercel.app/fetch/fetchapproved/${registrationNumber}`);
+        const response = await fetch(`${process.env.REACT_APP_BASE_URL}/fetch/fetchapproved/${registrationNumber}`);
         const data = await response.json();
 
         if (response.ok) {
