@@ -1,9 +1,9 @@
-const Leave = require('../Models/Leave'); // Assuming Leave is a Mongoose model
-const Outpass = require('../Models/Outpass'); // Assuming Outpass is a Mongoose model
+const Leave = require('../Models/Leave'); // Mongoose model for Leave
+const Outpass = require('../Models/Outpass'); // Mongoose model for Outpass
 
-
+// Controller to fetch leaves and outpasses based on the provided date
 const fetchLeavesOutpasses = async (req, res) => {
-  const { date } = req.query; 
+  const { date } = req.query; // Get the date from query parameters
 
   console.log(`[fetchLeavesOutpasses] Request received with date: ${date}`);
 
@@ -12,9 +12,21 @@ const fetchLeavesOutpasses = async (req, res) => {
       return res.status(400).json({ message: 'Date parameter is required' });
     }
 
+    const queryDate = new Date(date); // Convert the date to a JavaScript Date object
 
-    const outpasses = await Outpass.find({ outpassDate: date });
-    const leaves = await Leave.find({ endDate: date });
+    // Find outpasses where the given date matches the 'date' field (for outpass)
+    const outpasses = await Outpass.find({
+      date: {
+        $gte: queryDate.setHours(0, 0, 0, 0),  // Start of the day
+        $lt: queryDate.setHours(23, 59, 59, 999), // End of the day
+      }
+    });
+
+    // Find leaves where the given date falls within the 'startDate' and 'endDate' range
+    const leaves = await Leave.find({
+      startDate: { $lte: queryDate }, // Leave starts before or on the given date
+      endDate: { $gte: queryDate },   // Leave ends after or on the given date
+    });
 
     const data = {
       leaves,
@@ -28,8 +40,6 @@ const fetchLeavesOutpasses = async (req, res) => {
   }
 };
 
-
 module.exports = {
   fetchLeavesOutpasses,
-
 };
