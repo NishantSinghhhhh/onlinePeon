@@ -107,6 +107,19 @@ const StaffNavbar = () => {
                     Box
                 </BreadcrumbLink>
               </BreadcrumbItem>
+
+              <BreadcrumbItem>
+                <BreadcrumbLink
+                  as={Link}
+                  to='/AdminInOut'
+                  className={styles['breadcrumb-link']}
+                  bg={location.pathname === '/AdminInOut' ? 'gray.600' : 'transparent'}
+                  color={location.pathname === '/AdminInOut' ? 'white' : 'gray.300'}
+                  fontWeight={location.pathname === '/AdminInOut' ? 'bold' : 'normal'}
+                >
+                    AdminInOut
+                </BreadcrumbLink>
+              </BreadcrumbItem>
            
 
             {/* <BreadcrumbItem>

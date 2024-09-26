@@ -33,11 +33,11 @@ import Admin from './components/Admin/Admin'
 import AdminOutpass from './components/Admin/pages/AdminOutpassPage'
 import AdminLeavePage from './components/Admin/pages/AdminLeavePage';
 import AdminPLpage from './components/Admin/pages/AdminPLpage';
+import AdminInOut from './components/Admin/pages/AdminInOut';
 import Search from './components/search/search';
 import Box from './components/Box/Box';
 import Guard from './components/guard/guard'
 import Scan from './components/guard/pages/scan'
-
 import { LoginProvider } from './context/LoginContext';
 import { RollNumberProvider } from './context/RollNumberContext';
 
@@ -79,6 +79,7 @@ function App() {
         <Route path='/AdminOutpass' element={<AdminOutpass/>}/>
         <Route path='/AdminLeavePage' element={<AdminLeavePage/>}/>
         <Route path='/AdminPLpage' element={<AdminPLpage/>}/>
+        <Route path='/AdminInOut' element={<AdminInOut/>}/>
         <Route path='/Search' element={<Search/>}/>
         <Route path='/Box' element={<Box/>}/>
         <Route path='/Guard' element={<Guard/>}/>
