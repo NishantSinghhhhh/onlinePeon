@@ -37,7 +37,7 @@ const AdminInOut = () => {
       } finally {
         setLoading(false);
       }
-    }, 2000);
+    }, 1000);
     return () => clearTimeout(timeOutId);
   };
    
@@ -210,7 +210,7 @@ const AdminInOut = () => {
               </FormControl>
 
               {loading ? (
-                <Flex direction="column" align="center" justify="center" p={5} minH="100vh">
+                <Flex direction="column" align="center" justify="center" p={5} minH="10vh">
                   <HashLoader color="#000000" loading={loading} size={50} />
                   <Text mt={4}>Loading...</Text>
                 </Flex>

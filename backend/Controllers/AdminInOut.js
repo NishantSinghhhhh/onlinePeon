@@ -35,7 +35,7 @@ const fetchLeaves = async (req, res) => {
     // Debug: Log the constructed query
     console.log("Constructed MongoDB Query:", JSON.stringify(query));
 
-    // Fetch the matching leaves from the database
+  
     const leaves = await Leave.find(query);
     console.log("Found Leaves:", leaves.length);
 
@@ -161,8 +161,53 @@ const fetchLateComers = async (req, res) => {
   }
 };
 
+const LateLeaveComers = async (req, res) => {
+  try {
+    const { date } = req.query;
+
+    console.log("Fetching Late comers for:");
+    console.log("Date: ", date);
+
+    if (!date) {
+      console.log("Error: Date is missing in the request");
+      return res.status(400).json({ message: 'Date is required' }); // Ensure a date is provided
+    }
+
+    const formattedDate = new Date(date);
+    console.log("Formatted Date: ", formattedDate.toISOString());
+
+    // Add one day to the formattedDate to calculate the next day
+    const nextDay = new Date(formattedDate);
+    nextDay.setDate(nextDay.getDate() + 1);
+
+    console.log("Next Day: ", nextDay.toISOString());
+
+    // Construct MongoDB query for leaves with endDate < current day and extraValidation is [0,1]
+    const query = {
+      endDate: { $gte: formattedDate, $lt: nextDay }, // endDate is between the formatted date and the next day
+      extraValidation: [0, 1] // Match extraValidation array exactly as [0,1]
+    };
+
+    console.log("Constructed MongoDB Query:", JSON.stringify(query));
+
+    const leaves = await Leave.find(query); // Await the result of the query
+    console.log("Found Leaves: ", leaves.length);
+
+    if (leaves.length === 0) {
+      console.log("No matching leaves found for the provided date and validation arrays");
+    }
+
+    return res.status(200).json(leaves);
+  } catch (error) {
+    console.log("Error occurred: ", error);
+    return res.status(500).json({ message: 'Error fetching Leaves', error });
+  }
+};
+
+
 module.exports = {
   fetchOutpasses,
   fetchLeaves,
-  fetchLateComers
+  fetchLateComers,
+  LateLeaveComers
 };
