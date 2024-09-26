@@ -10,7 +10,7 @@ const fetchUser = require('./Routes/fetchUserRoute');
 const messageRoutes = require('./Routes/MessageRouter'); // Ensure this exports an Express router
 const adminInOut = require('./Routes/AdminRoutes');
 const check = require('./Routes/check')
-
+require('dotenv').config();
 require('./Models/db'); // Ensure this file sets up your DB connection
 
 const PORT = process.env.PORT || 8080;
@@ -20,10 +20,14 @@ const app = express();
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 app.use(cors({
-    origin: ["https://online-peon-frontend.vercel.app"],
-    methods : ["POST", "GET", "PUT", "DELETE"],
-    credentials : true
+    origin: [
+        "https://online-peon-frontend.vercel.app",
+        "http://localhost:3000" // Local development URL
+    ],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true
 }));
+
 
 // Define routes
 app.use('/auth', authRoutes);
