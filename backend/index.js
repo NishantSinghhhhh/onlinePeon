@@ -42,7 +42,7 @@ app.get('/', (req, res) => {
     res.json("PONG");
 });
 
-// Error handling middleware
+
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.setHeader('Access-Control-Allow-Origin', '*');
