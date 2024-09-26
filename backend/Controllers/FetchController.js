@@ -2,6 +2,7 @@ const { Outpass } = require('../Models/Outpass');
 const { PL } = require('../Models/PL');
 const { Leave } = require('../Models/Leave');
 const {Staff} = require('../Models/staff')
+
 const fetchPendingByRegNo = async (req, res) => {
   try {
       const { regNo } = req.params;
