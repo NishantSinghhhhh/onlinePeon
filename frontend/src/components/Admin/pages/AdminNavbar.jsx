@@ -16,12 +16,6 @@ const StaffNavbar = () => {
   const location = useLocation(); 
   const { loginInfo } = useContext(LoginContext); // Access loginInfo from LoginContext
 
-//   import AdminOutpass from './components/Admin/pages/AdminOutpassPage'
-//   import AdminLeavePage from './components/Admin/pages/AdminLeavePage';
-//   import AdminPLpage from './components/Admin/pages/AdminPLpage';
-  
-  const isWarden = loginInfo.position.toLowerCase() === 'warden';
-
   return (
     <Box
       as='nav'
