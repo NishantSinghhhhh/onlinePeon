@@ -373,6 +373,7 @@ const sendLeaveMessageToTeachers = async () => {
                     selected={formData.startDate}
                     onChange={(date) => handleDateChange(date, 'startDate')}
                     className={styles['chakra-input']}
+                    minDate={new Date()}
                   />
                 </FormControl>
 
