@@ -59,20 +59,19 @@ const OutpassForm = () => {
       };
       const [firstName, ...lastNameParts] = userData.name.split(' ');
       const lastName = lastNameParts.join(' '); // Join remaining parts for last name
-
-
+  
       setFormData(prevData => ({
         ...prevData,
         rollNumber: userData.rollNumber,
         className: userData.class,
         contactNumber: userData.contactNumber,
         registrationNumber: userData.registrationNumber,
-        firstName: userData.firstName,
-        lastName: userData.lastName,
+        firstName, // Update firstName directly
+        lastName, // Update lastName directly
       }));
     }
   }, [loading, data]);
-
+  
   const toast = useToast();
   const navigate = useNavigate();
 

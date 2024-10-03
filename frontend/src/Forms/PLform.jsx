@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {  useState, useContext, useEffect } from 'react';
 import {
   Card as ChakraCard,
   CardHeader,
@@ -20,7 +20,9 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import styles from './Form.module.css';
 import { useRollNumber } from '../context/RollNumberContext';
-
+import { StudentLoginContext } from '../context/StudentContext'; // Adjust path as necessary
+import useFetchRegistration from '../hooks/StudentInfo';
+import Navbar from '../components/navbar/navbar';
 const classOptions = [
   'FE-COMP-A', 'FE-COMP-B', 'FE-ENTC-A', 'FE-ENTC-B', 'FE-IT-A', 'FE-IT-B',
   'FE-MECH', 'FE-ARE', 'SE-COMP-A', 'SE-COMP-B', 'SE-ENTC-A', 'SE-ENTC-B',
@@ -44,6 +46,32 @@ const PLForm = () => {
 
   const toast = useToast();
   const { setRollNumber: setRollNumberContext } = useRollNumber();
+
+   
+  const { loginInfo } = useContext(StudentLoginContext);
+  const regnNum = loginInfo.registrationNumber;
+
+  const { data, loading, error } = useFetchRegistration(regnNum);
+
+  useEffect(() => {
+    if (!loading && data) {
+      const userData = {
+        rollNumber: data.rollNumber,
+        class: data.class,
+        name: data.name,
+        contactNumber: data.fatherPhoneNumber,
+        registrationNumber: data.registrationNumber,
+      };
+      const [firstName, ...lastNameParts] = userData.name.split(' ');
+      const lastName = lastNameParts.join(' ');
+
+      setFirstName(firstName);
+      setLastName(lastName);
+      setRollNumber(userData.rollNumber);
+      setClassName(userData.class);
+      setRegistrationNumber(userData.registrationNumber);
+    }
+  }, [loading, data]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -206,6 +234,7 @@ const PLForm = () => {
 
   return (
     <>
+    <Navbar/>
       <div className={styles.main}>
         <ChakraCard borderWidth='1px' borderRadius='md' p={4} boxShadow='md' w='full'>
           <CardHeader>

@@ -91,3 +91,6 @@
     align-items: center;
     justify-content: center;
   }
+  .formContainer{
+    height: 10px;
+  }
