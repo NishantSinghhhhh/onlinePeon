@@ -1,12 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Navbar from './pages/navbar';
 import { Box, Container, Flex, Heading, Text, useColorModeValue } from '@chakra-ui/react';
+import { useLeave } from '../../context/LeaveNumContext'; // Import the useLeave hook
 
 const Guard = () => {
-  const [successLeaves, setSuccessLeaves] = useState(0);
-  const [failureLeaves, setFailureLeaves] = useState(0);
-  const [successOutpasses, setSuccessOutpasses] = useState(0);
-  const [failureOutpasses, setFailureOutpasses] = useState(0);
+  const { successLeaves, failureLeaves } = useLeave(); // Get the leave counts
 
   const backgroundColor = useColorModeValue('gray.50', 'gray.800');
   const textColor = useColorModeValue('gray.800', 'gray.200');
@@ -32,7 +30,7 @@ const Guard = () => {
                 Successful Leaves
               </Text>
               <Text fontSize="2xl" color="green.500">
-                {successLeaves}
+                {successLeaves} {/* Display successful leaves count */}
               </Text>
             </Box>
             <Box
@@ -46,35 +44,7 @@ const Guard = () => {
                 Failed Leaves
               </Text>
               <Text fontSize="2xl" color="red.500">
-                {failureLeaves}
-              </Text>
-            </Box>
-            <Box
-              bg={cardBgColor}
-              p="4"
-              borderRadius="md"
-              boxShadow="md"
-              textAlign="center"
-            >
-              <Text fontSize="lg" fontWeight="bold">
-                Successful Outpasses
-              </Text>
-              <Text fontSize="2xl" color="green.500">
-                {successOutpasses}
-              </Text>
-            </Box>
-            <Box
-              bg={cardBgColor}
-              p="4"
-              borderRadius="md"
-              boxShadow="md"
-              textAlign="center"
-            >
-              <Text fontSize="lg" fontWeight="bold">
-                Failed Outpasses
-              </Text>
-              <Text fontSize="2xl" color="red.500">
-                {failureOutpasses}
+                {failureLeaves} {/* Display failed leaves count */}
               </Text>
             </Box>
           </Flex>

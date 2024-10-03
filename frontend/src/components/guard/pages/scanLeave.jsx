@@ -4,7 +4,7 @@ import { Html5Qrcode } from 'html5-qrcode';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Navbar from './navbar';
-import { useLeaveContext } from '../../../context/LeaveNumContext'; // Import the leave context
+import { useLeave  } from '../../../context/LeaveNumContext'; // Import the leave context
 
 const ScanLeave = () => {
   const toast = useToast();
@@ -17,7 +17,7 @@ const ScanLeave = () => {
   const navigate = useNavigate();
 
   // Get the context values
-  const { setSuccessLeaves, setFailureLeaves } = useLeaveContext();
+  const { setSuccessLeaves, setFailureLeaves } = useLeave();
 
   useEffect(() => {
     html5QrCodeRef.current = new Html5Qrcode("reader");
