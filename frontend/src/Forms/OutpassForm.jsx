@@ -72,6 +72,8 @@ const OutpassForm = () => {
     }
   }, [loading, data]);
   
+  
+
   const toast = useToast();
   const navigate = useNavigate();
 
@@ -83,11 +85,35 @@ const OutpassForm = () => {
     }));
   };
 
+  
   const handleDateChange = (date) => {
     setFormData(prevData => ({
       ...prevData,
       date
     }));
+  };
+
+  
+
+  const validateTime = (time) => {
+    const [hours, minutes] = time.split(':').map(Number);
+    const totalMinutes = hours * 60 + minutes;
+    return totalMinutes >= 420 && totalMinutes <= 1110; // 7:00 AM to 9:30 PM
+  };
+
+  const generateHourOptions = (start, end) => {
+    const options = [];
+    for (let hour = start; hour <= end; hour++) {
+      options.push(
+        <option key={`${hour}:00`} value={`${hour.toString().padStart(2, '0')}:00`}>
+          {`${hour.toString().padStart(2, '0')}:00`}
+        </option>,
+        <option key={`${hour}:30`} value={`${hour.toString().padStart(2, '0')}:30`}>
+          {`${hour.toString().padStart(2, '0')}:30`}
+        </option>
+      );
+    }
+    return options;
   };
 
   const handleSubmit = async (e) => {
@@ -106,8 +132,27 @@ const OutpassForm = () => {
     if (!rollNumber) emptyFields.push('rollNumber');
     if (!reason) emptyFields.push('reason');
     if (!date) emptyFields.push('date');
-    if (!startHour) emptyFields.push('startHour');
-    if (!endHour) emptyFields.push('endHour');
+    if (!validateTime(formData.startHour)) {
+      toast({
+        title: 'Invalid Start Hour',
+        description: 'Start hour must be between 7:00 AM and 9:30 PM.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true
+      });
+      return;
+    }    
+    if (!validateTime(formData.endHour)) {
+      toast({
+        title: 'Invalid End Hour',
+        description: 'End hour must be between 7:00 AM and 9:30 PM.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true
+      });
+      return;
+    }
+
     if (!contactNumber) emptyFields.push('contactNumber');
     if (!className) emptyFields.push('className');
 
@@ -327,33 +372,39 @@ const OutpassForm = () => {
                 <FormControl isRequired>
                   <FormLabel>Date</FormLabel>
                   <DatePicker
-                    selected={formData.date}
-                    onChange={handleDateChange}
+                    selected={formData.date} // Bind the selected date
+                    onChange={handleDateChange} // Update the date on change
+                    minDate={new Date()} // Restrict to today and future dates
                     className={styles['chakra-input']}
+                    dateFormat="MMMM d, yyyy" // Format can be adjusted as needed
                   />
                 </FormControl>
-
                 <FormControl isRequired>
-                  <FormLabel>Start Hour</FormLabel>
-                  <Input
-                    placeholder='Start Hour (HH:MM)'
-                    name='startHour'
-                    value={formData.startHour}
-                    onChange={handleChange}
-                    className={styles['chakra-input']}
-                  />
-                </FormControl>
+              <FormLabel>Start Hour</FormLabel>
+              <Select
+                name='startHour'
+                value={formData.startHour}
+                onChange={handleChange}
+                className={styles['chakra-input']}
+              >
+                <option value="" disabled>Select Start Hour</option>
+                {generateHourOptions(7, 21)} {/* 7 AM to 9 PM */}
+              </Select>
+            </FormControl>
 
-                <FormControl isRequired>
-                  <FormLabel>End Hour</FormLabel>
-                  <Input
-                    placeholder='End Hour (HH:MM)'
-                    name='endHour'
-                    value={formData.endHour}
-                    onChange={handleChange}
-                    className={styles['chakra-input']}
-                  />
-                </FormControl>
+            <FormControl isRequired>
+              <FormLabel>End Hour</FormLabel>
+              <Select
+                name='endHour'
+                value={formData.endHour}
+                onChange={handleChange}
+                className={styles['chakra-input']}
+              >
+                <option value="" disabled>Select End Hour</option>
+                {generateHourOptions(7, 21)} {/* 7 AM to 9 PM */}
+              </Select>
+            </FormControl>
+
 
                 <FormControl isRequired>
                   <FormLabel>Contact Number</FormLabel>
@@ -383,7 +434,7 @@ const OutpassForm = () => {
                   </Select>
                 </FormControl>
 
-                <Button type='submit' colorScheme='teal' size='lg'>
+                <Button type='submit' size='lg'>
                   Submit
                 </Button>
               </Stack>
