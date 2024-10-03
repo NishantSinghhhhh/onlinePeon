@@ -2,6 +2,7 @@ const { Outpass } = require('../Models/Outpass');
 const { PL } = require('../Models/PL');
 const { Leave } = require('../Models/Leave');
 const {Staff} = require('../Models/staff')
+const {User} = require('../Models/User')
 
 const fetchPendingByRegNo = async (req, res) => {
   try {
@@ -239,11 +240,34 @@ const fetchTeacherById = async (req, res) => {
   }
 };
 
+const fetctStudentByRegistrationNum = async (req, res) => {
+  console.log("Request parameters: ", req.params);
+
+  const { registrationNumber } = req.params;
+
+  console.log("Registration Number is: ", registrationNumber);
+
+  try {
+    // Search for the user with the given registration number
+    const student = await User.findOne({ registrationNumber });
+
+    if (!student) {
+      return res.status(404).json({ message: 'Student not found' });
+    }
+
+    // Return the found student object
+    return res.status(200).json(student);
+  } catch (error) {
+    console.error("Error fetching student data: ", error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
 module.exports = {
   fetchPendingByRegNo,
   fetchApprovedByRegNo,
   fetchDeclinedByRegNo,
   fetchExpiredByRegNo,
   fetchTeachers,
-  fetchTeacherById
+  fetchTeacherById,
+  fetctStudentByRegistrationNum
 };

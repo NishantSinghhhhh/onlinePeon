@@ -13,6 +13,7 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 import styles from './signIn.module.css';
 import { LoginContext } from '../../context/LoginContext';
+import { StudentLoginContext } from '../../context/StudentContext'; // Update the path as needed
 
 const SignInCard = () => {
   const [isStudent, setIsStudent] = useState(true);
@@ -25,7 +26,7 @@ const SignInCard = () => {
   const navigate = useNavigate();
   const toast = useToast();
   const { updateLoginInfo } = useContext(LoginContext);
-
+  const { setStudentLoginInfo } = useContext(StudentLoginContext);
   const handleStudentClick = () => setIsStudent(true);
   const handleStaffClick = () => setIsStudent(false);
 
@@ -76,7 +77,7 @@ const SignInCard = () => {
         localStorage.setItem('loggedInUser', name);
         localStorage.setItem('loginInfo', JSON.stringify({ email, registrationNumber, isStudent: true }));
 
-        updateLoginInfo({
+        setStudentLoginInfo({
           email,
           registrationNumber,
           isStudent: true
