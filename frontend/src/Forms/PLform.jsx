@@ -353,7 +353,7 @@ const PLForm = () => {
                 )}
               </Stack>
               <CardFooter mt={4}>
-                <Button colorScheme='blue' type='submit'>
+                <Button  type='submit'>
                   Submit
                 </Button>
               </CardFooter>

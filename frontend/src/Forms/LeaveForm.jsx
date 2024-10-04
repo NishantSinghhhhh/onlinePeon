@@ -459,7 +459,7 @@ const LeaveForm = () => {
                   </Select>
                 </FormControl>
 
-                <Button type='submit' colorScheme='teal'>Submit</Button>
+                <Button type='submit'>Submit</Button>
               </Stack>
             </form>
           </CardBody>
