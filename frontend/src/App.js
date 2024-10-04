@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home/Home';
 import LeaveForm from './Forms/LeaveForm';
 import OutpassForm from './Forms/OutpassForm';
+import HolidayOutpassForm from './Forms/HolidayOutpass';
 import PLform from './Forms/PLform';
 import Approved from './components/Result/Approved';
 import Declined from './components/Result/Declined';
@@ -56,6 +57,7 @@ function App() {
                   <Route path="/" element={<SignInCard />} />
                   <Route path="/Home" element={<Home />} />
                   <Route path="/OutpassForm" element={<OutpassForm />} />
+                  <Route path="/HolidayOutpassForm" element={<HolidayOutpassForm />} />
                   <Route path="/LeaveForm" element={<LeaveForm />} />
                   <Route path="/PLform" element={<PLform />} />
                   <Route path='/Approved' element={<Approved />} />

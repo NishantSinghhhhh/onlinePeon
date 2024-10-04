@@ -28,7 +28,7 @@ const classOptions = [
   'BE-ENTC-A', 'BE-ENTC-B', 'BE-IT-A', 'BE-IT-B', 'BE-MECH'
 ];
 
-const OutpassForm = () => {
+const HolidayOutpassForm = () => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -40,7 +40,7 @@ const OutpassForm = () => {
     endHour: '',
     contactNumber: '',
     className: '',
-    extraDataArray: [0, 0, 0, 0],
+    extraDataArray: [1, 1, 1, 1],
   });
 
   const { loginInfo } = useContext(StudentLoginContext);
@@ -340,11 +340,11 @@ const OutpassForm = () => {
                   <FormLabel>Registration Number</FormLabel>
                   <Input
                     placeholder='Registration Number'
+                    isReadOnly
                     name='registrationNumber'
                     value={formData.registrationNumber}
                     onChange={handleChange}
                     className={styles['chakra-input']}
-                    isReadOnly
                   />
                 </FormControl>
 
@@ -354,7 +354,6 @@ const OutpassForm = () => {
                     placeholder='Roll Number'
                     name='rollNumber'
                     value={formData.rollNumber}
-                    isReadOnly
                     onChange={handleChange}
                     className={styles['chakra-input']}
                   />
@@ -415,9 +414,8 @@ const OutpassForm = () => {
                     name='contactNumber'
                     value={formData.contactNumber}
                     onChange={handleChange}
-                    isReadOnly
-
                     className={styles['chakra-input']}
+                    isReadOnly
                   />
                 </FormControl>
 
@@ -450,4 +448,4 @@ const OutpassForm = () => {
   );
 };
 
-export default OutpassForm;
+export default HolidayOutpassForm;
