@@ -1,16 +1,17 @@
-import React, {  useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import {
   Card as ChakraCard, useToast, CardHeader, CardBody, CardFooter,
-  Heading, FormControl, FormLabel, Input, Button, Stack, Select
+  Heading, FormControl, FormLabel, Input, Button, Stack, Select,
+  Box, Alert, AlertIcon, AlertTitle, AlertDescription
 } from '@chakra-ui/react';
 import Navbar from '../components/navbar/navbar';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useNavigate } from 'react-router-dom';
 import styles from './Form.module.css';
-import { StudentLoginContext } from '../context/StudentContext'; // Adjust path as necessary
+import { StudentLoginContext } from '../context/StudentContext';
 import useFetchRegistration from '../hooks/StudentInfo';
-
+import { WarningIcon } from "@chakra-ui/icons";
 const classOptions = [
   'FE-COMP-A', 'FE-COMP-B', 'FE-ENTC-A', 'FE-ENTC-B', 'FE-IT-A', 'FE-IT-B',
   'FE-MECH', 'FE-ARE', 'SE-COMP-A', 'SE-COMP-B', 'SE-ENTC-A', 'SE-ENTC-B',
@@ -31,15 +32,18 @@ const LeaveForm = () => {
     placeOfResidence: '',
     attendancePercentage: '',
     contactNumber: '',
-    className: '', // Added className
-    extraDataArray: [0, 0, 0, 0] // Hidden array with 4 numbers
+    className: '',
+    extraDataArray: [0, 0, 0, 0]
   });
 
+  const [showSOSAlert, setShowSOSAlert] = useState(false);
   
   const { loginInfo } = useContext(StudentLoginContext);
   const regnNum = loginInfo.registrationNumber;
 
   const { data, loading, error } = useFetchRegistration(regnNum);
+  const toast = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!loading && data) {
@@ -51,7 +55,7 @@ const LeaveForm = () => {
         registrationNumber: data.registrationNumber,
       };
       const [firstName, ...lastNameParts] = userData.name.split(' ');
-      const lastName = lastNameParts.join(' '); // Join remaining parts for last name
+      const lastName = lastNameParts.join(' ');
   
       setFormData(prevData => ({
         ...prevData,
@@ -59,21 +63,17 @@ const LeaveForm = () => {
         className: userData.class,
         contactNumber: userData.contactNumber,
         registrationNumber: userData.registrationNumber,
-        firstName, // Update firstName directly
-        lastName, // Update lastName directly
+        firstName,
+        lastName,
       }));
     }
   }, [loading, data]);
-  
-
-  const toast = useToast();
-  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prevData => {
       const newData = { ...prevData, [name]: value };
-      console.log(`Field '${name}' updated:`, newData[name]); // Debug log
+      console.log(`Field '${name}' updated:`, newData[name]);
       return newData;
     });
   };
@@ -81,7 +81,7 @@ const LeaveForm = () => {
   const handleDateChange = (date, name) => {
     setFormData(prevData => {
       const newData = { ...prevData, [name]: date };
-      console.log(`${name} updated:`, date); // Debug log
+      console.log(`${name} updated:`, date);
       return newData;
     });
   };
@@ -89,12 +89,10 @@ const LeaveForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
   
-    // Debug: Log the form data before submission
     console.log('Full formData state:', formData);
   
     const { firstName, lastName, registrationNumber, rollNumber, reasonForLeave, startDate, endDate, placeOfResidence, attendancePercentage, contactNumber, className, extraDataArray } = formData;
   
-    // Check if startDate and endDate are valid
     let isoStartDate = '';
     let isoEndDate = '';
   
@@ -110,22 +108,20 @@ const LeaveForm = () => {
       return handleError('Invalid end date selected.');
     }
   
-    // Debug: Log the form data to be sent to the server
     console.log('Form data at submission:', {
       firstName: `"${firstName}"`,
       lastName: `"${lastName}"`,
       registrationNumber: `"${registrationNumber}"`,
       reasonForLeave: `"${reasonForLeave}"`,
-      rollNumber : `"${rollNumber}`,
+      rollNumber: `"${rollNumber}"`,
       startDate: `"${isoStartDate}"`,
       endDate: `"${isoEndDate}"`,
       placeOfResidence: `"${placeOfResidence}"`,
       attendancePercentage: `"${attendancePercentage}"`,
       contactNumber: `"${contactNumber}"`,
-      className: `"${className}"`, // Added className
-      extraDataArray // Include hidden array in request
+      className: `"${className}"`,
+      extraDataArray
     });
-  
 
     const emptyFields = [];
     if (!firstName) emptyFields.push('firstName');
@@ -138,15 +134,14 @@ const LeaveForm = () => {
     if (!placeOfResidence) emptyFields.push('placeOfResidence');
     if (!attendancePercentage) emptyFields.push('attendancePercentage');
     if (!contactNumber) emptyFields.push('contactNumber');
-    if (!className) emptyFields.push('className'); // Check for className
+    if (!className) emptyFields.push('className');
   
     if (emptyFields.length > 0) {
       console.log('Empty fields:', emptyFields);
       return handleError(`The following fields are required: ${emptyFields.join(', ')}`);
     }
   
-    // Validate registration number and contact number
-    if (!/^\d{5,6}$/.test(registrationNumber)) { // Updated regex
+    if (!/^\d{5,6}$/.test(registrationNumber)) {
       return handleError('Registration number must be exactly 5 or 6 digits.');
     }
     
@@ -154,13 +149,12 @@ const LeaveForm = () => {
       return handleError('Roll number must be exactly 4 digits.');
     }
 
-
     if (!/^\d{10}$/.test(contactNumber)) {
       return handleError('Contact number must be exactly 10 digits.');
     }
   
     try {
-      const url = `${process.env.REACT_APP_BASE_URL}/auth/leave`; // Ensure this URL is correct
+      const url = `${process.env.REACT_APP_BASE_URL}/auth/leave`;
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -177,19 +171,19 @@ const LeaveForm = () => {
           placeOfResidence,
           attendancePercentage,
           contactNumber,
-          className, // Added className
-          extraDataArray // Include hidden array in request
+          className,
+          extraDataArray
         }),
       });
   
       if (!response.ok) {
         const errorData = await response.json();
-        console.error('Server response error:', errorData); // Debug log
+        console.error('Server response error:', errorData);
         return handleError(errorData.message || 'An error occurred');
       }
   
       const result = await response.json();
-      console.log('Server response:', result); // Debug log
+      console.log('Server response:', result);
   
       if (result.success) {
         await sendLeaveMessageToParents();
@@ -203,7 +197,7 @@ const LeaveForm = () => {
         handleError(result.message || 'An unexpected error occurred.');
       }
     } catch (err) {
-      console.error('Fetch error:', err); // Debug log
+      console.error('Fetch error:', err);
       handleError('An unexpected error occurred.');
     }
   };
@@ -221,8 +215,8 @@ const LeaveForm = () => {
           registrationNumber: formData.registrationNumber,
           rollNumber: formData.rollNumber,
           reason: formData.reasonForLeave,
-          startHour: formData.startDate.toISOString(), // Convert to ISO string if necessary
-          endHour: formData.endDate.toISOString(), // Convert to ISO string if necessary
+          startHour: formData.startDate.toISOString(),
+          endHour: formData.endDate.toISOString(),
           placeOfResidence: formData.placeOfResidence,
           attendancePercentage: formData.attendancePercentage,
           className: formData.className
@@ -244,43 +238,42 @@ const LeaveForm = () => {
     }
   };
   
-const sendLeaveMessageToTeachers = async () => {
+  const sendLeaveMessageToTeachers = async () => {
     try {
-        const response = await fetch(`${process.env.REACT_APP_BASE_URL}/Message/sendLeaveMessageToTeachers`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                contactNumber: formData.contactNumber,
-                studentName: `${formData.firstName} ${formData.lastName}`,
-                reasonForLeave: formData.reasonForLeave,
-                startDate: formData.startDate.toISOString(), // Convert to ISO string if necessary
-                endDate: formData.endDate.toISOString(), // Convert to ISO string if necessary
-                placeOfResidence: formData.placeOfResidence,
-                attendancePercentage: formData.attendancePercentage,
-                className: formData.className
-            }),
-        });
+      const response = await fetch(`${process.env.REACT_APP_BASE_URL}/Message/sendLeaveMessageToTeachers`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contactNumber: formData.contactNumber,
+          studentName: `${formData.firstName} ${formData.lastName}`,
+          reasonForLeave: formData.reasonForLeave,
+          startDate: formData.startDate.toISOString(),
+          endDate: formData.endDate.toISOString(),
+          placeOfResidence: formData.placeOfResidence,
+          attendancePercentage: formData.attendancePercentage,
+          className: formData.className
+        }),
+      });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            console.error('Server response error:', errorData);
-            handleError(errorData.message || 'An error occurred while sending message to teachers');
-            return;
-        }
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Server response error:', errorData);
+        handleError(errorData.message || 'An error occurred while sending message to teachers');
+        return;
+      }
 
-        const result = await response.json();
-        handleSuccess(result.message);
+      const result = await response.json();
+      handleSuccess(result.message);
     } catch (err) {
-        console.error('Fetch error:', err);
-        handleError('An unexpected error occurred while sending message to teachers.');
+      console.error('Fetch error:', err);
+      handleError('An unexpected error occurred while sending message to teachers.');
     }
-};
+  };
 
-  
   const handleError = (message) => {
-    console.error('Error:', message); // Debug log
+    console.error('Error:', message);
     toast({
       title: 'Error',
       description: message,
@@ -291,7 +284,7 @@ const sendLeaveMessageToTeachers = async () => {
   };
 
   const handleSuccess = (message) => {
-    console.log('Success:', message); // Debug log
+    console.log('Success:', message);
     toast({
       title: 'Success',
       description: message,
@@ -301,13 +294,46 @@ const sendLeaveMessageToTeachers = async () => {
     });
   };
 
+  const handleSOSClick = () => {
+    setShowSOSAlert(true);
+    console.log("SOS button clicked");
+    // Implement actual SOS functionality here
+  };
+
   return (
     <>
       <Navbar />
       <div className={styles.main}>
+       
         <ChakraCard borderWidth='1px' borderRadius='md' p={4} boxShadow='md' w='full'>
-          <CardHeader>
+          <CardHeader className=''>
             <Heading size='lg'>Leave Request Form</Heading>
+            <Box position="relative" mb={4}>
+              <Button
+                  colorScheme="red"
+                  size="lg" // Increase the button size
+                  variant="solid" // Change to solid variant for better visibility
+                  position="absolute"
+                  right="20px" // Adjust right position for better spacing
+                  top="20px" // Adjust top position for better spacing
+                  leftIcon={<WarningIcon />} // Add an icon to the button
+                  boxShadow="md" // Add a shadow for a 3D effect
+                  _hover={{ bg: "red.600", transform: "scale(1.05)" }} // Change background color and scale on hover
+                  _active={{ bg: "red.700", transform: "scale(0.95)" }} // Darker color and scale effect on active
+                  onClick={handleSOSClick}
+                >
+              SOS
+            </Button>
+            </Box>
+        
+        {showSOSAlert && (
+          <Alert status="error" mb={4}>
+            <AlertIcon />
+            <AlertTitle mr={2}>SOS Alert Sent!</AlertTitle>
+            <AlertDescription>Your SOS Leave Is approved , All the teachers will be informed</AlertDescription>
+          </Alert>
+        )}
+        
           </CardHeader>
           <CardBody>
             <form onSubmit={handleSubmit}>
@@ -385,7 +411,6 @@ const sendLeaveMessageToTeachers = async () => {
                     className={styles['chakra-input']}
                   />
                 </FormControl>
-
                 <FormControl isRequired>
                   <FormLabel>Place of Residence</FormLabel>
                   <Input 
@@ -401,6 +426,7 @@ const sendLeaveMessageToTeachers = async () => {
                   <FormLabel>Attendance Percentage</FormLabel>
                   <Input 
                     placeholder='Attendance Percentage' 
+                    type='number'
                     name='attendancePercentage'
                     value={formData.attendancePercentage}
                     onChange={handleChange}
@@ -420,25 +446,29 @@ const sendLeaveMessageToTeachers = async () => {
                 </FormControl>
 
                 <FormControl isRequired>
-                  <FormLabel>Class</FormLabel>
-                  <Select
-                    placeholder='Select Class'
-                    name='className'
+                  <FormLabel>Class Name</FormLabel>
+                  <Select 
+                    name='className' 
                     value={formData.className}
                     onChange={handleChange}
-                    className={styles['chakra-select']}
+                    placeholder='Select Class'
+                    className={styles['chakra-input']}
                   >
-                    {classOptions.map(option => (
-                      <option key={option} value={option}>{option}</option>
+                    {classOptions.map((classOption, index) => (
+                      <option key={index} value={classOption}>
+                        {classOption}
+                      </option>
                     ))}
                   </Select>
                 </FormControl>
+
+                <Button type='submit' colorScheme='teal'>Submit</Button>
               </Stack>
-              <CardFooter>
-                <Button type='submit' colorScheme='blue' mt={4}>Submit</Button>
-              </CardFooter>
             </form>
           </CardBody>
+          <CardFooter>
+            {/* Any additional footer information can go here */}
+          </CardFooter>
         </ChakraCard>
       </div>
     </>

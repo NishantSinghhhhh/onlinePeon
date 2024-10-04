@@ -17,8 +17,8 @@ const isInDateRange = (startDate, endDate) => {
 
 // Function to determine if the button should be enabled
 const isButtonEnabled = (manualStartDate, manualEndDate) => {
-  // Enable the button if it's a weekend or within the manual date range
-  return isWeekend() || isInDateRange(manualStartDate, manualEndDate);
+  // Enable the button only if it's a weekend or within the manual date range
+  return !manualStartDate || !manualEndDate || isWeekend() || isInDateRange(manualStartDate, manualEndDate);
 };
 
 // Card Component
