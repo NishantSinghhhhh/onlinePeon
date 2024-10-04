@@ -57,10 +57,10 @@ const Declined = () => {
     const getPendingStatus = (extraDataArray) => {
       if (!extraDataArray || extraDataArray.length === 0) return 'Unknown Status';
   
-      if (extraDataArray[0] === 0) return 'Class Teacher';
-      if (extraDataArray[1] === 0) return 'HOD';
-      if (extraDataArray[2] === 0) return 'Warden';
-      if (extraDataArray[3] === 0) return 'Joint Director';
+      if (extraDataArray[0] === -1) return 'Class Teacher';
+      if (extraDataArray[1] === -1) return 'HOD';
+      if (extraDataArray[2] === -1) return 'Warden';
+      if (extraDataArray[3] === -1) return 'Joint Director';
   
       return 'All Approved';
     };
