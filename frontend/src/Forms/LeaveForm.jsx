@@ -12,6 +12,8 @@ import styles from './Form.module.css';
 import { StudentLoginContext } from '../context/StudentContext';
 import useFetchRegistration from '../hooks/StudentInfo';
 import { WarningIcon } from "@chakra-ui/icons";
+import useSos from '../hooks/useSos';
+
 const classOptions = [
   'FE-COMP-A', 'FE-COMP-B', 'FE-ENTC-A', 'FE-ENTC-B', 'FE-IT-A', 'FE-IT-B',
   'FE-MECH', 'FE-ARE', 'SE-COMP-A', 'SE-COMP-B', 'SE-ENTC-A', 'SE-ENTC-B',
@@ -36,8 +38,7 @@ const LeaveForm = () => {
     extraDataArray: [0, 0, 0, 0]
   });
 
-  const [showSOSAlert, setShowSOSAlert] = useState(false);
-  
+ 
   const { loginInfo } = useContext(StudentLoginContext);
   const regnNum = loginInfo.registrationNumber;
 
@@ -294,21 +295,7 @@ const LeaveForm = () => {
     });
   };
 
-  const handleSOSClick = (e) => {
-    e.preventDefault(); // Prevent default button behavior
-    setShowSOSAlert(true);
-    console.log("SOS button clicked");
-    
-    // Update the formData with the SOS extraDataArray
-    setFormData(prevData => ({
-      ...prevData,
-      extraDataArray: [1, 1, 1, 1]
-    }));
-
-    // Call handleSubmit with a synthetic event
-    handleSubmit({ preventDefault: () => {} });
-  };
-
+  const { handleSosSubmit } = useSos();
 
   return (
     <>
@@ -330,13 +317,13 @@ const LeaveForm = () => {
                   boxShadow="md" // Add a shadow for a 3D effect
                   _hover={{ bg: "red.600", transform: "scale(1.05)" }} // Change background color and scale on hover
                   _active={{ bg: "red.700", transform: "scale(0.95)" }} // Darker color and scale effect on active
-                  onClick={handleSOSClick}
+                  onClick={handleSosSubmit}
                 >
               SOS
             </Button>
             </Box>
         
-        {showSOSAlert && (
+        {!handleSosSubmit && (
           <Alert status="error" mb={4}>
             <AlertIcon />
             <AlertTitle mr={2}>SOS Alert Sent!</AlertTitle>
