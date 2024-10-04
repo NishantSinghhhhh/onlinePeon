@@ -47,12 +47,24 @@ const Declined = () => {
     // Ensure loader is shown for at least 2 seconds
     const timer = setTimeout(() => {
       setShowLoader(false);
-    }, 2000);
+    }, 1000);
 
     // Clear the timeout if the component unmounts before 2 seconds
     return () => clearTimeout(timer);
   }, []);
 
+    // Function to get the pending status based on the extraDataArray
+    const getPendingStatus = (extraDataArray) => {
+      if (!extraDataArray || extraDataArray.length === 0) return 'Unknown Status';
+  
+      if (extraDataArray[0] === 0) return 'Class Teacher';
+      if (extraDataArray[1] === 0) return 'HOD';
+      if (extraDataArray[2] === 0) return 'Warden';
+      if (extraDataArray[3] === 0) return 'Joint Director';
+  
+      return 'All Approved';
+    };
+  
   if (loading || showLoader) {
     return (
       <Flex direction="column" align="center" justify="center" p={5} minH="100vh">
@@ -87,7 +99,7 @@ const Declined = () => {
                   <Heading fontSize="lg" mr={2}>
                     {card.reason || 'Declined Outpass'}
                   </Heading>
-                  <Badge colorScheme="red">Declined</Badge>
+                  <Badge colorScheme="red">Declined By : {getPendingStatus(card.extraDataArray)}</Badge>
                 </Flex>
                 <Text mb={2}>{card.reason || 'Details about the declined outpass'}</Text>
                 <Text fontWeight="bold">
@@ -102,40 +114,8 @@ const Declined = () => {
           <Text>No declined outpasses.</Text>
         )}
 
-        {/* Render Declined PL Requests */}
-        <Heading as="h2" size="lg" mt={8} mb={4}>Declined PL Requests</Heading>
-        {plRequests.length > 0 ? (
-          <Stack spacing={4} maxW="md" w="full">
-            {plRequests.map((card, index) => (
-              <Box
-                key={`pl-${index}`}
-                p={5}
-                shadow="md"
-                borderWidth="1px"
-                borderRadius="md"
-                bg="white"
-              >
-                <Flex align="center" mb={2}>
-                  <Heading fontSize="lg" mr={2}>
-                    {card.reason || 'Declined PL'}
-                  </Heading>
-                  <Badge colorScheme="red">Declined</Badge>
-                </Flex>
-                <Text mb={2}>{card.reason || 'Details about the declined PL'}</Text>
-                <Text fontWeight="bold">
-                  From: {format(new Date(card.startDate), 'yyyy-MM-dd')} 
-                  &nbsp; to &nbsp; 
-                  {format(new Date(card.endDate), 'yyyy-MM-dd')}
-                </Text>
-              </Box>
-            ))}
-          </Stack>
-        ) : (
-          <Text>No declined PLs.</Text>
-        )}
-
-        {/* Render Declined Leaves */}
-        <Heading as="h2" mt={8} size="lg" mb={4}>Declined Leaves</Heading>
+         {/* Render Declined Leaves */}
+         <Heading as="h2" mt={8} size="lg" mb={4}>Declined Leaves</Heading>
         {leaves.length > 0 ? (
           <Stack spacing={4} maxW="md" w="full">
             {leaves.map((card, index) => (
@@ -165,6 +145,41 @@ const Declined = () => {
         ) : (
           <Text>No declined leaves.</Text>
         )}
+
+
+        {/* Render Declined PL Requests */}
+        <Heading as="h2" size="lg" mt={8} mb={4}>Declined PL Requests</Heading>
+        {plRequests.length > 0 ? (
+          <Stack spacing={4} maxW="md" w="full">
+            {plRequests.map((card, index) => (
+              <Box
+                key={`pl-${index}`}
+                p={5}
+                shadow="md"
+                borderWidth="1px"
+                borderRadius="md"
+                bg="white"
+              >
+                <Flex align="center" mb={2}>
+                  <Heading fontSize="lg" mr={2}>
+                    {card.reason || 'Declined PL'}
+                  </Heading>
+                  <Badge colorScheme="red">Declined By : {getPendingStatus(card.extraDataArray)}</Badge>
+                </Flex>
+                <Text mb={2}>{card.reason || 'Details about the declined PL'}</Text>
+                <Text fontWeight="bold">
+                  From: {format(new Date(card.startDate), 'yyyy-MM-dd')} 
+                  &nbsp; to &nbsp; 
+                  {format(new Date(card.endDate), 'yyyy-MM-dd')}
+                </Text>
+              </Box>
+            ))}
+          </Stack>
+        ) : (
+          <Text>No declined PLs.</Text>
+        )}
+
+       
       </Flex>
     </>
   );

@@ -6,8 +6,6 @@ import {
   Text,
   Flex,
   Badge,
-  Tag,
-  TagLabel,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -69,11 +67,10 @@ const Pending = () => {
     fetchPendingData();
   }, []);
 
-  // Function to get the pending status based on the extraDataArray
   const getPendingStatus = (extraDataArray) => {
     if (!extraDataArray || extraDataArray.length === 0) return 'Unknown Status';
 
-    if (extraDataArray[0] === 0) return 'Class Teacher / Counsellor';
+    if (extraDataArray[0] === 0) return 'Class Teacher';
     if (extraDataArray[1] === 0) return 'HOD';
     if (extraDataArray[2] === 0) return 'Warden';
     if (extraDataArray[3] === 0) return 'Joint Director';
@@ -144,12 +141,12 @@ const Pending = () => {
                   <Heading fontSize="lg" mr={2}>
                     {card.reason || 'Pending Outpass'}
                   </Heading>
-                  <Badge colorScheme="yellow">Pending</Badge>
+                  <Badge colorScheme="yellow">Pending with : {getPendingStatus(card.extraDataArray)}</Badge>
                 </Flex>
                 <Text mb={2}>{card.reason || 'Details about the pending outpass'}</Text>
-                <Tag colorScheme="yellow" mb={2}>
-                  <TagLabel>Pending with: {getPendingStatus(card.extraDataArray)}</TagLabel>
-                </Tag>
+                {/* <Text fontWeight="bold">
+                  Pending with: {getPendingStatus(card.extraDataArray)}
+                </Text> */}
                 <Text fontWeight="bold">
                   From: {card.startHour || '00:00'} 
                   &nbsp; to &nbsp; 
@@ -180,12 +177,10 @@ const Pending = () => {
                   <Heading fontSize="lg" mr={2}>
                     {card.reason || 'Pending PL'}
                   </Heading>
-                  <Badge colorScheme="yellow">Pending</Badge>
+                  <Badge colorScheme="yellow">Pending with : {getPendingStatus(card.extraDataArray)} </Badge>
                 </Flex>
                 <Text mb={2}>{card.reason || 'Details about the pending PL'}</Text>
-                <Tag colorScheme="yellow" mb={2}>
-                  <TagLabel>Status: {getPendingStatus(card.extraDataArray)}</TagLabel>
-                </Tag>
+             
                 <Text fontWeight="bold">
                   From: {format(new Date(card.startDate), 'yyyy-MM-dd')} 
                   &nbsp; to &nbsp; 
@@ -247,25 +242,23 @@ const Pending = () => {
                 <Text><strong>Registration Number:</strong> {selectedRequest.registrationNumber}</Text>
                 <Text><strong>Classes Missed:</strong> {selectedRequest.classesMissed}</Text>
                 <Text><strong>Reason:</strong> {selectedRequest.reason}</Text>
-                <Text><strong>From:</strong> {format(new Date(selectedRequest.startDate), 'yyyy-MM-dd')} 
-                  &nbsp; to &nbsp; 
-                  {format(new Date(selectedRequest.endDate), 'yyyy-MM-dd')}
-                </Text>
-                <Text mt={4}><strong>Document:</strong></Text>
+                <Text><strong>From:</strong> {format(new Date(selectedRequest.startDate), 'yyyy-MM-dd')}</Text>
+                <Text><strong>To:</strong> {format(new Date(selectedRequest.endDate), 'yyyy-MM-dd')}</Text>
+
                 {loadingDocument ? (
-                  <HashLoader color="#000000" loading={loadingDocument} size={30} />
-                ) : pdfUrl ? (
-                  <Worker workerUrl={`https://unpkg.com/pdfjs-dist@2.10.377/build/pdf.worker.min.js`}>
-                    <Viewer fileUrl={pdfUrl} />
-                  </Worker>
+                  <HashLoader color="#000000" loading={loadingDocument} size={50} />
                 ) : (
-                  <Text>No document available.</Text>
+                  pdfUrl && (
+                    <Worker workerUrl={`https://unpkg.com/pdfjs-dist@3.0.279/build/pdf.worker.min.js`}>
+                      <Viewer fileUrl={pdfUrl} />
+                    </Worker>
+                  )
                 )}
               </Box>
             )}
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme="blue" onClick={onClose}>Close</Button>
+            <Button colorScheme="blue" mr={3} onClick={onClose}>Close</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
