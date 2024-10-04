@@ -294,11 +294,21 @@ const LeaveForm = () => {
     });
   };
 
-  const handleSOSClick = () => {
+  const handleSOSClick = (e) => {
+    e.preventDefault(); // Prevent default button behavior
     setShowSOSAlert(true);
     console.log("SOS button clicked");
-    // Implement actual SOS functionality here
+    
+    // Update the formData with the SOS extraDataArray
+    setFormData(prevData => ({
+      ...prevData,
+      extraDataArray: [1, 1, 1, 1]
+    }));
+
+    // Call handleSubmit with a synthetic event
+    handleSubmit({ preventDefault: () => {} });
   };
+
 
   return (
     <>
