@@ -1,66 +1,78 @@
 .card {
-    transition: all 0.3s ease;
-  }
-  
-  .card:hover {
-    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
-    transform: translateY(-2px);
-  }
-  
-  .cardContent {
-    padding: 16px;
-  }
-  
-  .header {
-    margin-bottom: 8px;
-  }
-  
-  .title {
-    color: #2D3748;
-  }
-  
-  .outpassBadge {
-    background-color: #4299E1;
-    color: white;
-    font-size: 12px;
-    padding: 2px 8px;
-    border-radius: 9999px;
-  }
-  
-  .className {
-    margin-bottom: 8px;
-  }
-  
-  .reason {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-  
-  .details {
-    display: flex;
-    align-items: center;
-    margin-bottom: 16px;
-  }
-  
-  .icon {
-    width: 16px;
-    height: 16px;
-    color: #718096;
-    margin-right: 8px;
-  }
-  
-  .dateTime {
-    color: #4A5568;
-  }
-  
-  .seeMoreBtn {
-    background-color: #4299E1;
-    color: white;
-    transition: background-color 0.3s ease;
-  }
-  
-  .seeMoreBtn:hover {
-    background-color: #3182CE;
-  }
+  width: 300px; /* Fixed width for all cards */
+  height: 400px; /* Fixed height for consistency */
+  transition: all 0.3s ease;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden; /* Ensures content doesn't overflow */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Ensures even spacing */
+}
+
+.card:hover {
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.cardContent {
+  padding: 16px;
+  flex-grow: 1; /* Allows the content area to grow and take up space */
+}
+
+.header {
+  margin-bottom: 8px;
+}
+
+.title {
+  color: #2D3748;
+}
+
+.outpassBadge {
+  background-color: #4299E1;
+  color: white;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 9999px;
+}
+
+.className {
+  margin-bottom: 8px;
+}
+
+.reason {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.details {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.icon {
+  width: 16px;
+  height: 16px;
+  color: #718096;
+  margin-right: 8px;
+}
+
+.dateTime {
+  color: #4A5568;
+}
+
+.seeMoreBtn {
+  background-color: #4299E1;
+  color: white;
+  transition: background-color 0.3s ease;
+  width: 100%;
+  text-align: center;
+}
+
+.seeMoreBtn:hover {
+  background-color: #3182CE;
+}
