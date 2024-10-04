@@ -1,6 +1,7 @@
-import React from 'react';
-import { Card as ChakraCard, CardHeader, CardBody, CardFooter, Heading, Text, Button, Flex, Box, useToast } from '@chakra-ui/react';
+import React, { useEffect, useState, useContext } from 'react';
+import { Card as ChakraCard, CardHeader, CardBody, CardFooter, Heading, Text, Button, Flex, Box, useToast, Spinner } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
+import { StudentLoginContext } from '../../context/StudentContext'; // Ensure you have this in your context
 import styles from './cards.module.css'; // Custom CSS for additional styles
 
 // Utility function to check if today is a Saturday or Sunday
@@ -15,15 +16,9 @@ const isInDateRange = (startDate, endDate) => {
   return today >= new Date(startDate) && today <= new Date(endDate);
 };
 
-// Function to determine if the button should be enabled
-const isButtonEnabled = (manualStartDate, manualEndDate) => {
-  // Enable the button only if it's a weekend or within the manual date range
-  return !manualStartDate || !manualEndDate || isWeekend() || isInDateRange(manualStartDate, manualEndDate);
-};
-
 // Card Component
-const Card = ({ title, description, buttonText, link, manualStartDate, manualEndDate }) => {
-  const buttonEnabled = isButtonEnabled(manualStartDate, manualEndDate);
+const Card = ({ title, description, buttonText, link, isDisabled, manualStartDate, manualEndDate }) => {
+  const buttonEnabled = !isDisabled && (!manualStartDate || !manualEndDate || isWeekend() || isInDateRange(manualStartDate, manualEndDate));
   const toast = useToast();
 
   const handleButtonClick = (e) => {
@@ -31,7 +26,7 @@ const Card = ({ title, description, buttonText, link, manualStartDate, manualEnd
       e.preventDefault(); // Prevent navigation
       toast({
         title: "Notice",
-        description: "Today there is no holiday, so you cannot fill this form.",
+        description: "There are pending requests, so you cannot apply for this at the moment.",
         status: "warning",
         duration: 4000,
         isClosable: true,
@@ -49,7 +44,7 @@ const Card = ({ title, description, buttonText, link, manualStartDate, manualEnd
       transition="transform 0.3s ease-in-out"
       _hover={{ 
         boxShadow: '2xl', 
-        transform: 'scale(1.05)',
+        transform: buttonEnabled ? 'scale(1.05)' : 'none',
       }}
       p={6}
       bg="white"
@@ -81,6 +76,60 @@ const Card = ({ title, description, buttonText, link, manualStartDate, manualEnd
 
 // Dashboard Component
 const Dashboard = () => {
+  const { loginInfo } = useContext(StudentLoginContext); // Get login info from context
+  const [outpasses, setOutpasses] = useState([]);
+  const [plRequests, setPlRequests] = useState([]);
+  const [leaves, setLeaves] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [showLoader, setShowLoader] = useState(true);
+  const toast = useToast();
+
+  useEffect(() => {
+    const fetchPendingRequests = async () => {
+      try {
+        const response = await fetch(`${process.env.REACT_APP_BASE_URL}/fetch/fetchpending/${loginInfo.registrationNumber}`);
+        const data = await response.json();
+        console.log(data)
+        if (response.ok) {
+          setOutpasses(data.outpasses);
+          setPlRequests(data.pls);
+          setLeaves(data.leaves);
+        } else {
+          throw new Error(data.message || 'Failed to fetch pending requests');
+        }
+      } catch (err) {
+        setError(err.message || 'An unexpected error occurred');
+      } finally {
+        setLoading(false);
+        setShowLoader(false);
+      }
+    };
+
+    if (loginInfo.registrationNumber) {
+      fetchPendingRequests();
+    }
+  }, [loginInfo.registrationNumber]);
+
+  if (loading) {
+    return <Spinner size="xl" color="blue.500" />;
+  }
+
+  if (error) {
+    toast({
+      title: "Error",
+      description: error,
+      status: "error",
+      duration: 5000,
+      isClosable: true,
+    });
+  }
+
+  // Check for pending requests to disable the buttons
+  const hasPendingOutpasses = outpasses.length > 0;
+  const hasPendingPls = plRequests.length > 0;
+  const hasPendingLeaves = leaves.length > 0;
+
   return (
     <Box bg="gray.50" minH="100vh" py={10}>
       <Flex 
@@ -90,32 +139,41 @@ const Dashboard = () => {
         align='center'
         gap={8}
       >
+        {/* Disable the Academic Hour Outpass button if there are pending outpasses */}
         <Card
           title='Apply for Outpass [Academic Hour]'
           description='Generally it takes 1 day to get your outpass approved with a valid reason'
           buttonText='Fill Form'
           link='/OutpassForm'
+          isDisabled={hasPendingOutpasses}
         />
+        
+        {/* Holiday outpass is always available based on weekend and manual date range logic */}
         <Card
           title='Apply for Outpass [Holidays]'
           description='A QR code will be generated instantly. Get it scanned by the guard okay..'
           buttonText='Fill Form'
           link='/HolidayOutpassForm'
-          // Set the manual date range here
           manualStartDate="2024-10-06" // Example: October 6th, 2024
           manualEndDate="2024-10-10" // Example: October 10th, 2024
         />
+
+        {/* Disable the Leave button if there are pending leaves */}
         <Card
           title='Apply for Leave'
           description='Generally it takes 2-3 days to get your Leave approved with a valid reason'
           buttonText='Fill Form'
           link='/LeaveForm'
+          isDisabled={hasPendingLeaves}
         />
+
+        {/* Disable the PL button if there are pending PL requests */}
         <Card
           title='Apply for PL'
           description='Generally it takes 2-3 days to get your PL approved with a valid reason'
           buttonText='Fill Form'
           link='/PLform'
+          isDisabled={hasPendingPls}
         />
       </Flex>
     </Box>

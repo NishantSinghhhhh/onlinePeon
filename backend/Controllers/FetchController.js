@@ -3,22 +3,25 @@ const { PL } = require('../Models/PL');
 const { Leave } = require('../Models/Leave');
 const {Staff} = require('../Models/staff')
 const {User} = require('../Models/User')
-
 const fetchPendingByRegNo = async (req, res) => {
   try {
       const { regNo } = req.params;
 
       // Criteria for matching at least one zero in the array for Outpass and Leave
-      const atLeastOneZero = {
+      const atLeastOneZeroAndNoMinusOne = {
           registrationNumber: regNo,
-          extraDataArray: { $in: [0] } // Check if there's at least one zero in the array
+          extraDataArray: {
+              $in: [0],       // Check if there's at least one zero in the array
+              $nin: [-1]      // Ensure there's no -1 in the array
+          }
       };
 
       // Criteria for matching zero in either the first or second position for PL
-      const plWithZeroInFirstOrSecond = [
+      const plWithZeroInFirstOrSecondAndNoMinusOne = [
           {
               $match: {
-                  registrationNumber: regNo
+                  registrationNumber: regNo,
+                  extraDataArray: { $nin: [-1] } // Ensure there's no -1 in the array
               }
           },
           {
@@ -39,9 +42,9 @@ const fetchPendingByRegNo = async (req, res) => {
 
       // Execute the queries
       const [outpasses, pls, leaves] = await Promise.all([
-          Outpass.find(atLeastOneZero).exec(),
-          PL.aggregate(plWithZeroInFirstOrSecond).exec(),
-          Leave.find(atLeastOneZero).exec()
+          Outpass.find(atLeastOneZeroAndNoMinusOne).exec(),
+          PL.aggregate(plWithZeroInFirstOrSecondAndNoMinusOne).exec(),
+          Leave.find(atLeastOneZeroAndNoMinusOne).exec()
       ]);
 
       res.status(200).json({
