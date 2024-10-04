@@ -29,7 +29,7 @@ const Approved = () => {
       try {
         const response = await fetch(`${process.env.REACT_APP_BASE_URL}/fetch/fetchapproved/${registrationNumber}`);
         const data = await response.json();
-
+        console.log(data)
         if (response.ok) {
           setOutpasses(data.outpasses);
           setPlRequests(data.pls);
@@ -89,46 +89,51 @@ const Approved = () => {
       <Navbar />
       <Flex direction="column" align="center" justify="center" p={5}>
         {/* Render Approved Outpasses */}
-        <Heading as="h2" size="lg" mb={4}>Approved Outpasses</Heading>
-        {outpasses.length > 0 ? (
-          <Stack spacing={4} maxW="md" w="full">
-            {outpasses.map((card, index) => (
-              <Box
-                key={`outpass-${index}`}
-                p={5}
-                shadow="md"
-                borderWidth="1px"
-                borderRadius="md"
-                bg="white"
-                cursor="pointer"
-              >
-                <Flex align="center" mb={2}>
-                  <Heading fontSize="lg" mr={2}>
-                    {card.reason || 'Approved Outpass'}
-                  </Heading>
-                  <Badge colorScheme="green">Approved</Badge>
-                </Flex>
-                <Text mb={2}>{card.reason || 'Details about the approved outpass'}</Text>
-                <Button
-                  colorScheme="green"
-                  variant="outline"
-                  size="sm"
-                  mt={3}
-                  borderRadius="full"
-                  px={4}
-                  fontWeight="bold"
-                  _hover={{ bg: 'green.100' }}
-                  onClick={() => handleShowQrCode(card._id)}
-                >
-                  Show QR Code
-                </Button>
+    {/* Render Approved Outpasses */}
+<Heading as="h2" size="lg" mb={4}>
+  Approved  Outpasses
+</Heading>
 
-              </Box>
-            ))}
-          </Stack>
-        ) : (
-          <Text>No approved outpasses.</Text>
-        )}
+{outpasses.length > 0 ? (
+  <Stack spacing={4} maxW="md" w="full">
+    {outpasses
+      .filter((card) => !card.extraValidation || card.extraValidation.toString() !== '1,1') // Filter outpasses where extraValidation is [1,1]
+      .map((card, index) => (
+        <Box
+          key={`outpass-${index}`}
+          p={5}
+          shadow="md"
+          borderWidth="1px"
+          borderRadius="md"
+          bg="white"
+          cursor="pointer"
+        >
+          <Flex align="center" mb={2}>
+            <Heading fontSize="lg" mr={2}>
+              {card.reason || 'Approved Outpass'}
+            </Heading>
+            <Badge colorScheme="green">Approved</Badge>
+          </Flex>
+          <Text mb={2}>{card.reason || 'Details about the approved outpass'}</Text>
+          <Button
+            colorScheme="green"
+            variant="outline"
+            size="sm"
+            mt={3}
+            borderRadius="full"
+            px={4}
+            fontWeight="bold"
+            _hover={{ bg: 'green.100' }}
+            onClick={() => handleShowQrCode(card._id)}
+          >
+            Show QR Code
+          </Button>
+        </Box>
+      ))}
+  </Stack>
+) : (
+  <Text>No outpasses present.</Text>
+)}
 
           <Modal isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
@@ -153,96 +158,90 @@ const Approved = () => {
           </Modal>
 
         {/* Render Approved PL Requests */}
-        <Heading as="h2" size="lg" mt={8} mb={4}>Approved Permitted Leaves</Heading>
-        {plRequests.length > 0 ? (
-          <Stack spacing={4} maxW="md" w="full">
-            {plRequests.map((card, index) => (
-              <Box
-                key={`pl-${index}`}
-                p={5}
-                shadow="md"
-                borderWidth="1px"
-                borderRadius="md"
-                bg="white"
-                cursor="pointer"
-              >
-                <Flex align="center" mb={2}>
-                  <Heading fontSize="lg" mr={2}>
-                    {card.reason || 'Approved PL'}
-                  </Heading>
-                  <Badge colorScheme="green">Approved</Badge>
-                </Flex>
-                <Text mb={2}>{card.reason || 'Details about the approved PL'}</Text>
-                <Text fontWeight="bold">
-                  Date: {format(new Date(card.startDate), 'yyyy-MM-dd')} 
-                  &nbsp; to &nbsp; 
-                  {format(new Date(card.endDate), 'yyyy-MM-dd')}
-                </Text>
-                <Button
-                  colorScheme="green"
-                  variant="outline"
-                  size="sm"
-                  mt={3}
-                  borderRadius="full"
-                  px={4}
-                  fontWeight="bold"
-                  _hover={{ bg: 'green.100' }}
-                  onClick={() => handleShowQrCode(card._id)}
-                >
-                  Show QR Code
-                </Button>
-              </Box>
-            ))}
-          </Stack>
-        ) : (
-          <Text>No approved PLs.</Text>
-        )}
+       
 
-        {/* Render Approved Leaves */}
-        <Heading as="h2" mt={8} size="lg" mb={4}>Approved Leaves</Heading>
-        {leaves.length > 0 ? (
-          <Stack spacing={4} maxW="md" w="full">
-            {leaves.map((card, index) => (
-              <Box
-                key={`leave-${index}`}
-                p={5}
-                shadow="md"
-                borderWidth="1px"
-                borderRadius="md"
-                bg="white"
-                cursor="pointer"
-              >
-                <Flex align="center" mb={2}>
-                  <Heading fontSize="lg" mr={2}>
-                    {card.reason || 'Approved Leave'}
-                  </Heading>
-                  <Badge colorScheme="green">Approved</Badge>
-                </Flex>
-                <Text mb={2}>{card.reason || 'Details about the approved leave'}</Text>
-                <Text fontWeight="bold">
-                  Date: {format(new Date(card.startDate), 'yyyy-MM-dd')} 
-                  &nbsp; to &nbsp; 
-                  {format(new Date(card.endDate), 'yyyy-MM-dd')}
-                </Text>
-                <Button
-                  colorScheme="green"
-                  variant="outline"
-                  size="sm"
-                  mt={3}
-                  borderRadius="full"
-                  px={4}
-                  fontWeight="bold"
-                  _hover={{ bg: 'green.100' }}
-                  onClick={() => handleShowQrCode(card._id)}
-                >
-                  Show QR Code
-                </Button>
-              </Box>
-            ))}
-          </Stack>
-        ) : (
-          <Text>No approved leaves.</Text>
-        )}
+   {/* Render Approved Leaves */}
+<Heading as="h2" mt={8} size="lg" mb={4}>
+  Approved Leaves
+</Heading>
+
+{leaves.length > 0 ? (
+  <Stack spacing={4} maxW="md" w="full">
+    {leaves
+      .filter((card) => !card.extraValidation || card.extraValidation.toString() !== '1,1') // Filter leaves where extraValidation is [1,1]
+      .map((card, index) => (
+        <Box
+          key={`leave-${index}`}
+          p={5}
+          shadow="md"
+          borderWidth="1px"
+          borderRadius="md"
+          bg="white"
+          cursor="pointer"
+        >
+          <Flex align="center" mb={2}>
+            <Heading fontSize="lg" mr={2}>
+              {card.reason || 'Approved Leave'}
+            </Heading>
+            <Badge colorScheme="green">Approved</Badge>
+          </Flex>
+          <Text mb={2}>{card.reason || 'Details about the approved leave'}</Text>
+          <Text fontWeight="bold">
+            Date: {format(new Date(card.startDate), 'yyyy-MM-dd')} 
+            &nbsp; to &nbsp; 
+            {format(new Date(card.endDate), 'yyyy-MM-dd')}
+          </Text>
+          <Button
+            colorScheme="green"
+            variant="outline"
+            size="sm"
+            mt={3}
+            borderRadius="full"
+            px={4}
+            fontWeight="bold"
+            _hover={{ bg: 'green.100' }}
+            onClick={() => handleShowQrCode(card._id)}
+          >
+            Show QR Code
+          </Button>
+        </Box>
+      ))}
+  </Stack>
+) : (
+  <Text>No approved leaves.</Text>
+)}
+
+       <Heading as="h2" size="lg" mt={8} mb={4}>Approved Permitted Leaves</Heading>
+{plRequests.length > 0 ? (
+  <Stack spacing={4} maxW="md" w="full">
+    {plRequests.map((card, index) => (
+      <Box
+        key={`pl-${index}`}
+        p={5}
+        shadow="md"
+        borderWidth="1px"
+        borderRadius="md"
+        bg="white"
+        cursor="pointer"
+      >
+        <Flex align="center" mb={2}>
+          <Heading fontSize="lg" mr={2}>
+            {card.reason || 'Approved PL'}
+          </Heading>
+          <Badge colorScheme="green">Approved</Badge>
+        </Flex>
+        <Text mb={2}>{card.reason || 'Details about the approved PL'}</Text>
+        <Text fontWeight="bold">
+          Date: {format(new Date(card.startDate), 'yyyy-MM-dd')} 
+          &nbsp; to &nbsp; 
+          {format(new Date(card.endDate), 'yyyy-MM-dd')}
+        </Text>
+      </Box>
+    ))}
+  </Stack>
+) : (
+  <Text>No approved PLs.</Text>
+)}
       </Flex>
     </>
   );

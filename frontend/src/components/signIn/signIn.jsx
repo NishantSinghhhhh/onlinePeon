@@ -276,7 +276,6 @@ const SignInCard = () => {
               </FormControl>
               <Button
                 mt={4}
-                colorScheme='blue'
                 type='submit'
                 width='full'
               >
