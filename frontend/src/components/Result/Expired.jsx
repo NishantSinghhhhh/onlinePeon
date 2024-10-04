@@ -4,7 +4,8 @@ import Navbar from '../navbar/navbar';
 import { HashLoader } from 'react-spinners';
 
 const Expired = () => {
-  const [expiredItems, setExpiredItems] = useState([]);
+  const [expiredOutpasses, setExpiredOutpasses] = useState([]);
+  const [expiredLeaves, setExpiredLeaves] = useState([]);
   const [loading, setLoading] = useState(true);
   const [initialLoading, setInitialLoading] = useState(true); // Added initialLoading state
   const [error, setError] = useState('');
@@ -28,13 +29,17 @@ const Expired = () => {
         console.log('Expired data:', expiredData); // Log the data to verify structure
 
         if (expiredResponse.ok) {
-          // Adding type field to each item
-          const itemsWithType = [
-            ...expiredData.outpasses.map(item => ({ ...item, type: 'Outpass' })),
-            ...expiredData.pls.map(item => ({ ...item, type: 'PL' })),
-            ...expiredData.leaves.map(item => ({ ...item, type: 'Leave' }))
-          ];
-          setExpiredItems(itemsWithType);
+          // Separate and filter expired Outpasses and Leaves
+          const filteredOutpasses = expiredData.outpasses
+            .filter((item) => item.extraValidation && item.extraValidation.toString() === '1,1')
+            .map(item => ({ ...item, type: 'Outpass' }));
+
+          const filteredLeaves = expiredData.leaves
+            .filter((item) => item.extraValidation && item.extraValidation.toString() === '1,1')
+            .map(item => ({ ...item, type: 'Leave' }));
+
+          setExpiredOutpasses(filteredOutpasses);
+          setExpiredLeaves(filteredLeaves);
         } else {
           throw new Error('Failed to fetch data');
         }
@@ -43,7 +48,7 @@ const Expired = () => {
       } finally {
         setLoading(false);
         // Ensure the loader is shown for at least 2 seconds
-        setTimeout(() => setInitialLoading(false), 2000);
+        setTimeout(() => setInitialLoading(false), 1000);
       }
     };
 
@@ -72,36 +77,72 @@ const Expired = () => {
     <>
       <Navbar />
       <Flex direction="column" align="center" justify="center" p={5}>
-        {expiredItems.length > 0 ? (
-          <Stack spacing={4} maxW="md" w="full">
-            {expiredItems.map((item, index) => (
-              <Box
-                key={index}
-                p={5}
-                shadow="md"
-                borderWidth="1px"
-                borderRadius="md"
-                bg="white"
-              >
-                <Flex align="center" mb={2}>
-                  <Heading fontSize="lg" mr={2}>
-                    {item.reason || item.reasonForLeave || 'Expired Request'}
-                  </Heading>
-                  <Badge colorScheme="gray">Expired</Badge>
-                </Flex>
-                <Flex align="center" mb={2}>
-                  <Badge colorScheme="blue">{item.type}</Badge>
-                </Flex>
-                <Text mb={2}>{item.reason || item.reasonForLeave || 'Details about the expired request'}</Text>
-                <Text fontWeight="bold">
-                  From: {new Date(item.startDate || item.date).toLocaleDateString()} 
-                  &nbsp; to &nbsp; 
-                  {new Date(item.endDate || item.date).toLocaleDateString()}
-                </Text>
-              </Box>
-            ))}
-          </Stack>
-        ) : (
+        {/* Section for Expired Outpasses */}
+        {expiredOutpasses.length > 0 && (
+          <>
+            <Heading size="md" mb={4}>Expired Outpasses</Heading>
+            <Stack spacing={4} maxW="md" w="full">
+              {expiredOutpasses.map((item, index) => (
+                <Box
+                  key={index}
+                  p={5}
+                  shadow="md"
+                  borderWidth="1px"
+                  borderRadius="md"
+                  bg="white"
+                >
+                  <Flex align="center" mb={2}>
+                    <Heading fontSize="lg" mr={2}>
+                      {item.reason || 'Expired Outpass'}
+                    </Heading>
+                    <Badge colorScheme="blue">Expired</Badge>
+                  </Flex>
+                  <Text mb={2}>{item.reason || 'Details about the expired request'}</Text>
+                  <Text fontWeight="bold">
+                    From: {new Date(item.startDate).toLocaleDateString()} 
+                    &nbsp; to &nbsp; 
+                    {new Date(item.endDate).toLocaleDateString()}
+                  </Text>
+                </Box>
+              ))}
+            </Stack>
+          </>
+        )}
+
+        {/* Section for Expired Leaves */}
+        {expiredLeaves.length > 0 && (
+          <>
+            <Heading size="md" mb={4}>Expired Leaves</Heading>
+            <Stack spacing={4} maxW="md" w="full">
+              {expiredLeaves.map((item, index) => (
+                <Box
+                  key={index}
+                  p={5}
+                  shadow="md"
+                  borderWidth="1px"
+                  borderRadius="md"
+                  bg="white"
+                >
+                  <Flex align="center" mb={2}>
+                    <Heading fontSize="lg" mr={2}>
+                      {item.reasonForLeave || 'Expired Leave'}
+                    </Heading>
+                    <Badge colorScheme="blue">Expired</Badge>
+                  </Flex>
+                  <Text mb={2}>{item.reasonForLeave || 'Details about the expired leave'}</Text>
+                  <Text fontWeight="bold">
+                    From: {new Date(item.startDate).toLocaleDateString()} 
+                    &nbsp; to &nbsp; 
+                    {new Date(item.endDate).toLocaleDateString()}
+                  </Text>
+                </Box>
+              ))}
+            </Stack>
+          </>
+        )}
+
+        {/* If no expired requests */}
+        {expiredOutpasses.length === 0 && expiredLeaves.length === 0 && (
           <Text>No expired requests.</Text>
         )}
       </Flex>
