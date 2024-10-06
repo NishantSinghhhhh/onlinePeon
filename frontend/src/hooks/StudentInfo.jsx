@@ -31,3 +31,4 @@ const useFetchRegistration = (registrationNumber) => {
 };
 
 export default useFetchRegistration;
+// for fetching user information.
