@@ -214,8 +214,7 @@ const HolidayOutpassForm = () => {
 
   const handleOutpassMessage = async () => {
     try {
-      const outpassUrl = `${process.env.REACT_APP_BASE_URL}/Message/send`;
-      const teacherUrl = `${process.env.REACT_APP_BASE_URL}/Message/sendTeacher`;
+      const outpassUrl = `${process.env.REACT_APP_BASE_URL}/Message/sendInOut`;
 
       const {
         firstName,
@@ -240,17 +239,7 @@ const HolidayOutpassForm = () => {
         startHour,
         endHour,
         className,
-      };
-
-      const teacherMessageBody = {
-        contactNumber,
-        studentName: `${firstName} ${lastName}`,
-        reason,
-        returnDate: '',
-        startHour,
-        endHour,
-        className,
-      };
+      }
 
       const outpassResponse = await fetch(outpassUrl, {
         method: 'POST',
@@ -266,18 +255,6 @@ const HolidayOutpassForm = () => {
         return;
       }
 
-      const teacherResponse = await fetch(teacherUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(teacherMessageBody),
-      });
-
-      if (!teacherResponse.ok) {
-        const teacherData = await teacherResponse.json();
-        handleError(teacherData.error || 'Failed to send teacher message.');
-      }
     } catch (err) {
       handleError('Failed to send the message.');
     }

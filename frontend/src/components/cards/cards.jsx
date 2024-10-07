@@ -150,7 +150,7 @@ const Dashboard = () => {
         
         {/* Holiday outpass is always available based on weekend and manual date range logic */}
         <Card
-          title='Apply for Outpass [Holidays]'
+          title='In-Out Pass'
           description='A QR code will be generated instantly. Get it scanned by the guard okay..'
           buttonText='Fill Form'
           link='/HolidayOutpassForm'
