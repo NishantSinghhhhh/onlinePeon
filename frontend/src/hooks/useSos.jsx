@@ -77,7 +77,8 @@ const useSos = () => {
 
       const result = await response.json();
       if (result.success) {
-        // await sendSosMessages(); // Notify teachers/parents
+        // await sendLeaveMessageToParents(); // Notify teachers/parents
+        await sendLeaveMessageToTeachers(); // Notify teachers/parents
         handleSuccess(result.message);
         setTimeout(() => navigate('/Home'), 1000);
       } else {
@@ -88,38 +89,76 @@ const useSos = () => {
     }
   };
 
-//   const sendSosMessages = async () => {
-//     // Logic to notify parents and teachers, similar to the original form
-//     try {
-//       const sosMessageEndpoints = [
-//         `${process.env.REACT_APP_BASE_URL}/Message/sendLeaveMessageToParents`,
-//         `${process.env.REACT_APP_BASE_URL}/Message/sendLeaveMessageToTeachers`
-//       ];
 
-//       const sosMessagePromises = sosMessageEndpoints.map(endpoint =>
-//         fetch(endpoint, {
-//           method: 'POST',
-//           headers: {
-//             'Content-Type': 'application/json',
-//           },
-//           body: JSON.stringify({
-//             contactNumber: formData.contactNumber,
-//             studentName: `${formData.firstName} ${formData.lastName}`,
-//             reason: formData.reasonForLeave,
-//             startDate: formData.startDate.toISOString(),
-//             endDate: formData.endDate.toISOString(),
-//             placeOfResidence: formData.placeOfResidence,
-//             attendancePercentage: formData.attendancePercentage,
-//             className: formData.className
-//           }),
-//         })
-//       );
+  // const sendLeaveMessageToParents = async () => {
+  //   try {
+  //     const response = await fetch(`${process.env.REACT_APP_BASE_URL}/Message/sendSOS`, {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({
+  //         contactNumber: formData.contactNumber,
+  //         studentName: `${formData.firstName} ${formData.lastName}`,
+  //         registrationNumber: formData.registrationNumber,
+  //         rollNumber: formData.rollNumber,
+  //         reason: formData.reasonForLeave,
+  //         startHour: formData.startDate.toISOString(),
+  //         endHour: formData.endDate.toISOString(),
+  //         placeOfResidence: formData.placeOfResidence,
+  //         attendancePercentage: formData.attendancePercentage,
+  //         className: formData.className
+  //       }),
+  //     });
+  
+  //     if (!response.ok) {
+  //       const errorData = await response.json();
+  //       console.error('Server response error:', errorData);
+  //       handleError(errorData.message || 'An error occurred while sending message to parents');
+  //       return;
+  //     }
+  
+  //     const result = await response.json();
+  //     handleSuccess(result.message);
+  //   } catch (err) {
+  //     console.error('Fetch error:', err);
+  //     handleError('An unexpected error occurred while sending message to parents.');
+  //   }
+  // };
+  
+  const sendLeaveMessageToTeachers = async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BASE_URL}/Message/sendSOS`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contactNumber: formData.contactNumber,
+          studentName: `${formData.firstName} ${formData.lastName}`,
+          reasonForLeave: formData.reasonForLeave,
+          startDate: formData.startDate.toISOString(),
+          endDate: formData.endDate.toISOString(),
+          placeOfResidence: formData.placeOfResidence,
+          attendancePercentage: formData.attendancePercentage,
+          className: formData.className
+        }),
+      });
 
-//       await Promise.all(sosMessagePromises);
-//     } catch (err) {
-//       handleError('An error occurred while sending SOS notifications.');
-//     }
-//   };
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Server response error:', errorData);
+        handleError(errorData.message || 'An error occurred while sending message to teachers');
+        return;
+      }
+
+      const result = await response.json();
+      handleSuccess(result.message);
+    } catch (err) {
+      console.error('Fetch error:', err);
+      handleError('An unexpected error occurred while sending message to teachers.');
+    }
+  };
 
   const handleError = (message) => {
     toast({

@@ -1,6 +1,56 @@
 require('dotenv').config();
 const twilio = require('twilio');
 
+const sendSOS = async (req, res) =>{
+    console.log('Received Body:', req.body);
+
+    const {
+        contactNumber,
+        studentName,
+        reasonForLeave,
+        startDate,
+        endDate,
+        placeOfResidence,
+        attendancePercentage,
+        className
+    } = req.body;
+
+    console.log('Form Data:', {
+        contactNumber,
+        studentName,
+        reasonForLeave,
+        startDate,
+        endDate,
+        placeOfResidence,
+        attendancePercentage,
+        className
+    });
+
+    const formattedStartDate = new Date(startDate).toLocaleDateString();
+    const formattedEndDate = new Date(endDate).toLocaleDateString();
+
+
+    const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+
+    if (!contactNumber) {
+        return res.status(400).json({ error: 'Teacher contact number is required' });
+    }
+
+    try {
+        const message = await client.messages.create({
+            body: `Dear Teacher,\n\nThis is to inform you that your student, ${studentName}, has applied for an Emergency leave. Below are the details of the Emergency Leave:\n\n- Class: ${className}\n- Reason for Leave: ${reasonForLeave}\n Please take note of this Emergency Leave request, and do contact the child when you get time.\n\nThank you.`,
+            from: process.env.TWILIO_WHATSAPP_NUMBER,
+           to: `whatsapp:+919649959730`
+        });
+
+        console.log('WhatsApp message sent successfully with SID:', message.sid);
+        return res.status(200).json({ message: 'WhatsApp message sent successfully', sid: message.sid });
+    } catch (error) {
+        console.error('Error sending WhatsApp message:', error);
+        return res.status(500).json({ error: 'Failed to send WhatsApp message', details: error.message });
+    }
+}
+
 const sendSMS = async (req, res) => {
     console.log('Received Body:', req.body);   
     
@@ -107,7 +157,7 @@ const sendWhatsAppMessage = async (req, res) => {
     }
 };
 
-const sendLeaveMessageToParents = async (req, res) => {
+const sendLeaveMessageToParents = async(req, res) => {
     console.log('Received Body:', req.body);
 
     const {
@@ -316,5 +366,6 @@ module.exports = {
     sendLeaveMessageToTeachers,
     sendPLMessageToTeachers,
     sendPLMessageToParents,
-    sendSMSInOUt
+    sendSMSInOUt,
+    sendSOS
 };

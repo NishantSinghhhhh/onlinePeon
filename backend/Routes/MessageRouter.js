@@ -7,12 +7,14 @@ const {
   sendLeaveMessageToParents,
   sendLeaveMessageToTeachers,
   sendPLMessageToParents, // Add this
-  sendPLMessageToTeachers // Add this
+  sendPLMessageToTeachers,
+  sendSOS // Add this
 } = require('../Controllers/MessageController');
 
 
 router.post('/send', sendSMS);
 router.post('/sendInOut', sendSMSInOUt);
+router.post('/sendSOS', sendSOS);
 router.post('/sendTeacher', sendWhatsAppMessage);
 router.post('/sendLeaveMessageToParents', sendLeaveMessageToParents);
 router.post('/sendLeaveMessageToTeachers', sendLeaveMessageToTeachers);
