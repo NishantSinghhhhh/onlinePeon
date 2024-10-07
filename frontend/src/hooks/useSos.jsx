@@ -90,41 +90,6 @@ const useSos = () => {
   };
 
 
-  // const sendLeaveMessageToParents = async () => {
-  //   try {
-  //     const response = await fetch(`${process.env.REACT_APP_BASE_URL}/Message/sendSOS`, {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({
-  //         contactNumber: formData.contactNumber,
-  //         studentName: `${formData.firstName} ${formData.lastName}`,
-  //         registrationNumber: formData.registrationNumber,
-  //         rollNumber: formData.rollNumber,
-  //         reason: formData.reasonForLeave,
-  //         startHour: formData.startDate.toISOString(),
-  //         endHour: formData.endDate.toISOString(),
-  //         placeOfResidence: formData.placeOfResidence,
-  //         attendancePercentage: formData.attendancePercentage,
-  //         className: formData.className
-  //       }),
-  //     });
-  
-  //     if (!response.ok) {
-  //       const errorData = await response.json();
-  //       console.error('Server response error:', errorData);
-  //       handleError(errorData.message || 'An error occurred while sending message to parents');
-  //       return;
-  //     }
-  
-  //     const result = await response.json();
-  //     handleSuccess(result.message);
-  //   } catch (err) {
-  //     console.error('Fetch error:', err);
-  //     handleError('An unexpected error occurred while sending message to parents.');
-  //   }
-  // };
   
   const sendLeaveMessageToTeachers = async () => {
     try {

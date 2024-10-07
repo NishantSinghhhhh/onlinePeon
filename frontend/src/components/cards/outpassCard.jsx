@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Flex,
@@ -14,11 +14,31 @@ import {
   ModalCloseButton,
   ModalBody,
   ModalFooter,
-  Divider
+  Divider,
+  IconButton,
+  Input
 } from '@chakra-ui/react';
+import { EditIcon } from '@chakra-ui/icons';
 
-const OutpassCard = ({ data, onStatusChange }) => {
+const OutpassCard = ({ data, onStatusChange, onEdit }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen: isDateOpen, onOpen: onDateOpen, onClose: onDateClose } = useDisclosure();
+  const { isOpen: isStartHourOpen, onOpen: onStartHourOpen, onClose: onStartHourClose } = useDisclosure();
+  const { isOpen: isEndHourOpen, onOpen: onEndHourOpen, onClose: onEndHourClose } = useDisclosure();
+
+  const [editedDate, setEditedDate] = useState(data.date);
+  const [editedStartHour, setEditedStartHour] = useState(data.startHour);
+  const [editedEndHour, setEditedEndHour] = useState(data.endHour);
+
+  const handleEdit = (field, value) => {
+    onEdit(data._id, field, value);
+    
+    // console.log("Outpass ID:", data._id);
+    // console.log("Field being edited:", field);
+    // console.log("New value:", value);
+  
+  };
+  
 
   return (
     <>
@@ -40,7 +60,7 @@ const OutpassCard = ({ data, onStatusChange }) => {
               {data.firstName} {data.lastName}
             </Text>
             <Text fontSize="md" mb={2} color="gray.600">
-              {data.className} {/* Render the className here */}
+              {data.className}
             </Text>
             <Text fontSize="md" mb={4} color="gray.600">
               {data.reason}
@@ -68,12 +88,27 @@ const OutpassCard = ({ data, onStatusChange }) => {
               {[
                 { label: 'First Name', value: data.firstName },
                 { label: 'Last Name', value: data.lastName },
-                { label: 'Class Name', value: data.className }, // Add className to modal details
+                { label: 'Class Name', value: data.className },
                 { label: 'Registration Number', value: data.registrationNumber },
                 { label: 'Reason', value: data.reason },
-                { label: 'Date', value: new Date(data.date).toLocaleDateString() },
-                { label: 'Start Hour', value: data.startHour },
-                { label: 'End Hour', value: data.endHour },
+                {
+                  label: 'Date',
+                  value: new Date(data.date).toLocaleDateString(),
+                  editable: true,
+                  onEditOpen: onDateOpen
+                },
+                {
+                  label: 'Start Hour',
+                  value: data.startHour,
+                  editable: true,
+                  onEditOpen: onStartHourOpen
+                },
+                {
+                  label: 'End Hour',
+                  value: data.endHour,
+                  editable: true,
+                  onEditOpen: onEndHourOpen
+                },
                 { label: 'Contact Number', value: data.contactNumber }
               ].map((item, index) => (
                 <Box key={index} mb={2}>
@@ -82,6 +117,15 @@ const OutpassCard = ({ data, onStatusChange }) => {
                       {item.label}:
                     </Text>
                     <Text>{item.value}</Text>
+                    {item.editable && (
+                      <IconButton
+                        aria-label={`Edit ${item.label}`}
+                        icon={<EditIcon />}
+                        size="sm"
+                        ml={2}
+                        onClick={item.onEditOpen}
+                      />
+                    )}
                   </Flex>
                   {index < 8 && <Divider my={2} />}
                 </Box>
@@ -89,18 +133,99 @@ const OutpassCard = ({ data, onStatusChange }) => {
             </Flex>
           </ModalBody>
           <ModalFooter>
-            <Button 
-              colorScheme="green" 
-              mr={3} 
+            <Button
+              colorScheme="green"
+              mr={3}
               onClick={() => onStatusChange(data._id, 1)} // Approve: send status=1
             >
               Approve
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => onStatusChange(data._id, -1)} // Decline: send status=-1
             >
               Decline
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Date Edit Modal */}
+      <Modal isOpen={isDateOpen} onClose={onDateClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Edit Date</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Input
+              type="date"
+              value={editedDate}
+              onChange={(e) => setEditedDate(e.target.value)}
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              colorScheme="blue"
+              onClick={() => {
+                handleEdit('date', editedDate);
+                onDateClose();
+              }}
+            >
+              Save
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Start Hour Edit Modal */}
+      <Modal isOpen={isStartHourOpen} onClose={onStartHourClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Edit Start Hour</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Input
+              type="time"
+              value={editedStartHour}
+              onChange={(e) => setEditedStartHour(e.target.value)}
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              colorScheme="blue"
+              onClick={() => {
+                handleEdit('startHour', editedStartHour);
+                onStartHourClose();
+              }}
+            >
+              Save
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* End Hour Edit Modal */}
+      <Modal isOpen={isEndHourOpen} onClose={onEndHourClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Edit End Hour</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Input
+              type="time"
+              value={editedEndHour}
+              onChange={(e) => setEditedEndHour(e.target.value)}
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              colorScheme="blue"
+              onClick={() => {
+                handleEdit('endHour', editedEndHour);
+                onEndHourClose();
+              }}
+            >
+              Save
             </Button>
           </ModalFooter>
         </ModalContent>

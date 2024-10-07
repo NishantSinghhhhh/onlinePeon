@@ -3,6 +3,7 @@ import { Card as ChakraCard, CardHeader, CardBody, CardFooter, Heading, Text, Bu
 import { Link } from 'react-router-dom';
 import { StudentLoginContext } from '../../context/StudentContext'; // Ensure you have this in your context
 import styles from './cards.module.css'; // Custom CSS for additional styles
+import { HashLoader } from 'react-spinners';
 
 // Utility function to check if today is a Saturday or Sunday
 const isWeekend = () => {
@@ -111,10 +112,14 @@ const Dashboard = () => {
     }
   }, [loginInfo.registrationNumber]);
 
-  if (loading) {
-    return <Spinner size="xl" color="blue.500" />;
+  if (loading || showLoader) {
+    return (
+      <Flex direction="column" align="center" justify="center" p={5} minH="100vh">
+        <HashLoader color="#000000" loading={loading || showLoader} size={50} />
+        <Text mt={4}>Loading...</Text>
+      </Flex>
+    );
   }
-
   if (error) {
     toast({
       title: "Error",

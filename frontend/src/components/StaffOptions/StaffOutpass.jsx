@@ -22,6 +22,11 @@ const StaffOutpass = () => {
     }
   };
 
+  const handleEdit = (id, field, value) => {
+  
+    console.log(`Editing ${field} for Outpass ID: ${id} with new value: ${value}`);
+  };
+
   useEffect(() => {
     const fetchTeacherAndOutpasses = async () => {
       const loginInfo = JSON.parse(localStorage.getItem('loginInfo'));
@@ -31,14 +36,14 @@ const StaffOutpass = () => {
         setShowLoader(false);
         return;
       }
-
+    
       const { staffId } = loginInfo;
-
+    
       try {
         const teacherResponse = await fetch(`${process.env.REACT_APP_BASE_URL}/fetch/fetchTeacher/${staffId}`);
+        if (!teacherResponse.ok) throw new Error('Failed to fetch teacher data');
         const teacherData = await teacherResponse.json();
-        if (!teacherResponse.ok) throw new Error(teacherData.message);
-
+    
         const classAssigned = teacherData.teacher?.classAssigned;
         if (classAssigned) {
           const outpassData = await fetchOutpass(classAssigned);
@@ -47,13 +52,14 @@ const StaffOutpass = () => {
           setError('No class assigned for the teacher.');
         }
       } catch (err) {
+        console.error('Fetch Teacher or Outpass Error:', err);
         setError(err.message || 'An unexpected error occurred');
       } finally {
         setLoading(false);
         setShowLoader(false);
       }
     };
-
+    
     fetchTeacherAndOutpasses();
 
     const timer = setTimeout(() => {
@@ -65,7 +71,6 @@ const StaffOutpass = () => {
 
   const handleStatusChange = async (outpassId, status) => {
     try {
-
       const position = 0;
 
       const response = await axios.put(`${process.env.REACT_APP_BASE_URL}/update/updateOutpass/${outpassId}`, {
@@ -116,11 +121,12 @@ const StaffOutpass = () => {
         <Heading as="h2" size="lg" mb={4}>Outpass Details</Heading>
         {filteredOutpasses.length > 0 ? (
           <Stack spacing={4} maxW="md" w="full">
-            {filteredOutpasses.map((outpass, index) => (
+            {filteredOutpasses.map((outpass) => (
               <OutpassCard 
-                key={index} 
+                key={outpass._id} 
                 data={outpass} 
                 onStatusChange={handleStatusChange} 
+                onEdit={handleEdit} 
               />
             ))}
           </Stack>
