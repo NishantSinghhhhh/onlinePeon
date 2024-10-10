@@ -4,12 +4,16 @@ import StaffNavbar from '../StaffNavbar/StaffNavbar';
 import OutpassCard from '../cards/outpassCard';
 import { HashLoader } from 'react-spinners';
 import axios from 'axios';
+import useEditLeave from '../hooks/useEditLeave'; // Adjust the path as necessary
 
 const StaffOutpass = () => {
   const [outpasses, setOutpasses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showLoader, setShowLoader] = useState(true);
+  
+  // State to manage the current editing outpass
+  const [editingOutpassId, setEditingOutpassId] = useState(null);
 
   const fetchOutpass = async (classAssigned) => {
     try {
@@ -22,11 +26,6 @@ const StaffOutpass = () => {
     }
   };
 
-  const handleEdit = (id, field, value) => {
-  
-    console.log(`Editing ${field} for Outpass ID: ${id} with new value: ${value}`);
-  };
-
   useEffect(() => {
     const fetchTeacherAndOutpasses = async () => {
       const loginInfo = JSON.parse(localStorage.getItem('loginInfo'));
@@ -36,14 +35,14 @@ const StaffOutpass = () => {
         setShowLoader(false);
         return;
       }
-    
+
       const { staffId } = loginInfo;
-    
+
       try {
         const teacherResponse = await fetch(`${process.env.REACT_APP_BASE_URL}/fetch/fetchTeacher/${staffId}`);
         if (!teacherResponse.ok) throw new Error('Failed to fetch teacher data');
         const teacherData = await teacherResponse.json();
-    
+
         const classAssigned = teacherData.teacher?.classAssigned;
         if (classAssigned) {
           const outpassData = await fetchOutpass(classAssigned);
@@ -59,7 +58,7 @@ const StaffOutpass = () => {
         setShowLoader(false);
       }
     };
-    
+
     fetchTeacherAndOutpasses();
 
     const timer = setTimeout(() => {
@@ -89,6 +88,19 @@ const StaffOutpass = () => {
     } catch (error) {
       console.error('Error updating outpass:', error.message);
     }
+  };
+
+  // Integration of useEditLeave hook
+  const { formData, setFormData, handleEditSubmit } = useEditLeave(editingOutpassId);
+
+  const handleEdit = (outpass) => {
+    // Set the form data to the current outpass details for editing
+    setFormData({
+      date: new Date(outpass.date), // Assuming `date` is in the correct format
+      startHour: outpass.startHour || '',
+      endHour: outpass.endHour || '',
+    });
+    setEditingOutpassId(outpass._id); // Set the editing outpass ID
   };
 
   if (loading || showLoader) {
@@ -126,13 +138,15 @@ const StaffOutpass = () => {
                 key={outpass._id} 
                 data={outpass} 
                 onStatusChange={handleStatusChange} 
-                onEdit={handleEdit} 
+                onEdit={() => handleEdit(outpass)} // Pass the current outpass to handleEdit
               />
             ))}
           </Stack>
         ) : (
           <Text fontSize="xl" color="gray.600">No live outpasses are there.</Text>
         )}
+        {/* Add a submit button to handle the edit form submission */}
+        <Button onClick={handleEditSubmit} colorScheme="blue" mt={4}>Submit Edits</Button>
       </Flex>
     </>
   );

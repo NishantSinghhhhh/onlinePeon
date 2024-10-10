@@ -1,31 +1,31 @@
 import { useState, useEffect } from 'react';
 import { useToast } from '@chakra-ui/react';
-// import { StudentLoginContext } from '../context/StudentContext';
-// import useFetchRegistration from '../hooks/StudentInfo';
 import { useNavigate } from 'react-router-dom';
 
-const useEditLeave = (leaveId) => {
+const useEditLeave = (outpassId) => {
   const [formData, setFormData] = useState({
     date: new Date(), // Default to current date
     startHour: '', // Placeholder for start hour
     endHour: '', // Placeholder for end hour
   });
 
-//   const { loginInfo } = useContext(StudentLoginContext);
-//   const regnNum = loginInfo.registrationNumber;
-//   const { data, loading } = useFetchRegistration(regnNum);
-
   const toast = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
-   
+    // Log the outpassId coming from StaffOutpass
+    console.log('Editing outpass with ID:', outpassId);
+
+    // You can fetch existing leave data based on outpassId here if necessary
+  }, [outpassId]);
+
   const handleEditSubmit = async () => {
     try {
       const { date, startHour, endHour } = formData;
       const isoDate = date.toISOString();
 
-      const response = await fetch(`${process.env.REACT_APP_BASE_URL}/auth/leave/${leaveId}`, {
+      // Include the outpassId in the API endpoint
+      const response = await fetch(`${process.env.REACT_APP_BASE_URL}/edit/editOutpass/${outpassId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -39,7 +39,7 @@ const useEditLeave = (leaveId) => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        handleError(errorData.message || 'An error occurred during leave edit submission');
+        handleError(errorData.message || 'An error occurred during outpass edit submission');
         return;
       }
 
@@ -48,10 +48,10 @@ const useEditLeave = (leaveId) => {
         handleSuccess(result.message);
         setTimeout(() => navigate('/Home'), 1000);
       } else {
-        handleError(result.message || 'An error occurred during leave edit submission');
+        handleError(result.message || 'An error occurred during outpass edit submission');
       }
     } catch (err) {
-      handleError('An unexpected error occurred during leave edit submission.');
+      handleError('An unexpected error occurred during outpass edit submission.');
     }
   };
 
@@ -80,8 +80,7 @@ const useEditLeave = (leaveId) => {
     setFormData,
     handleEditSubmit,
   };
-})
-
 };
 
 export default useEditLeave;
+// this thing exports useEditLeave
