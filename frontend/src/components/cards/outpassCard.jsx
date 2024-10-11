@@ -31,14 +31,27 @@ const OutpassCard = ({ data, onStatusChange, onEdit }) => {
   const [editedEndHour, setEditedEndHour] = useState(data.endHour);
 
   const handleEdit = (field, value) => {
-    onEdit(data._id, field, value);
-    
-    // console.log("Outpass ID:", data._id);
-    // console.log("Field being edited:", field);
-    // console.log("New value:", value);
-  
+    // Update the local state
+    if (field === 'date') setEditedDate(value);
+    if (field === 'startHour') setEditedStartHour(value);
+    if (field === 'endHour') setEditedEndHour(value);
+
+    // Prepare the updated data along with the outpass ID
+    const updatedData = {
+      id: data._id, // Include the outpass ID
+      date: field === 'date' ? value : editedDate,
+      startHour: field === 'startHour' ? value : editedStartHour,
+      endHour: field === 'endHour' ? value : editedEndHour
+    };
+
+    // Log the updated data
+    // console.log('Updated data:', updatedData); // Log for debugging
+
+    // Send the updated data to the parent component
+    if (onEdit) {
+      onEdit(updatedData); // Send the entire updatedData object
+    }
   };
-  
 
   return (
     <>
@@ -136,13 +149,13 @@ const OutpassCard = ({ data, onStatusChange, onEdit }) => {
             <Button
               colorScheme="green"
               mr={3}
-              onClick={() => onStatusChange(data._id, 1)} // Approve: send status=1
+              onClick={() => onStatusChange(data._id, 1)}
             >
               Approve
             </Button>
             <Button
               variant="outline"
-              onClick={() => onStatusChange(data._id, -1)} // Decline: send status=-1
+              onClick={() => onStatusChange(data._id, -1)}
             >
               Decline
             </Button>
@@ -150,7 +163,6 @@ const OutpassCard = ({ data, onStatusChange, onEdit }) => {
         </ModalContent>
       </Modal>
 
-      {/* Date Edit Modal */}
       <Modal isOpen={isDateOpen} onClose={onDateClose}>
         <ModalOverlay />
         <ModalContent>
@@ -177,7 +189,6 @@ const OutpassCard = ({ data, onStatusChange, onEdit }) => {
         </ModalContent>
       </Modal>
 
-      {/* Start Hour Edit Modal */}
       <Modal isOpen={isStartHourOpen} onClose={onStartHourClose}>
         <ModalOverlay />
         <ModalContent>
@@ -204,7 +215,6 @@ const OutpassCard = ({ data, onStatusChange, onEdit }) => {
         </ModalContent>
       </Modal>
 
-      {/* End Hour Edit Modal */}
       <Modal isOpen={isEndHourOpen} onClose={onEndHourClose}>
         <ModalOverlay />
         <ModalContent>

@@ -9,6 +9,7 @@ const updateRoutes = require('./Routes/updateRoutes');
 const fetchUser = require('./Routes/fetchUserRoute');
 const messageRoutes = require('./Routes/MessageRouter'); // Ensure this exports an Express router
 const adminInOut = require('./Routes/AdminRoutes');
+const EditRoutes = require('./Routes/EditRoutes');
 const check = require('./Routes/check')
 require('dotenv').config();
 require('./Models/db'); // Ensure this file sets up your DB connection
@@ -41,6 +42,7 @@ app.use('/fetchUser', fetchUser);
 app.use('/message', messageRoutes); // Ensure this is correct
 app.use('/check', check); // Ensure this is correct
 app.use('/adminInOut',adminInOut )
+app.use('/edit',EditRoutes )
 // Test route
 app.get('/', (req, res) => {
     res.json("PONG");
