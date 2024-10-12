@@ -43,32 +43,35 @@ const PLPage = () => {
   };
 
   const filterAndSortPLs = (pls) => {
+    // Ensure only HODs can access this page
     if (!loginInfo.position || loginInfo.position.toLowerCase() !== 'hod') {
       setError('Unauthorized access. Only HODs can view this page.');
       return;
     }
+  
     const assignedBranch = loginInfo.branchAssigned;
-
-    const filtered = pls.filter(pl => {
-      const plBranch = extractBranchFromClassName(pl.className);
-
-      if (plBranch === assignedBranch && !pl.className.toLowerCase().includes('fe')) {
-        
-        const extraDataArray = JSON.stringify(pl.extraDataArray);
-        
-        return extraDataArray === JSON.stringify([1, 0, 0, 0]);
-      }
-
-      return false;
-    });
-
+  
+    let filtered;
+  
+    // Check if the HOD is from ASGE
+    if (assignedBranch === 'ASGE') {
+      // Include all PLs with "FE" in the class name
+      filtered = pls.filter(pl => pl.className.toLowerCase().includes('fe'));
+    } else {
+      // HOD from another branch, exclude FE and match the branch
+      filtered = pls.filter(pl => {
+        const plBranch = extractBranchFromClassName(pl.className); // Extract branch from className
+        return plBranch === assignedBranch && !pl.className.toLowerCase().includes('fe');
+      });
+    }
+  
     console.log('Filtered PLs:', filtered);
-
+  
     const sorted = filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
-
+  
     setFilteredPLs(sorted);
   };
-
+  
   // Helper function to extract the branch from className
   const extractBranchFromClassName = (className) => {
     const parts = className.split('-');

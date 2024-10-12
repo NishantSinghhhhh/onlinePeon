@@ -51,37 +51,34 @@ const OutpassPage = () => {
   };
 
   const filterAndSortOutpasses = (outpasses) => {
-    if (!loginInfo.position) {
-      setError('No position information found. Please log in again.');
+    if (!loginInfo.position || loginInfo.position.toLowerCase() !== 'hod') {
+      setError('Unauthorized access. Only HODs can view this page.');
       return;
     }
-
+  
     const assignedBranch = loginInfo.branchAssigned;
-
     let filtered;
-
-    if (loginInfo.position.toLowerCase() === 'hod') {
-      filtered = outpasses.filter(outpass => {
-        const outpassBranch = extractBranchFromClassName(outpass.className);
-        return outpassBranch === assignedBranch &&
-               JSON.stringify(outpass.extraDataArray) === JSON.stringify([1, 0, 0, 0]);
-      });
+  
+    // Check if the position is HOD and the branch is ASGE
+    if (assignedBranch === 'ASGE') {
+      // Include all outpasses with "FE" in the class name
+      filtered = outpasses.filter(outpass => outpass.className.toLowerCase().includes('fe'));
     } else {
+      // HOD but not from ASGE
       filtered = outpasses.filter(outpass => {
         const outpassBranch = extractBranchFromClassName(outpass.className);
-        return outpassBranch === assignedBranch &&
-               !outpass.className.toLowerCase().includes('fe') &&
-               outpass.extraDataArray && outpass.extraDataArray[0] === 1;
+        return outpassBranch === assignedBranch && 
+               !outpass.className.toLowerCase().includes('fe'); // Exclude "fe"
       });
     }
-
+  
     console.log('Filtered Outpasses:', filtered);
-
+  
     const sorted = filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
-
+  
     setFilteredOutpasses(sorted);
   };
-
+  
   useEffect(() => {
     fetchOutpasses();
 

@@ -50,21 +50,19 @@ const LeavePage = () => {
   
     const assignedBranch = loginInfo.branchAssigned;
   
-    const filtered = leaves.filter(leave => {
-      const leaveBranch = extractBranchFromClassName(leave.className); // Extract branch from className
+    let filtered;
   
-      // Check if the branch in the className matches the assignedBranch and exclude FE students
-      if (leaveBranch === assignedBranch && !leave.className.toLowerCase().includes('fe')) {
-        
-        // Apply the logic for extraDataArray
-        const extraDataArray = JSON.stringify(leave.extraDataArray);
-        
-        // Include leaves with extraDataArray === [1, 0, 0, 0] and exclude other combinations
-        return extraDataArray === JSON.stringify([1, 0, 0, 0]);
-      }
-  
-      return false;
-    });
+    // Check if the HOD is from ASGE
+    if (assignedBranch === 'ASGE') {
+      // Include all leaves with "FE" in the class name
+      filtered = leaves.filter(leave => leave.className.toLowerCase().includes('fe'));
+    } else {
+      // HOD from another branch, exclude FE and match the branch
+      filtered = leaves.filter(leave => {
+        const leaveBranch = extractBranchFromClassName(leave.className); // Extract branch from className
+        return leaveBranch === assignedBranch && !leave.className.toLowerCase().includes('fe');
+      });
+    }
   
     console.log('Filtered Leaves:', filtered);
   
