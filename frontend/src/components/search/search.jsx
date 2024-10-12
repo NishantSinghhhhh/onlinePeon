@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { Input, Box, Button } from '@chakra-ui/react';
+import { Input, Box, Button, Alert, AlertIcon, AlertTitle, AlertDescription } from '@chakra-ui/react';
 import axios from 'axios';
 import AdminNavbar from '../Admin/pages/AdminNavbar';
 import HODNavbar from '../MainHod/pages/navbar';
@@ -26,7 +26,7 @@ const Search = ({ selectedClass }) => {
       case 'HOD':
         return <HODNavbar />;
       case 'Class Teacher':
-        return <StaffNavbar />;  // Update this to return the correct navbar for Class Teacher
+        return <StaffNavbar />;
       case 'Warden':
         return <WardenNavbar />;
       case 'Joint Director':
@@ -37,7 +37,6 @@ const Search = ({ selectedClass }) => {
         return <StaffNavbar />;
     }
   };
-  
 
   const handleInputChange = (e) => {
     setRegistrationNumber(e.target.value);
@@ -45,30 +44,52 @@ const Search = ({ selectedClass }) => {
 
   const handleSearch = async () => {
     try {
+      // Fetch user data
       const userResponse = await axios.get(`${process.env.REACT_APP_BASE_URL}/fetch/teachers/fetchUser/${registrationNumber}`);
       console.log('User data:', userResponse.data.data);
       setUserData(userResponse.data.data);
+      setError(''); // Clear error if user is found
   
-      const outpassesResponse = await axios.get(`${process.env.REACT_APP_BASE_URL}/fetch/teachers/fetchOutpasses/registration/${registrationNumber}`);
-      console.log('Outpasses:', outpassesResponse.data.data);
-      setOutpasses(outpassesResponse.data.data);
+      // Fetch outpasses
+      try {
+        const outpassesResponse = await axios.get(`${process.env.REACT_APP_BASE_URL}/fetch/teachers/fetchOutpasses/registration/${registrationNumber}`);
+        console.log('Outpasses:', outpassesResponse.data.data);
+        setOutpasses(outpassesResponse.data.data);
+      } catch (err) {
+        console.error('Error fetching outpasses:', err);
+        setOutpasses([]); // Set to empty if error occurs
+        // Optionally set an error message for outpasses
+      }
   
-      const leavesResponse = await axios.get(`${process.env.REACT_APP_BASE_URL}/fetch/teachers/fetchLeaves/registration/${registrationNumber}`);
-      console.log('Leaves:', leavesResponse.data.data);
-      setLeaves(leavesResponse.data.data);
+      // Fetch leaves
+      try {
+        const leavesResponse = await axios.get(`${process.env.REACT_APP_BASE_URL}/fetch/teachers/fetchLeaves/registration/${registrationNumber}`);
+        console.log('Leaves:', leavesResponse.data.data);
+        setLeaves(leavesResponse.data.data);
+      } catch (err) {
+        console.error('Error fetching leaves:', err);
+        setLeaves([]); // Set to empty if error occurs
+        // Optionally set an error message for leaves
+      }
   
-      const plsResponse = await axios.get(`${process.env.REACT_APP_BASE_URL}/fetch/teachers/fetchPLs/registration/${registrationNumber}`);
-      console.log('PLs:', plsResponse.data.data);
-      setPls(plsResponse.data.data);
+      // Fetch PLs
+      try {
+        const plsResponse = await axios.get(`${process.env.REACT_APP_BASE_URL}/fetch/teachers/fetchPLs/registration/${registrationNumber}`);
+        console.log('PLs:', plsResponse.data.data);
+        setPls(plsResponse.data.data);
+      } catch (err) {
+        console.error('Error fetching PLs:', err);
+        setPls([]); // Set to empty if error occurs
+        // Optionally set an error message for PLs
+      }
   
-      setError('');
     } catch (err) {
-      console.error('Error fetching data:', err);
-      setError('Error fetching data. Please try again.');
+      console.error('Error fetching user data:', err);
+      setError('No Student Found with This Registration');
       setUserData(null);
-      setOutpasses([]);
-      setLeaves([]);
-      setPls([]);
+      setOutpasses([]); // Clear outpasses
+      setLeaves([]); // Clear leaves
+      setPls([]); // Clear PLs
     }
   };
   
@@ -147,8 +168,15 @@ const Search = ({ selectedClass }) => {
         <Button mt="10px" display="flex" alignItems="center" justifyContent="center" onClick={handleSearch}>
           Search
         </Button>
-        {error && <Box mt="10px" color="red.500">{error}</Box>}
       </Box>
+
+      {error && (
+        <Alert status="error" mt="20px">
+          <AlertIcon />
+          <AlertTitle>Error!</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
 
       <div className={styles.main}>
         {userData && (
@@ -161,7 +189,8 @@ const Search = ({ selectedClass }) => {
           />
         )}
 
-        {outpasses.length === 0 && leaves.length === 0 && pls.length === 0 && userData && (
+        {/* Render message if there are no records but userData exists */}
+        {userData && outpasses.length === 0 && leaves.length === 0 && pls.length === 0 && (
           <Box mt="20px" textAlign="center">
             <p>No record of outpasses, leaves, or PLs found.</p>
           </Box>
