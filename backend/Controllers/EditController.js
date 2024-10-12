@@ -39,36 +39,34 @@ const EditOutpass = async (req, res) => {
 
 const EditLeave = async (req, res) => {
     try {
-        const { outpassId, date, startHour, endHour } = req.body;
+        const { id, startDate, endDate } = req.body;
         console.log(req.body);
 
-        if (!mongoose.Types.ObjectId.isValid(outpassId)) {
-            return res.status(400).json({ message: 'Invalid outpass ID' });
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: 'Invalid leave ID' });
         }
 
-        const outpass = await Outpass.findOne({ _id: outpassId });
+        const leave = await Leave.findOne({ _id: id });
 
-        if (!outpass) {
-            return res.status(404).json({ message: 'Outpass not found' });
+        if (!leave) {
+            return res.status(404).json({ message: 'Leave not found' });
         }
 
-        outpass.date = date;
-        outpass.startHour = startHour;
-        outpass.endHour = endHour;
+        leave.startDate = startDate;
+        leave.endDate = endDate;
 
-        // Save the updated outpass
-        const updatedOutpass = await outpass.save();
+        const updatedLeave = await leave.save();
 
-        // Log the updated outpass for debugging
-        console.log("Updated Outpass:", updatedOutpass);
+
+        console.log("Updated Leave:", updatedLeave);
 
         res.status(200).json({ 
-            message: 'Outpass updated successfully',
-            updatedOutpass // Optionally return the updated outpass data
+            message: 'Leave updated successfully',
+            updatedLeave // Optionally return the updated leave data
         });
     } catch (error) {
-        console.error('Error editing outpass:', error);
-        res.status(500).json({ message: 'An error occurred while editing the outpass' });
+        console.error('Error editing leave:', error);
+        res.status(500).json({ message: 'An error occurred while editing the leave' });
     }
 };
 

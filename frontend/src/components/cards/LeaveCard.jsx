@@ -15,24 +15,29 @@ import {
   ModalBody,
   ModalFooter,
   Divider,
-  Input,
+  IconButton,
+  Input
 } from '@chakra-ui/react';
+import { EditIcon } from '@chakra-ui/icons';
 
-const LeaveCard = ({ data, onStatusChange, onDateChange }) => {
+const LeaveCard = ({ data, onStatusChange, onEdit }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [startDate, setStartDate] = useState(new Date(data.startDate).toISOString().substr(0, 10));
-  const [endDate, setEndDate] = useState(new Date(data.endDate).toISOString().substr(0, 10));
-  
+  const { isOpen: isStartDateOpen, onOpen: onStartDateOpen, onClose: onStartDateClose } = useDisclosure();
+  const { isOpen: isEndDateOpen, onOpen: onEndDateOpen, onClose: onEndDateClose } = useDisclosure();
+
+  const [editedStartDate, setEditedStartDate] = useState(data.startDate);
+  const [editedEndDate, setEditedEndDate] = useState(data.endDate);
+
   const handleEdit = async (field, value) => {
-    if (field === 'startDate') setStartDate(value);
-    if (field === 'endDate') setEndDate(value);
-  
+    if (field === 'startDate') setEditedStartDate(value);
+    if (field === 'endDate') setEditedEndDate(value);
+
     const updatedData = {
-      id: data._id, 
-      startDate: field === 'startDate' ? value : startDate,
-      endDate: field === 'endDate' ? value : endDate,
+      id: data._id,
+      startDate: field === 'startDate' ? value : editedStartDate,
+      endDate: field === 'endDate' ? value : editedEndDate,
     };
-  
+
     try {
       const response = await fetch(`${process.env.REACT_APP_BASE_URL}/edit/editLeave`, {
         method: 'PUT',
@@ -41,7 +46,7 @@ const LeaveCard = ({ data, onStatusChange, onDateChange }) => {
         },
         body: JSON.stringify(updatedData),
       });
-  
+
       if (response.ok) {
         const result = await response.json();
         console.log('Leave updated successfully:', result);
@@ -52,9 +57,9 @@ const LeaveCard = ({ data, onStatusChange, onDateChange }) => {
     } catch (error) {
       console.error('An error occurred while updating the leave:', error);
     }
-  
-    if (onDateChange) {
-      onDateChange(updatedData);
+
+    if (onEdit) {
+      onEdit(updatedData);
     }
   };
 
@@ -100,11 +105,23 @@ const LeaveCard = ({ data, onStatusChange, onDateChange }) => {
           <ModalCloseButton />
           <ModalBody>
             <Flex direction="column" spacing={3} p={4}>
-              {[ 
+              {[
                 { label: 'First Name', value: data.firstName },
                 { label: 'Last Name', value: data.lastName },
                 { label: 'Registration Number', value: data.registrationNumber },
                 { label: 'Reason For Leave', value: data.reasonForLeave },
+                {
+                  label: 'Start Date',
+                  value: new Date(editedStartDate).toLocaleDateString(),
+                  editable: true,
+                  onEditOpen: onStartDateOpen
+                },
+                {
+                  label: 'End Date',
+                  value: new Date(editedEndDate).toLocaleDateString(),
+                  editable: true,
+                  onEditOpen: onEndDateOpen
+                },
                 { label: 'Contact Number', value: data.contactNumber }
               ].map((item, index) => (
                 <Box key={index} mb={2}>
@@ -113,43 +130,86 @@ const LeaveCard = ({ data, onStatusChange, onDateChange }) => {
                       {item.label}:
                     </Text>
                     <Text>{item.value}</Text>
+                    {item.editable && (
+                      <IconButton
+                        aria-label={`Edit ${item.label}`}
+                        icon={<EditIcon />}
+                        size="sm"
+                        ml={2}
+                        onClick={item.onEditOpen}
+                      />
+                    )}
                   </Flex>
-                  {index < 5 && <Divider my={2} />}
+                  {index < 6 && <Divider my={2} />}
                 </Box>
               ))}
-
-              <Box mb={2}>
-                <Flex justify="space-between" align="center">
-                  <Text fontWeight="semibold" color="gray.700">
-                    Start Date:
-                  </Text>
-                  <Input
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => handleEdit('startDate', e.target.value)}
-                  />
-                </Flex>
-                <Divider my={2} />
-              </Box>
-
-              <Box mb={2}>
-                <Flex justify="space-between" align="center">
-                  <Text fontWeight="semibold" color="gray.700">
-                    End Date:
-                  </Text>
-                  <Input
-                    type="date"
-                    value={endDate}
-                    onChange={(e) => handleEdit('endDate', e.target.value)}
-                  />
-                </Flex>
-                <Divider my={2} />
-              </Box>
             </Flex>
           </ModalBody>
           <ModalFooter>
-            <Button variant="outline" onClick={onClose}>
-              Close
+            <Button
+              colorScheme="green"
+              mr={3}
+              onClick={() => onStatusChange(data._id, 1)}
+            >
+              Approve
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => onStatusChange(data._id, -1)}
+            >
+              Decline
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      <Modal isOpen={isStartDateOpen} onClose={onStartDateClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Edit Start Date</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Input
+              type="date"
+              value={editedStartDate}
+              onChange={(e) => setEditedStartDate(e.target.value)}
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              colorScheme="blue"
+              onClick={() => {
+                handleEdit('startDate', editedStartDate);
+                onStartDateClose();
+              }}
+            >
+              Save
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      <Modal isOpen={isEndDateOpen} onClose={onEndDateClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Edit End Date</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Input
+              type="date"
+              value={editedEndDate}
+              onChange={(e) => setEditedEndDate(e.target.value)}
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              colorScheme="blue"
+              onClick={() => {
+                handleEdit('endDate', editedEndDate);
+                onEndDateClose();
+              }}
+            >
+              Save
             </Button>
           </ModalFooter>
         </ModalContent>
