@@ -5,7 +5,7 @@ import HODNavbar from '../MainHod/pages/navbar';
 import WardenNavbar from '../HOD/pages/navbar';
 import StaffNavbar from '../StaffNavbar/StaffNavbar';
 import { LoginContext } from '../../context/LoginContext';
-import styles from './Box.module.css'; // Import the CSS module
+import styles from './Box.module.css';
 
 const BoxComponent = () => {
   const { loginInfo } = useContext(LoginContext);
@@ -17,7 +17,9 @@ const BoxComponent = () => {
   const [error, setError] = useState(null);     
   const [modalContent, setModalContent] = useState(null);  
   const [showModal, setShowModal] = useState(false); 
-  const [activeStudents, setActiveStudents] = useState([]); // Add activeStudents state
+  const [activeStudents, setActiveStudents] = useState([]);
+  const [studentsOnLeave, setStudentsOnLeave] = useState([]);
+  const [studentsOnOutpass, setStudentsOnOutpass] = useState([]);
 
   const classOptions = [
     'FE-COMP-A', 'FE-COMP-B', 'FE-ENTC-A', 'FE-ENTC-B', 'FE-IT-A', 'FE-IT-B',
@@ -30,8 +32,9 @@ const BoxComponent = () => {
   const renderNavbar = () => {
     switch (loginInfo.position) {
       case 'HOD':
-      case 'Class Teacher':
         return <HODNavbar />;
+      case 'Class Teacher':
+        return <StaffNavbar />;
       case 'Warden':
         return <WardenNavbar />;
       case 'Joint Director':
@@ -135,21 +138,31 @@ const BoxComponent = () => {
   }, [selectedClass]);
 
   useEffect(() => {
-    const activeList = [];
+    const updateActiveStudents = () => {
+      const onLeave = [];
+      const onOutpass = [];
 
-    studentMap.forEach(student => {
-      const studentLeaves = leavesMap.get(student.rollNumber) || [];
-      const studentOutpasses = outpassesMap.get(student.rollNumber) || [];
+      studentMap.forEach(student => {
+        const studentLeaves = leavesMap.get(student.rollNumber) || [];
+        const studentOutpasses = outpassesMap.get(student.rollNumber) || [];
 
-      const hasActiveLeave = studentLeaves.some(isActiveLeave);
-      const hasActiveOutpass = studentOutpasses.some(isActiveOutpass);
+        const hasActiveLeave = studentLeaves.some(isActiveLeave);
+        const hasActiveOutpass = studentOutpasses.some(isActiveOutpass);
 
-      if (hasActiveLeave || hasActiveOutpass) {
-        activeList.push(student);
-      }
-    });
+        if (hasActiveLeave) {
+          onLeave.push(student);
+        }
+        if (hasActiveOutpass) {
+          onOutpass.push(student);
+        }
+      });
 
-    setActiveStudents(activeList);
+      setStudentsOnLeave(onLeave);
+      setStudentsOnOutpass(onOutpass);
+      setActiveStudents([...onLeave, ...onOutpass]);
+    };
+
+    updateActiveStudents();
   }, [studentMap, leavesMap, outpassesMap]);
 
   const handleSelectChange = (e) => {
@@ -172,59 +185,54 @@ const BoxComponent = () => {
     setModalContent(null);
   };
 
-  const downloadCSV = () => {
-    // CSV header
-    const csvHeader = ['Roll Number', 'Name', 'Leave Reason', 'Leave Dates', 'Outpass Reason', 'Outpass Dates'];
-    const csvRows = activeStudents.map((student) => {
+  const downloadCSV = (students, filePrefix) => {
+    // Define CSV header based on the file prefix
+    const csvHeader = filePrefix === 'leave' 
+      ? ['Roll Number', 'Name', 'Reason for Leave', 'Dates', 'Place of Residence', 'Attendance Percentage', 'Contact Number'] 
+      : ['Roll Number', 'Name', 'Reason', 'Times', 'Contact Number', 'Class Name'];
+  
+    const csvRows = students.map((student) => {
       const studentLeaves = leavesMap.get(student.rollNumber) || [];
       const studentOutpasses = outpassesMap.get(student.rollNumber) || [];
-  
-      // Formatting leave and outpass data
-      const leaveDetails = studentLeaves
-        .filter(isActiveLeave)
-        .map((leave) => ({
-          reason: leave.reason || 'N/A',
-          dates: `${leave.startDate} to ${leave.endDate}`
-        }));
-  
-      const outpassDetails = studentOutpasses
-        .filter(isActiveOutpass)
-        .map((outpass) => ({
-          reason: outpass.reason || 'N/A',
-          dates: `${outpass.startHour} to ${outpass.endHour}`
-        }));
-  
-      // Convert to string for CSV
-      const leaveReasons = leaveDetails.map((leave) => leave.reason).join('; ');
-      const leaveDates = leaveDetails.map((leave) => leave.dates).join('; ');
-      const outpassReasons = outpassDetails.map((outpass) => outpass.reason).join('; ');
-      const outpassDates = outpassDetails.map((outpass) => outpass.dates).join('; ');
-  
-      // Return the CSV row for the student
-      return [
-        student.rollNumber,
-        student.name,
-        leaveReasons,
-        leaveDates,
-        outpassReasons,
-        outpassDates
-      ];
+      
+      let details;
+      if (filePrefix === 'leave') {
+        details = studentLeaves.filter(isActiveLeave)[0]; // Get active leave details
+        return [
+          student.rollNumber,
+          `${student.firstName} ${student.lastName}`, // Full name
+          details?.reasonForLeave || 'N/A', // Reason for leave
+          details ? `${new Date(details.startDate).toLocaleDateString()} to ${new Date(details.endDate).toLocaleDateString()}` : 'N/A', // Date range for leave
+          details?.placeOfResidence || 'N/A', // Place of residence
+          details?.attendancePercentage !== undefined ? details.attendancePercentage : 'N/A', // Attendance percentage
+          details?.contactNumber || 'N/A' // Contact number
+        ];
+      } else {
+        details = studentOutpasses.filter(isActiveOutpass)[0]; // Get active outpass details
+        return [
+          student.rollNumber,
+          `${student.firstName || ''} ${student.lastName || ''}`.trim() || 'N/A', // Full name
+          details?.reason || 'N/A', // Reason for outpass
+          details ? `${details.startHour} to ${details.endHour}` : 'N/A', // Time range for outpass
+          details?.contactNumber || 'N/A', // Contact number
+          details?.className || 'N/A' // Class name
+        ];
+      }
     });
   
-    // Convert to CSV string format
     const csvContent = [
-      csvHeader.join(','), // CSV header
-      ...csvRows.map(row => row.join(',')) // CSV rows
-    ].join('\n'); // Join rows with newline
+      csvHeader.join(','), // Join header
+      ...csvRows.map(row => row.join(',')) // Join each row
+    ].join('\n'); // Join all rows with a new line
   
-    // Create CSV file and download
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.setAttribute('href', url);
-    a.setAttribute('download', 'active_students_with_leave_outpass.csv');
-    a.click();
+    const blob = new Blob([csvContent], { type: 'text/csv' }); // Create a Blob for CSV
+    const url = window.URL.createObjectURL(blob); // Create a URL for the Blob
+    const a = document.createElement('a'); // Create an anchor element
+    a.setAttribute('href', url); // Set the href to the Blob URL
+    a.setAttribute('download', `${filePrefix}_students.csv`); // Set the filename
+    a.click(); // Trigger the download
   };
+  
   
 
   const sortedStudents = Array.from(studentMap.values()).sort((a, b) => {
@@ -252,7 +260,6 @@ const BoxComponent = () => {
         </div>
       </div>
 
-      {/* Loading and error handling */}
       {loading ? (
         <p>Loading...</p>
       ) : error ? (
@@ -284,28 +291,31 @@ const BoxComponent = () => {
         </div>
       )}
 
-      {/* Display active students */}
       <div className={styles.boxes}>
-        <h3>Students on Active Leave or Outpass</h3>
-        {activeStudents.length > 0 ? (
           <>
-            {activeStudents.map((student) => (
-              <div key={student.rollNumber} className={styles.studentBox}>
-                <p>{student.rollNumber} - {student.name}</p>
-              </div>
-            ))}
-
-            {/* Download Button */}
-            <button onClick={downloadCSV} className={styles.downloadButton}>
-              Download CSV
-            </button>
+            <div className={styles.downloadButtons}>
+              <button 
+                onClick={() => downloadCSV(studentsOnLeave, 'leave')} 
+                className={styles.downloadButton}
+                disabled={studentsOnLeave.length === 0}
+              >
+                Download Students on Leave
+              </button>
+              <button 
+                onClick={() => downloadCSV(studentsOnOutpass, 'outpass')} 
+                className={styles.downloadButton}
+                disabled={studentsOnOutpass.length === 0}
+              >
+                Download Students on Outpass
+              </button>
+            </div>
           </>
-        ) : (
+    
+        {(studentsOnLeave.length === 0 && studentsOnOutpass.length === 0) && (
           <p>No students are currently on active leave or outpass</p>
         )}
       </div>
 
-      {/* Modal for detailed view */}
       {showModal && modalContent && (
         <div className={styles.modal}>
           <div className={styles.modalContent}>

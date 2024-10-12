@@ -96,6 +96,36 @@
   z-index: 1000;
 }
 
+.downloadButton {
+  padding: 10px 20px; /* Adjusts padding */
+  background-color: #4CAF50; /* Green background */
+  color: white; /* White text color */
+  border: none; /* No border */
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+  font-size: 16px; /* Increases font size */
+  transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.downloadButtons{
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+
+}
+/* Hover effect */
+.downloadButton:hover {
+  background-color: #45a049; /* Darker green on hover */
+}
+
+/* Disabled button styles */
+.downloadButton:disabled {
+  background-color: #ccc; /* Light gray background */
+  cursor: not-allowed; /* Not-allowed cursor for disabled state */
+  color: #666; /* Darker text color for disabled state */
+  display: none;
+}
+
 .modalContent {
   background: #fff;
   padding: 20px;
