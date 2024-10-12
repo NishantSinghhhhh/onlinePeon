@@ -1,5 +1,7 @@
 const { Outpass } = require('../Models/Outpass'); // Adjust the path to your Outpass model
 const { Leave } = require('../Models/Leave');     // Adjust the path to your Leave model
+const {PL} = require('../Models/PL')
+
 const mongoose = require('mongoose');              // Import mongoose
 
 const EditOutpass = async (req, res) => {
@@ -72,36 +74,40 @@ const EditLeave = async (req, res) => {
 
 const EditPL = async (req, res) => {
     try {
-        const { outpassId, date, startHour, endHour } = req.body;
+        const { id, classesMissed, startDate, endDate } = req.body;
         console.log(req.body);
 
-        if (!mongoose.Types.ObjectId.isValid(outpassId)) {
-            return res.status(400).json({ message: 'Invalid outpass ID' });
+        // Validate the PL ID
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: 'Invalid PL ID' });
         }
 
-        const outpass = await Outpass.findOne({ _id: outpassId });
+        // Find the PL by ID
+        const pl = await PL.findById(id);
 
-        if (!outpass) {
-            return res.status(404).json({ message: 'Outpass not found' });
+        if (!pl) {
+            return res.status(404).json({ message: 'PL not found' });
         }
 
-        outpass.date = date;
-        outpass.startHour = startHour;
-        outpass.endHour = endHour;
+        // Update the PL fields
+        pl.classesMissed = classesMissed;
+        pl.startDate = startDate;
+        pl.endDate = endDate;
 
-        // Save the updated outpass
-        const updatedOutpass = await outpass.save();
+        // Save the updated PL
+        const updatedPL = await pl.save();
 
-        // Log the updated outpass for debugging
-        console.log("Updated Outpass:", updatedOutpass);
+        // Log the updated PL for debugging
+        console.log("Updated PL:", updatedPL);
 
+        // Send response back with the updated PL
         res.status(200).json({ 
-            message: 'Outpass updated successfully',
-            updatedOutpass // Optionally return the updated outpass data
+            message: 'PL updated successfully',
+            updatedPL // Optionally return the updated PL data
         });
     } catch (error) {
-        console.error('Error editing outpass:', error);
-        res.status(500).json({ message: 'An error occurred while editing the outpass' });
+        console.error('Error editing PL:', error);
+        res.status(500).json({ message: 'An error occurred while editing the PL' });
     }
 };
 
