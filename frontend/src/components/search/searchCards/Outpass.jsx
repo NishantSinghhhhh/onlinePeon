@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styles from './Cards.module.css';
 
-const OutpassCard = ({ outpass, onStatusChange }) => {
+const OutpassCard = ({ outpass, onStatusChange, onVeto }) => {
   const [isModalOpen, setModalOpen] = useState(false);
 
   const formatDate = (dateString) => {
@@ -36,9 +36,35 @@ const OutpassCard = ({ outpass, onStatusChange }) => {
   };
 
   const handleDecline = () => {
-    onStatusChange( -1); // Decline: send status=-1
+    onStatusChange(-1); // Decline: send status=-1
     console.log('Declined');
   };
+
+  const handleVeto = async () => {
+    try {
+        console.log('Veto action triggered');
+        console.log('Outpass ID:', outpass._id); // Log the outpass ID
+
+        const response = await fetch(`${process.env.REACT_APP_BASE_URL}/veto/OutpassVeto`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ outpassId: outpass._id }) // Send necessary data
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        console.log('Response from backend:', data);
+        // Handle success response, e.g., update UI or state
+    } catch (error) {
+        console.error('Error during veto action:', error);
+        // Handle error, e.g., show an alert
+    }
+};
 
   const getDeclinedBy = () => {
     const { extraDataArray } = outpass;
@@ -75,10 +101,12 @@ const OutpassCard = ({ outpass, onStatusChange }) => {
             <span className={styles.label}>Status:</span>
             <span className={styles.value} style={{ color: statusColor }}>{status}</span>
           </div>
-          {declinedBy && <div className={styles.row}>
-            <span className={styles.label}>Declined By:</span>
-            <span className={styles.value}>{declinedBy}</span>
-          </div>}
+          {declinedBy && (
+            <div className={styles.row}>
+              <span className={styles.label}>Declined By:</span>
+              <span className={styles.value}>{declinedBy}</span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -120,14 +148,17 @@ const OutpassCard = ({ outpass, onStatusChange }) => {
                 <span className={styles.modalLabel}>Status:</span>
                 <span className={styles.modalValue} style={{ color: statusColor }}>{status}</span>
               </div>
-              {declinedBy && <div className={styles.modalRow}>
-                <span className={styles.modalLabel}>Declined By:</span>
-                <span className={styles.modalValue}>{declinedBy}</span>
-              </div>}
+              {declinedBy && (
+                <div className={styles.modalRow}>
+                  <span className={styles.modalLabel}>Declined By:</span>
+                  <span className={styles.modalValue}>{declinedBy}</span>
+                </div>
+              )}
             </div>
             <div className={styles.modalFooter}>
               <button className={styles.approveButton} onClick={handleApprove}>Approve</button>
               <button className={styles.declineButton} onClick={handleDecline}>Decline</button>
+              <button className={styles.vetoButton} onClick={handleVeto}>Veto</button>
             </div>
           </div>
         </div>

@@ -150,6 +150,17 @@
   transition: background-color 0.3s ease;
 }
 
+.vetoButton{
+  margin-left: 10px;
+  padding: 8px 16px;
+  border-radius: 4px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  background-color: rgb(119, 119, 168);
+}
+
 .approveButton {
   background-color: #48bb78;
   color: white;

@@ -24,8 +24,9 @@ const Search = ({ selectedClass }) => {
   const renderNavbar = () => {
     switch (loginInfo.position) {
       case 'HOD':
-      case 'Class Teacher':
         return <HODNavbar />;
+      case 'Class Teacher':
+        return <StaffNavbar />;  // Update this to return the correct navbar for Class Teacher
       case 'Warden':
         return <WardenNavbar />;
       case 'Joint Director':
@@ -36,6 +37,7 @@ const Search = ({ selectedClass }) => {
         return <StaffNavbar />;
     }
   };
+  
 
   const handleInputChange = (e) => {
     setRegistrationNumber(e.target.value);
@@ -94,10 +96,10 @@ const Search = ({ selectedClass }) => {
       console.log(`Sending update request for ${type} ${id} with status ${status} and position ${position}`);
 
       const endpoint = type === 'outpass' 
-        ? `https://online-peon.vercel.app/update/updateOutpass/${id}`
+        ? `${process.env.REACT_APP_BASE_URL}/update/updateOutpass/${id}`
         : type === 'leave'
-        ? `https://online-peon.vercel.app/update/updateLeave/${id}`
-        : `https://online-peon.vercel.app/update/updatePL/${id}`;
+        ? `${process.env.REACT_APP_BASE_URL}/update/updateLeave/${id}`
+        : `${process.env.REACT_APP_BASE_URL}/update/updatePL/${id}`;
 
       const response = await axios.put(endpoint, {
         status,
@@ -149,16 +151,15 @@ const Search = ({ selectedClass }) => {
       </Box>
 
       <div className={styles.main}>
-      {userData && (
-  <UserCard
-    userData={userData}
-    outpassesCount={outpasses.length || 0}
-    leavesCount={leaves.length || 0}
-    plsCount={pls.length || 0}
-    activeLeaves={activeLeaves || false}
-  />
-)}
-
+        {userData && (
+          <UserCard
+            userData={userData}
+            outpassesCount={outpasses.length || 0}
+            leavesCount={leaves.length || 0}
+            plsCount={pls.length || 0}
+            activeLeaves={activeLeaves || false}
+          />
+        )}
 
         {outpasses.length === 0 && leaves.length === 0 && pls.length === 0 && userData && (
           <Box mt="20px" textAlign="center">

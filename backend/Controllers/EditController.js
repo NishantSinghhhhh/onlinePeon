@@ -9,9 +9,7 @@ const EditOutpass = async (req, res) => {
         const { id, date, startHour, endHour } = req.body;
         console.log(req.body);
 
-        // if (!mongoose.Types.ObjectId.isValid(outpassId)) {
-        //     return res.status(400).json({ message: 'Invalid outpass ID' });
-        // }
+    
         console.log("hii");
         const outpass = await Outpass.findOne({ _id: id });
 

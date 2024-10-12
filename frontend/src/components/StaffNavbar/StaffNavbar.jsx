@@ -83,6 +83,19 @@ const StaffNavbar = () => {
                 Seen
               </BreadcrumbLink>
             </BreadcrumbItem>
+
+            <BreadcrumbItem>
+              <BreadcrumbLink
+                as={Link}
+                to='/Search'
+                className={styles['breadcrumb-link']}
+                bg={location.pathname === '/Search' ? 'gray.600' : 'transparent'}
+                color={location.pathname === '/Search' ? 'white' : 'gray.300'}
+                fontWeight={location.pathname === '/Search' ? 'bold' : 'normal'}
+              >
+                Search
+              </BreadcrumbLink>
+            </BreadcrumbItem>
           </Breadcrumb>
         </Flex>
 
