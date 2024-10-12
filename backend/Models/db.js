@@ -8,12 +8,12 @@ const mongo_url2 = process.env.MONGO_CONN2;
 // const mongo_url = 'mongodb+srv://admin:mAZBf8lxFk1JShxa@cluster0.hdhjs.mongodb.net/auth-db?retryWrites=true&w=majority&appName=Cluster0';
 // const mongo_url2 = 'mongodb+srv://admin:mAZBf8lxFk1JShxa@cluster0.hdhjs.mongodb.net/Forms?retryWrites=true&w=majority&appName=Cluster0';
 
-// mongoose.connect(mongo_url)
-//     .then(() =>{
-//         console.log('MongoDB Connected...')
-//     }).catch((err) => {
-//         console.log('Mngo db connection error', err);
-//     })
+mongoose.connect(mongo_url)
+    .then(() =>{
+        console.log('MongoDB Connected...')
+    }).catch((err) => {
+        console.log('Mngo db connection error', err);
+  })
 
 const db1 = mongoose.createConnection(mongo_url, {
     useNewUrlParser: true,

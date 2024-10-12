@@ -94,30 +94,31 @@ const StaffOutpass = () => {
   // Use the hook at the top level of the component
   // Use the hook at the top level of the component
   
-  const handleEditSubmit = async (outpassId, updatedData) => {
-    try {
-      // Set the outpass ID for editing in the hook
-      setEditingOutpassId(outpassId);
+  // const handleEditSubmit = async (outpassId, updatedData) => {
+  //   try {
+  //     // Set the outpass ID for editing in the hook
+  //     setEditingOutpassId(outpassId);
       
-      // Update the form data in the hook
-      setFormData(updatedData);
-      console.log('Edited data stored:', {
-        outpassId, // This logs the outpass ID
-        updatedData // This logs the updated data
-      });
+  //     // Update the form data in the hook
+  //     setFormData(updatedData);
+  //     // console.log('Edited data stored:', {
+  //     //   outpassId, // This logs the outpass ID
+  //     //   updatedData // This logs the updated data
+  //     // });
       
-      await editOutpass();
+  //     await editOutpass();
       
-      setEditedData(prevData => ({
-        ...prevData,
-        [outpassId]: updatedData
-      }));
+  //     setEditedData(prevData => ({
+  //       ...prevData,
+  //       [outpassId]: updatedData
+  //     }));
       
-    } catch (error) {
-      console.error('Failed to edit outpass:', error);
-    }
-  };
-  const { handleEditSubmit: editOutpass, setFormData } = useEditLeave(editingOutpassId, editedData[editingOutpassId]);
+  //   } catch (error) {
+  //     console.error('Failed to edit outpass:', error);
+  //   }
+  // };
+
+  // const { handleEditSubmit: editOutpass, setFormData } = useEditLeave(editingOutpassId, editedData[editingOutpassId]);
 
 
   if (loading || showLoader) {
@@ -155,7 +156,7 @@ const StaffOutpass = () => {
                 key={outpass._id} 
                 data={outpass} 
                 onStatusChange={handleStatusChange} 
-                onEdit={handleEditSubmit} 
+                // onEdit={handleEditSubmit} 
               />
             ))}
           </Stack>

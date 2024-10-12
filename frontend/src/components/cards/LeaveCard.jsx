@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Flex,
@@ -14,11 +14,49 @@ import {
   ModalCloseButton,
   ModalBody,
   ModalFooter,
-  Divider
+  Divider,
+  Input,
 } from '@chakra-ui/react';
 
-const LeaveCard = ({ data, onStatusChange }) => {
+const LeaveCard = ({ data, onStatusChange, onDateChange }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [startDate, setStartDate] = useState(new Date(data.startDate).toISOString().substr(0, 10));
+  const [endDate, setEndDate] = useState(new Date(data.endDate).toISOString().substr(0, 10));
+  
+  const handleEdit = async (field, value) => {
+    if (field === 'startDate') setStartDate(value);
+    if (field === 'endDate') setEndDate(value);
+  
+    const updatedData = {
+      id: data._id, 
+      startDate: field === 'startDate' ? value : startDate,
+      endDate: field === 'endDate' ? value : endDate,
+    };
+  
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BASE_URL}/edit/editLeave`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedData),
+      });
+  
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Leave updated successfully:', result);
+      } else {
+        const errorData = await response.json();
+        console.error('Error updating leave:', errorData.message);
+      }
+    } catch (error) {
+      console.error('An error occurred while updating the leave:', error);
+    }
+  
+    if (onDateChange) {
+      onDateChange(updatedData);
+    }
+  };
 
   return (
     <>
@@ -62,13 +100,11 @@ const LeaveCard = ({ data, onStatusChange }) => {
           <ModalCloseButton />
           <ModalBody>
             <Flex direction="column" spacing={3} p={4}>
-              {[
+              {[ 
                 { label: 'First Name', value: data.firstName },
                 { label: 'Last Name', value: data.lastName },
                 { label: 'Registration Number', value: data.registrationNumber },
                 { label: 'Reason For Leave', value: data.reasonForLeave },
-                { label: 'Start Date', value: new Date(data.startDate).toLocaleDateString() },
-                { label: 'End Date', value: new Date(data.endDate).toLocaleDateString() },
                 { label: 'Contact Number', value: data.contactNumber }
               ].map((item, index) => (
                 <Box key={index} mb={2}>
@@ -78,24 +114,42 @@ const LeaveCard = ({ data, onStatusChange }) => {
                     </Text>
                     <Text>{item.value}</Text>
                   </Flex>
-                  {index < 6 && <Divider my={2} />}
+                  {index < 5 && <Divider my={2} />}
                 </Box>
               ))}
+
+              <Box mb={2}>
+                <Flex justify="space-between" align="center">
+                  <Text fontWeight="semibold" color="gray.700">
+                    Start Date:
+                  </Text>
+                  <Input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => handleEdit('startDate', e.target.value)}
+                  />
+                </Flex>
+                <Divider my={2} />
+              </Box>
+
+              <Box mb={2}>
+                <Flex justify="space-between" align="center">
+                  <Text fontWeight="semibold" color="gray.700">
+                    End Date:
+                  </Text>
+                  <Input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => handleEdit('endDate', e.target.value)}
+                  />
+                </Flex>
+                <Divider my={2} />
+              </Box>
             </Flex>
           </ModalBody>
           <ModalFooter>
-            <Button
-              colorScheme="green"
-              mr={3}
-              onClick={() => onStatusChange(data._id, 1)}
-            >
-              Approve
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => onStatusChange(data._id, -1)}
-            >
-              Decline
+            <Button variant="outline" onClick={onClose}>
+              Close
             </Button>
           </ModalFooter>
         </ModalContent>

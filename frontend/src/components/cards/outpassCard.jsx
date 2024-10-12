@@ -30,29 +30,44 @@ const OutpassCard = ({ data, onStatusChange, onEdit }) => {
   const [editedStartHour, setEditedStartHour] = useState(data.startHour);
   const [editedEndHour, setEditedEndHour] = useState(data.endHour);
 
-  const handleEdit = (field, value) => {
-    // Update the local state
+  const handleEdit = async (field, value) => {
     if (field === 'date') setEditedDate(value);
     if (field === 'startHour') setEditedStartHour(value);
     if (field === 'endHour') setEditedEndHour(value);
-
-    // Prepare the updated data along with the outpass ID
+  
     const updatedData = {
-      id: data._id, // Include the outpass ID
+      id: data._id,
       date: field === 'date' ? value : editedDate,
       startHour: field === 'startHour' ? value : editedStartHour,
-      endHour: field === 'endHour' ? value : editedEndHour
+      endHour: field === 'endHour' ? value : editedEndHour,
     };
-
-    // Log the updated data
-    // console.log('Updated data:', updatedData); // Log for debugging
-
-    // Send the updated data to the parent component
+  
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BASE_URL}/edit/editOutpass`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedData),
+      });
+  
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Outpass updated successfully:', result);
+       
+      } else {
+        const errorData = await response.json();
+        console.error('Error updating outpass:', errorData.message);
+      }
+    } catch (error) {
+      console.error('An error occurred while updating the outpass:', error);
+    }
+  
     if (onEdit) {
-      onEdit(updatedData); // Send the entire updatedData object
+      onEdit(updatedData);
     }
   };
-
+  
   return (
     <>
       <Card

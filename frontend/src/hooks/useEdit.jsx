@@ -14,6 +14,11 @@ const useEditLeave = (outpassId, data) => {
 
   useEffect(() => {
     console.log('Editing outpass with ID:', outpassId);
+    if (data) {
+      console.log('Date:', outpassId.date);
+      console.log('Start Hour:', outpassId.startHour);
+      console.log('End Hour:', outpassId.endHour);
+    }
 
     // If data is passed, set formData
     if (data) {
@@ -21,26 +26,28 @@ const useEditLeave = (outpassId, data) => {
         date: data.date ? new Date(data.date) : new Date(),
         startHour: data.startHour || '',
         endHour: data.endHour || '',
+        
       });
+      console.log(data.date);
     }
   }, [outpassId, data]);
 
-  useEffect(() => {
-    console.log('Current formData:', formData);
-  }, [formData]);
-
   const handleEditSubmit = async () => {
+    console.log(data.date);
+    
+    if (!outpassId) {
+      handleError('Outpass ID is required');
+      return;
+    }
+
+    if (!formData.startHour || !formData.endHour) {
+      handleError('Start hour and end hour are required');
+      return;
+    }
+
     try {
       const { date, startHour, endHour } = formData;
       const isoDate = date.toISOString();
-
-      // Log the current form data before submission
-      console.log('Submitting the following data:', {
-        outpassId,
-        date: isoDate,
-        startHour,
-        endHour,
-      });
 
       const payload = {
         outpassId,
@@ -48,8 +55,6 @@ const useEditLeave = (outpassId, data) => {
         startHour,
         endHour,
       };
-
-      console.log('Data being sent to the server:', payload);
 
       const response = await fetch(`${process.env.REACT_APP_BASE_URL}/edit/editOutpass`, {
         method: 'PUT',
@@ -59,8 +64,7 @@ const useEditLeave = (outpassId, data) => {
         body: JSON.stringify(payload),
       });
 
-      // Check for a successful response
-      if (response.ok) {  // Using response.ok for better readability
+      if (response.ok) {
         const result = await response.json();
         handleSuccess(result.message || 'Outpass updated successfully!');
         setTimeout(() => navigate('/StaffHome'), 1000);
@@ -88,10 +92,10 @@ const useEditLeave = (outpassId, data) => {
     toast({
       title: 'Success',
       description: message,
-      status: 'success', // Typically green for success
+      status: 'success',
       duration: 5000,
       isClosable: true,
-      variant: 'subtle', // Try 'solid' or 'left-accent' for different styles
+      variant: 'subtle',
     });
   };
 
