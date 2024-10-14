@@ -36,7 +36,8 @@ const Register = () => {
     registrationNumber: '',
     fatherName: '',
     fatherPhoneNumber: '',
-    classTeacherName: ''
+    classTeacherName: '',
+    gender: '' 
   });
   const [classTeachers, setClassTeachers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -90,10 +91,11 @@ const Register = () => {
       registrationNumber,
       fatherName,
       fatherPhoneNumber,
-      classTeacherName
+      classTeacherName,
+      gender
     } = signupInfo;
 
-    if (!name || !email || !password || !className || !rollNumber || !registrationNumber || !fatherName || !fatherPhoneNumber || !classTeacherName) {
+    if (!name || !email || !password || !className || !rollNumber || !registrationNumber || !fatherName || !fatherPhoneNumber || !classTeacherName || !gender) {
       return handleError('All fields are required.');
     }
 
@@ -116,7 +118,8 @@ const Register = () => {
       registrationNumber,
       fatherName,
       fatherPhoneNumber,
-      classTeacherName
+      classTeacherName,
+      gender 
     });
 
     try {
@@ -135,7 +138,8 @@ const Register = () => {
           registrationNumber,
           fatherName,
           fatherPhoneNumber,
-          classTeacherName
+          classTeacherName,
+          gender 
         })
       });
 
@@ -288,6 +292,21 @@ const Register = () => {
                       onChange={handleChange}
                       className={styles.chakraInput}
                     />
+                  </FormControl>
+
+                  <FormControl isRequired>
+                    <FormLabel>Gender</FormLabel>
+                    <Select
+                      name="gender"
+                      placeholder="Select your gender"
+                      value={signupInfo.gender}
+                      onChange={handleChange}
+                      className={styles.chakraInput}
+                    >
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Other">Other</option>
+                    </Select>
                   </FormControl>
 
                   <FormControl isRequired>

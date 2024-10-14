@@ -224,7 +224,8 @@ const signup = async (req, res) => {
             fatherName, 
             fatherPhoneNumber,
             class: userClass, 
-            classTeacherName 
+            classTeacherName,
+            gender // Extract gender from request body
         } = req.body;
 
         // Check if the user already exists
@@ -246,7 +247,8 @@ const signup = async (req, res) => {
             fatherName,
             fatherPhoneNumber,
             class: userClass,
-            classTeacherName
+            classTeacherName,
+            gender // Add gender field to the user instance
         });
 
         // Hash the password

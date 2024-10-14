@@ -16,7 +16,8 @@ const signupValidation = (req, res, next) => {
             'TE-ENTC-B', 'TE-IT-A', 'TE-IT-B', 'TE-MECH', 'BE-COMP-A', 'BE-COMP-B',
             'BE-ENTC-A', 'BE-ENTC-B', 'BE-IT-A', 'BE-IT-B', 'BE-MECH'
         ).required(),
-        classTeacherName: Joi.string().required() // No predefined values, just required
+        classTeacherName: Joi.string().required(), // No predefined values, just required
+        gender: Joi.string().valid('Male', 'Female', 'Other').required() // Added gender field
     });
 
     // Validate the request body
@@ -43,6 +44,7 @@ const signupValidation = (req, res, next) => {
     
     next();
 };
+
 
 const loginValidation = (req, res, next) => {
     const schema = Joi.object({

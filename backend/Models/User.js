@@ -54,7 +54,11 @@ const UserSchema = new Schema({
     classTeacherName: {
         type: String,
         required: true
-        // No predefined values in the schema, just required
+    },
+    gender: {
+        type: String,
+        required: true,
+        enum: ['Male', 'Female', 'Other'] // Added gender field with 3 options
     }
 });
 
