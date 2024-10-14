@@ -118,7 +118,8 @@ const SignInCard = () => {
       }
   
       const { success, message, jwtToken, staff } = result;
-  
+      // console.log("first")
+      // console.log("gender", staff.gender);
       if (success && staff) {
         handleSuccess(message);
         localStorage.setItem('token', jwtToken);
@@ -130,9 +131,10 @@ const SignInCard = () => {
           email: staff.email,
           contactNumber: staff.contactNumber,
           classAssigned: staff.classAssigned,
-          branchAssigned: staff.branchAssigned
+          branchAssigned: staff.branchAssigned,
+          gender : staff.gender,
         });
-  
+        
         // Redirect based on position
         switch (staff.position) {
           case 'Class Teacher':

@@ -457,7 +457,8 @@ const staffLogin = async (req, res) => {
                 contactNumber: staff.contactNumber,
                 position: staff.position,
                 branchAssigned: staff.branchAssigned, // Ensure this field is included
-                classAssigned: staff.classAssigned,   // Add this field if available
+                classAssigned: staff.classAssigned, 
+                gender: staff.gender,  // Add this field if available
                 _id: staff._id
             }
         });

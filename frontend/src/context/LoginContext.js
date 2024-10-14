@@ -19,6 +19,7 @@ export const LoginProvider = ({ children }) => {
           position: '',
           classAssigned: '',
           branchAssigned: '',
+          gender : '',
           jwtToken: '',
         };
   });
@@ -51,6 +52,7 @@ export const LoginProvider = ({ children }) => {
       classAssigned: '',
       branchAssigned: '',
       jwtToken: '',
+      gender : '',
     };
     setLoginInfo(emptyLoginInfo);
     localStorage.removeItem('loginInfo'); // Clear from localStorage on logout

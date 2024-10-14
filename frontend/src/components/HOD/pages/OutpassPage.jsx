@@ -47,28 +47,52 @@ const OutpassPage = () => {
       setError('Unauthorized access. Please log in with a Warden account.');
       return;
     }
-
+    
+    // Safely log the warden's gender
+    console.log('Warden Gender:', loginInfo.gender);
+    
     // Extract the class level (e.g., FE, SE, TE, BE) from the className string
     const extractClassLevel = (className) => {
       const match = className.match(/(FE|SE|TE|BE)/);
       return match ? match[0] : null;
     };
-
+  
     const assignedClassLevel = extractClassLevel(loginInfo.classAssigned);
     const assignedBranch = loginInfo.branchAssigned;
-
+  
+    // Safely get the warden's gender, defaulting to an empty string if undefined
+    const wardenGender = loginInfo.gender ? loginInfo.gender.toLowerCase() : '';
+  
+    if (!wardenGender) {
+      setError('Gender information missing for the Warden.');
+      return;
+    }
+  
+    // Filter the outpasses
     const filtered = outpasses.filter(outpass => {
       const outpassClassLevel = extractClassLevel(outpass.className);
-      return outpassClassLevel === assignedClassLevel &&
-             JSON.stringify(outpass.extraDataArray) === JSON.stringify([1, 1, 0, 0]);
+  
+      // Safely check if outpass gender exists and perform case-insensitive comparison
+      const outpassGender = outpass.gender ? outpass.gender.toLowerCase() : '';
+  
+      // Check if the outpass has the matching year and gender
+      const isGenderMatch = wardenGender === 'female'
+        ? outpassGender === 'female'
+        : (outpassClassLevel === assignedClassLevel && outpassGender === 'male');
+  
+      // Check if the extraDataArray matches [1, 1, 0, 0]
+      const isExtraDataMatch = JSON.stringify(outpass.extraDataArray) === JSON.stringify([1, 1, 0, 0]);
+  
+      return isGenderMatch && isExtraDataMatch;
     });
-
+  
     console.log('Filtered Outpasses:', filtered);
-
+  
     const sorted = filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
-
+  
     setFilteredOutpasses(sorted);
   };
+  
 
   useEffect(() => {
     fetchOutpasses();

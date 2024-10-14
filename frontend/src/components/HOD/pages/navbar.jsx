@@ -16,7 +16,6 @@ const StaffNavbar = () => {
   const location = useLocation(); 
   const { loginInfo } = useContext(LoginContext); // Access loginInfo from LoginContext
 
-
   const isWarden = loginInfo.position.toLowerCase() === 'warden';
 
   return (
