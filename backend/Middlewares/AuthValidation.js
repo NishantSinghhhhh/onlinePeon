@@ -214,6 +214,7 @@ const staffSignupValidation = (req, res, next) => {
         name: Joi.string().min(3).max(100).required(),
         email: Joi.string().email().required(),
         password: Joi.string().min(4).max(100).required(),
+        gender: Joi.string().valid('Male', 'Female', 'Other').required(), // Gender field
         staffId: Joi.string().length(5).pattern(/^\d+$/).allow(null)
             .when('position', {
                 is: Joi.string().valid('Class Teacher', 'HOD', 'Warden'),

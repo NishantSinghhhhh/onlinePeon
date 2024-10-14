@@ -336,7 +336,8 @@ const signupStaff = async (req, res) => {
             contactNumber,
             position,
             classAssigned,
-            branchAssigned
+            branchAssigned,
+            gender // Added gender
         } = req.body;
 
         // Check if the user already exists
@@ -355,7 +356,8 @@ const signupStaff = async (req, res) => {
             password,
             staffId,
             contactNumber,
-            position
+            position,
+            gender // Added gender to newStaffData
         };
 
         // Add `classAssigned` if the position requires it
@@ -382,7 +384,7 @@ const signupStaff = async (req, res) => {
 
         const newStaff = new Staff(newStaffData);
 
-  
+        // Hash the password
         newStaff.password = await bcrypt.hash(password, 10);
 
         // Save the new staff to the database
@@ -401,6 +403,7 @@ const signupStaff = async (req, res) => {
         });
     }
 };
+
 
 const staffLogin = async (req, res) => {
     try {

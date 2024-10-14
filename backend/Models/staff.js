@@ -51,6 +51,11 @@ const StaffSchema = new Schema({
     required: function() {
       return this.position === 'HOD';
     }
+  },
+  gender: {
+    type: String,
+    enum: ['Male', 'Female', 'Other'],
+    required: true
   }
 });
 

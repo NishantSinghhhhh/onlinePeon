@@ -26,6 +26,7 @@ const StaffRegistration = () => {
     position: '', // Add position state
     classAssigned: '', // Add classAssigned state
     branchAssigned: '', // Add branchAssigned state for HOD
+    gender: ''
   });
 
   const toast = useToast(); // Initialize useToast
@@ -52,11 +53,11 @@ const StaffRegistration = () => {
         contactNumber,
         position,
         classAssigned, 
-        branchAssigned // Add branchAssigned to destructuring
+        branchAssigned, // Add branchAssigned to destructuring
+        gender 
     } = signupInfo;
 
-    // Check for empty fields
-    if (!name || !email || !password || !staffId || !contactNumber || !position || 
+    if (!name || !email || !password || !staffId || !contactNumber || !gender || !position || 
         (position === 'Class Teacher' && !classAssigned) ||
         (position === 'HOD' && !branchAssigned) || // Validate branchAssigned for HOD
         (position === 'Warden' && !classAssigned)) { // Validation for Class Teacher, HOD, and Warden
@@ -87,6 +88,7 @@ const StaffRegistration = () => {
                 position,
                 classAssigned: (position === 'Class Teacher' || position === 'Warden') ? classAssigned : undefined, // Only send classAssigned if position is "Class Teacher" or "Warden"
                 branchAssigned: (position === 'HOD') ? branchAssigned : undefined, // Only send branchAssigned if position is "HOD"
+                gender
             })
         });
 
@@ -216,6 +218,21 @@ const StaffRegistration = () => {
                       onChange={handleChange}
                       className={styles.chakraInput}
                     />
+                  </FormControl>
+                  
+                  <FormControl isRequired>
+                    <FormLabel>Gender</FormLabel> {/* Added Gender Field */}
+                    <Select
+                      name="gender"
+                      placeholder="Select your gender"
+                      value={signupInfo.gender}
+                      onChange={handleChange}
+                      className={styles.chakraInput}
+                    >
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Other">Other</option>
+                    </Select>
                   </FormControl>
 
                   <FormControl isRequired>
